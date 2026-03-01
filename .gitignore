@@ -1,0 +1,17 @@
+# XAMPP / PHP / Development
+/uploads/
+/vendor/
+*.log
+.DS_Store
+Thumbs.db
+config.php
+.env
+db_secrets.php
+/brain/
+/.system_generated/
+/knowledge/
+/artifacts/
+/tmp/
+migrate_socials.php
+migrate_recycle_bin.php
+migrate_emp_title.php
