@@ -1,8 +1,9 @@
 <?php
-$host = 'localhost';
-$dbname = 'bloom_africa';
-$username = 'root';
-$password = '';
+// Support both local XAMPP and cloud hosting (Render/Railway)
+$host = getenv('DB_HOST') ?: 'localhost';
+$dbname = getenv('DB_NAME') ?: 'bloom_africa';
+$username = getenv('DB_USER') ?: 'root';
+$password = getenv('DB_PASS') ?: '';
 
 try {
     $pdo = new PDO("mysql:host=$host", $username, $password);
