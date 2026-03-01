@@ -333,7 +333,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $other_deductions = (float) ($_POST['deductions'] ?? 0);
 
         $net_salary = ($calc_base_salary + $overtime_amount + $bonus) - ($absent_deduction + $late_penalty + $advance_deduction + $other_deductions);
-
         $stmt = $pdo->prepare("INSERT INTO payroll (employee_id, salary_month, year, base_salary, bonus, deductions, net_salary, working_days, present_days, absent_days, late_count, total_overtime_hours, overtime_amount, advance_deduction, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $emp_id,
@@ -394,7 +393,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         }
-
         $stmt = $pdo->prepare("UPDATE menu_items SET name=?, category=?, description=?, price=?, image_url=? WHERE id=?");
         $stmt->execute([$name, $category, $description, $price, $image_url, $id]);
         logActivity($pdo, "Updated menu item: " . $name);
@@ -474,7 +472,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         }
-
         $stmt = $pdo->prepare("UPDATE employees SET title=?, name=?, first_name=?, middle_name=?, last_name=?, role=?, email=?, phone=?, salary=?, salary_type=?, join_date=?, date_of_birth=?, gender=?, address=?, emergency_contact_name=?, emergency_contact_phone=?, bio=? $update_photo WHERE id=?");
         $stmt->execute([
             $_POST['title'] ?? '',
