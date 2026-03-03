@@ -2,7 +2,7 @@
     <div class="stat-card">
         <div>
             <div class="stat-value">
-                <?= $res_count ?>
+                <?= $pending_res_count ?>
             </div>
             <div class="stat-label">Pending Res.</div>
         </div>
@@ -41,12 +41,22 @@
     <div class="stat-card">
         <div>
             <div class="stat-value">
-                <?= $pending_salary ?>
+                <?= $pending_salary_count ?>
             </div>
             <div class="stat-label">Pending Salaries</div>
         </div>
         <div class="stat-icon" style="background:#f8d7da; color:#721c24;"><i
                 class="fa-solid fa-hand-holding-dollar"></i>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div>
+            <div class="stat-value">
+                <?= $fav_count ?>
+            </div>
+            <div class="stat-label">Total Favorites</div>
+        </div>
+        <div class="stat-icon" style="background:#fce4ec; color:#d81b60;"><i class="fa-solid fa-heart"></i>
         </div>
     </div>
 </div>
@@ -71,11 +81,14 @@
     </div>
 </div>
 
-<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px; margin-bottom: 30px;">
+<div
+    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-bottom: 30px;">
     <div class="card" style="margin-bottom: 0; background: #fafafa; border: 1px dashed var(--accent);">
         <div class="card-header" style="background: transparent;">
-            <span class="card-title" style="color: var(--blue);"><i class="fa-solid fa-comments"></i> Recent Chat Orders</span>
-            <a href="?tab=communication" style="font-size: 11px; text-decoration: none; color: var(--accent); font-weight: 700;">View Hub</a>
+            <span class="card-title" style="color: var(--blue);"><i class="fa-solid fa-comments"></i> Recent Chat
+                Orders</span>
+            <a href="?tab=communication"
+                style="font-size: 11px; text-decoration: none; color: var(--accent); font-weight: 700;">View Hub</a>
         </div>
         <table style="font-size: 13px;">
             <tr>
@@ -89,7 +102,8 @@
                 <tr>
                     <td><strong style="color: #333;"><?= htmlspecialchars($co['order_details']) ?></strong></td>
                     <td>
-                        <span style="font-size: 11px; font-weight: 600; color: <?= $co['platform'] == 'WhatsApp' ? '#25d366' : '#0088cc' ?>;">
+                        <span
+                            style="font-size: 11px; font-weight: 600; color: <?= $co['platform'] == 'WhatsApp' ? '#25d366' : '#0088cc' ?>;">
                             <i class="fa-brands fa-<?= strtolower($co['platform']) ?>"></i> <?= $co['platform'] ?>
                         </span>
                     </td>
@@ -97,7 +111,9 @@
                 </tr>
             <?php endforeach; ?>
             <?php if (empty($chat_orders)): ?>
-                <tr><td colspan="3" style="text-align: center; color: #999; padding: 20px;">No chat orders yet.</td></tr>
+                <tr>
+                    <td colspan="3" style="text-align: center; color: #999; padding: 20px;">No chat orders yet.</td>
+                </tr>
             <?php endif; ?>
         </table>
     </div>
@@ -137,7 +153,37 @@
             <?php endforeach; ?>
         </table>
     </div>
+    <div class="card" style="margin-bottom: 0; background: #fffafb; border: 1px solid #f8bbd0;">
+        <div class="card-header" style="background: transparent;">
+            <span class="card-title" style="color: #d81b60;"><i class="fa-solid fa-heart"></i> Recent Favorites</span>
+            <span style="font-size: 11px; color: #888;">Customer Interests</span>
+        </div>
+        <table style="font-size: 13px;">
+            <tr>
+                <th>Customer Email</th>
+                <th>Dish Name</th>
+                <th>Time</th>
+            </tr>
+            <?php foreach ($recent_favorites as $fav): ?>
+                <tr>
+                    <td><strong style="color: #333;"><?= htmlspecialchars($fav['customer_email']) ?></strong></td>
+                    <td>
+                        <span class="badge" style="background: rgba(216, 27, 96, 0.1); color: #d81b60; border: none;">
+                            <?= htmlspecialchars($fav['dish_name']) ?>
+                        </span>
+                    </td>
+                    <td style="color: #888; font-size: 11px;"><?= date('M d, H:i', strtotime($fav['created_at'])) ?></td>
+                </tr>
+            <?php endforeach; ?>
+            <?php if (empty($recent_favorites)): ?>
+                <tr>
+                    <td colspan="3" style="text-align: center; color: #999; padding: 20px;">No favorites yet.</td>
+                </tr>
+            <?php endif; ?>
+        </table>
+    </div>
 </div>
+
 
 <div class="card" style="margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e1e5ee;">
     <div class="card-header"

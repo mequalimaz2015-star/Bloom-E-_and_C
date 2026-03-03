@@ -506,10 +506,113 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$_POST['title'], $_POST['category'], $_POST['type'], $_POST['location'], $_POST['description'], $_POST['closing_date'], $_POST['id']]);
         logActivity($pdo, "Updated job listing: " . $_POST['title']);
     } elseif (isset($_POST['update_company'])) {
-        $stmt = $pdo->prepare("UPDATE company_info SET company_name=?, email=?, phone=?, address=?, about_text=?, facebook=?, instagram=?, twitter=?, tiktok=?, linkedin=?, telegram=?, whatsapp=?, ceo_name=?, ceo_title=?, ceo_message=?, ceo_image=? WHERE id=1");
-        $stmt->execute([$_POST['company_name'], $_POST['email'], $_POST['phone'], $_POST['address'], $_POST['about_text'], $_POST['facebook'], $_POST['instagram'], $_POST['twitter'], $_POST['tiktok'], $_POST['linkedin'], $_POST['telegram'], $_POST['whatsapp'], $_POST['ceo_name'], $_POST['ceo_title'], $_POST['ceo_message'], $_POST['ceo_image']]);
-        logActivity($pdo, "Updated company and CEO information");
-        $msg = "Company information updated successfully!";
+        // Handle CEO image
+        $ceo_image = $_POST['existing_ceo_image'] ?? '';
+        if (isset($_FILES['ceo_photo']) && $_FILES['ceo_photo']['error'] == 0) {
+            $new_path = "uploads/ceo/ceo_" . time() . "." . pathinfo($_FILES['ceo_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/ceo/"))
+                mkdir(__DIR__ . "/../uploads/ceo/", 0777, true);
+            if (move_uploaded_file($_FILES['ceo_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $ceo_image = $new_path;
+        } elseif (!empty($_POST['ceo_image_url'])) {
+            $ceo_image = $_POST['ceo_image_url'];
+        }
+
+        // Handle Hero Image
+        $hero_image = $_POST['existing_hero_image'] ?? '';
+        if (isset($_FILES['hero_photo']) && $_FILES['hero_photo']['error'] == 0) {
+            $new_path = "uploads/site/hero_" . time() . "." . pathinfo($_FILES['hero_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/site/"))
+                mkdir(__DIR__ . "/../uploads/site/", 0777, true);
+            if (move_uploaded_file($_FILES['hero_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $hero_image = $new_path;
+        }
+
+        // Handle About Images
+        $about_main = $_POST['existing_about_main'] ?? '';
+        if (isset($_FILES['about_main_photo']) && $_FILES['about_main_photo']['error'] == 0) {
+            $new_path = "uploads/site/about_main_" . time() . "." . pathinfo($_FILES['about_main_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/site/"))
+                mkdir(__DIR__ . "/../uploads/site/", 0777, true);
+            if (move_uploaded_file($_FILES['about_main_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $about_main = $new_path;
+        }
+
+        $about_sub1 = $_POST['existing_about_sub1'] ?? '';
+        if (isset($_FILES['about_sub1_photo']) && $_FILES['about_sub1_photo']['error'] == 0) {
+            $new_path = "uploads/site/about_sub1_" . time() . "." . pathinfo($_FILES['about_sub1_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/site/"))
+                mkdir(__DIR__ . "/../uploads/site/", 0777, true);
+            if (move_uploaded_file($_FILES['about_sub1_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $about_sub1 = $new_path;
+        }
+
+        $about_sub2 = $_POST['existing_about_sub2'] ?? '';
+        if (isset($_FILES['about_sub2_photo']) && $_FILES['about_sub2_photo']['error'] == 0) {
+            $new_path = "uploads/site/about_sub2_" . time() . "." . pathinfo($_FILES['about_sub2_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/site/"))
+                mkdir(__DIR__ . "/../uploads/site/", 0777, true);
+            if (move_uploaded_file($_FILES['about_sub2_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $about_sub2 = $new_path;
+        }
+
+        // Handle Dev Photo
+        $dev_image = $_POST['existing_dev_photo'] ?? '';
+        if (isset($_FILES['dev_photo']) && $_FILES['dev_photo']['error'] == 0) {
+            $new_path = "uploads/site/dev_" . time() . "." . pathinfo($_FILES['dev_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/site/"))
+                mkdir(__DIR__ . "/../uploads/site/", 0777, true);
+            if (move_uploaded_file($_FILES['dev_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $dev_image = $new_path;
+        }
+
+        $stmt = $pdo->prepare("UPDATE company_info SET 
+            company_name=?, email=?, phone=?, address=?, about_text=?, 
+            facebook=?, instagram=?, twitter=?, tiktok=?, linkedin=?, telegram=?, whatsapp=?, 
+            ceo_name=?, ceo_title=?, ceo_message=?, ceo_image=?,
+            hero_title=?, hero_subtitle=?, hero_button_text=?, hero_image=?,
+            about_subtitle=?, about_image_main=?, about_image_sub1=?, about_image_sub2=?,
+            history_title=?, history_text1=?, history_text2=?,
+            dev_name=?, dev_email=?, dev_phone=?, dev_photo=?, copyright_text=?
+            WHERE id=1");
+
+        $stmt->execute([
+            $_POST['company_name'],
+            $_POST['email'],
+            $_POST['phone'],
+            $_POST['address'],
+            $_POST['about_text'],
+            $_POST['facebook'],
+            $_POST['instagram'],
+            $_POST['twitter'],
+            $_POST['tiktok'],
+            $_POST['linkedin'],
+            $_POST['telegram'],
+            $_POST['whatsapp'],
+            $_POST['ceo_name'],
+            $_POST['ceo_title'],
+            $_POST['ceo_message'],
+            $ceo_image,
+            $_POST['hero_title'],
+            $_POST['hero_subtitle'],
+            $_POST['hero_button_text'],
+            $hero_image,
+            $_POST['about_subtitle'],
+            $about_main,
+            $about_sub1,
+            $about_sub2,
+            $_POST['history_title'],
+            $_POST['history_text1'],
+            $_POST['history_text2'],
+            $_POST['dev_name'],
+            $_POST['dev_email'],
+            $_POST['dev_phone'],
+            $dev_image,
+            $_POST['copyright_text']
+        ]);
+
+        logActivity($pdo, "Updated detailed site content and credits");
+        $msg = "All site content and footer credits updated successfully!";
     } elseif (isset($_POST['update_application_status'])) {
         $status = $_POST['status'];
         $id = $_POST['id'];
@@ -568,7 +671,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             logActivity($pdo, "Auto-added bulk accepted applicants to staff directory");
         }
-
         logActivity($pdo, "Bulk updated " . count($ids) . " applications to $status");
         $msg = count($ids) . " applications updated to $status!";
     } elseif (isset($_POST['bulk_delete'])) {
@@ -582,7 +684,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $category = $_POST['category'];
         $title = $_POST['title'];
         $image_url = "";
-
         if (isset($_FILES['gallery_photo']) && $_FILES['gallery_photo']['error'] == 0) {
             $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
             $filename = $_FILES['gallery_photo']['name'];
@@ -599,7 +700,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         }
-
         $description = $_POST['description'] ?? '';
         if ($image_url) {
             $stmt = $pdo->prepare("INSERT INTO gallery (image_url, category, title, description) VALUES (?, ?, ?, ?)");
@@ -653,7 +753,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $video_url = $_POST['video_url'] ?? '';
         $description = $_POST['description'] ?? '';
         $image_url = $_POST['existing_image'] ?? ''; // keep current by default
-
         // Replace image only if a new file was uploaded
         if (isset($_FILES['service_photo']) && $_FILES['service_photo']['error'] == 0) {
             $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
@@ -669,7 +768,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         }
-
         $stmt = $pdo->prepare("UPDATE services SET title=?, icon=?, category=?, status=?, video_url=?, description=?, image_url=? WHERE id=?");
         $stmt->execute([$title, $icon, $category, $status, $video_url, $description, $image_url, $id]);
         logActivity($pdo, "Updated service: " . $title);
@@ -703,6 +801,106 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->prepare("DELETE FROM recycle_bin WHERE id = ?")->execute([$trash_id]);
         logActivity($pdo, "Permanently purged item from Recycle Bin");
         $msg = "Item permanently removed!";
+    } elseif (isset($_POST['save_team_member'])) {
+        $name = $_POST['name'];
+        $role = $_POST['role'];
+        $order = $_POST['order_index'] ?? 0;
+        $id = $_POST['id'] ?? '';
+        $image_url = $_POST['existing_image'] ?? '';
+
+        if (isset($_FILES['member_photo']) && $_FILES['member_photo']['error'] == 0) {
+            $new_path = "uploads/team/member_" . time() . "." . pathinfo($_FILES['member_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/team/"))
+                mkdir(__DIR__ . "/../uploads/team/", 0777, true);
+            if (move_uploaded_file($_FILES['member_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $image_url = $new_path;
+        }
+
+        if ($id) {
+            $stmt = $pdo->prepare("UPDATE team_members SET name=?, role=?, image_url=?, order_index=? WHERE id=?");
+            $stmt->execute([$name, $role, $image_url, $order, $id]);
+            logActivity($pdo, "Updated team member: " . $name);
+        } else {
+            $stmt = $pdo->prepare("INSERT INTO team_members (name, role, image_url, order_index) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$name, $role, $image_url, $order]);
+            logActivity($pdo, "Added new team member: " . $name);
+        }
+        $msg = "Team member details saved!";
+    } elseif (isset($_POST['delete_team_member'])) {
+        $id = $_POST['id'];
+        $pdo->prepare("DELETE FROM team_members WHERE id=?")->execute([$id]);
+        logActivity($pdo, "Removed team member ID: " . $id);
+        $msg = "Team member removed from the list.";
+    } elseif (isset($_POST['add_gallery'])) {
+        $title = $_POST['title'];
+        $category = $_POST['category'];
+        $desc = $_POST['description'];
+        $image_url = "";
+
+        if (isset($_FILES['gallery_photo']) && $_FILES['gallery_photo']['error'] == 0) {
+            $new_path = "uploads/gallery/gal_" . time() . "_" . rand(100, 999) . "." . pathinfo($_FILES['gallery_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/gallery/"))
+                mkdir(__DIR__ . "/../uploads/gallery/", 0777, true);
+            if (move_uploaded_file($_FILES['gallery_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $image_url = $new_path;
+        }
+
+        if ($image_url) {
+            $stmt = $pdo->prepare("INSERT INTO gallery (image_url, category, title, description) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$image_url, $category, $title, $desc]);
+            logActivity($pdo, "Added new gallery image: " . $title);
+            $msg = "Image successfully added to the gallery!";
+        } else {
+            $msg = "Error: Failed to upload gallery image.";
+        }
+    } elseif (isset($_POST['update_user_permissions'])) {
+        $user_id = $_POST['user_id'];
+        $role = $_POST['role'];
+        $perms = isset($_POST['perms']) ? json_encode($_POST['perms']) : '[]';
+
+        $stmt = $pdo->prepare("UPDATE users SET role = ?, permissions = ? WHERE id = ?");
+        $stmt->execute([$role, $perms, $user_id]);
+        logActivity($pdo, "Updated permissions for User ID: " . $user_id);
+        $msg = "User permissions updated successfully!";
+    } elseif (isset($_POST['add_admin_user'])) {
+        $name = $_POST['full_name'];
+        $email = $_POST['email'];
+        $pass = password_hash($_POST['password'], PASSWORD_DEFAULT);
+        $role = $_POST['role'];
+        $perms = isset($_POST['perms']) ? json_encode($_POST['perms']) : '[]';
+
+        try {
+            $stmt = $pdo->prepare("INSERT INTO users (full_name, email, password, role, permissions) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$name, $email, $pass, $role, $perms]);
+            logActivity($pdo, "Created new admin user: " . $name);
+            $msg = "New user account created successfully!";
+        } catch (PDOException $e) {
+            if ($e->getCode() == 23000) {
+                $msg = "Error: This email address is already registered.";
+            } else {
+                $msg = "Error: " . $e->getMessage();
+            }
+        }
+    } elseif (isset($_POST['delete_admin_user'])) {
+        $user_id = $_POST['user_id'];
+        if ($user_id != 1) { // Protect primary admin
+            $pdo->prepare("DELETE FROM users WHERE id = ?")->execute([$user_id]);
+            logActivity($pdo, "Deleted admin user ID: " . $user_id);
+            $msg = "User account deleted!";
+        } else {
+            $msg = "Error: Cannot delete primary administrator.";
+        }
+    } elseif (isset($_POST['reset_admin_password'])) {
+        $user_id = $_POST['user_id'];
+        $new_pass = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
+        $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$new_pass, $user_id]);
+        logActivity($pdo, "Reset password for user ID: " . $user_id);
+        $msg = "Password reset successfully!";
+    } elseif (isset($_POST['delete_gallery'])) {
+        $id = $_POST['id'];
+        $pdo->prepare("DELETE FROM gallery WHERE id=?")->execute([$id]);
+        logActivity($pdo, "Removed gallery image ID: " . $id);
+        $msg = "Gallery image removed!";
     }
 
     header("Location: admin.php?tab=" . ($_GET['tab'] ?? 'dashboard') . "&msg=" . urlencode($msg));

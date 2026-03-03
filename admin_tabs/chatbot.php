@@ -1,5 +1,6 @@
 <?php
-$sessions = $pdo->query("SELECT DISTINCT m.session_id, MAX(m.created_at) as last_msg, s.customer_name, s.customer_phone 
+$sessions = $pdo->query("SELECT m.session_id, MAX(m.created_at) as last_msg, s.customer_name, s.customer_phone,
+                        SUM(CASE WHEN m.sender = 'User' AND m.is_read = 0 THEN 1 ELSE 0 END) as unread_count
                         FROM chat_messages m 
                         LEFT JOIN chat_sessions s ON m.session_id = s.session_id
                         GROUP BY m.session_id ORDER BY last_msg DESC")->fetchAll();
@@ -33,8 +34,14 @@ if ($active_sid) {
                         <span style="font-weight: 600; color: #333; font-size: 13px;">
                             <?= $s['customer_name'] ? htmlspecialchars($s['customer_name']) : 'Guest #' . substr($s['session_id'], 0, 4) ?>
                         </span>
-                        <small
-                            style="color: #94a3b8; font-size: 10px;"><?= date('H:i', strtotime($s['last_msg'])) ?></small>
+                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
+                            <small
+                                style="color: #94a3b8; font-size: 10px;"><?= date('H:i', strtotime($s['last_msg'])) ?></small>
+                            <?php if ($s['unread_count'] > 0): ?>
+                                <span class="nav-badge"
+                                    style="margin: 0; padding: 2px 6px; font-size: 9px;"><?= $s['unread_count'] ?></span>
+                            <?php endif; ?>
+                        </div>
                     </div>
                     <?php if ($s['customer_phone']): ?>
                         <div style="font-size: 11px; color: #64748b;"><i class="fa-solid fa-phone" style="font-size: 9px;"></i>

@@ -63,6 +63,17 @@
         });
     <?php endif; ?>
 
+    // Live Clock Logic
+    function updateClock() {
+        const now = new Date();
+        const clockEl = document.getElementById('liveClock');
+        if (clockEl) {
+            clockEl.innerHTML = '<i class="fa-regular fa-clock"></i> ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+    }
+    setInterval(updateClock, 1000);
+    document.addEventListener("DOMContentLoaded", updateClock);
+
     function toggleLogout() { document.getElementById('logoutDropdown').classList.toggle('show'); }
     function closeModals() {
         document.querySelectorAll('.modal-overlay').forEach(modal => {
@@ -233,12 +244,18 @@
         showIDCard(emp);
     }
 
-    function previewImage(input) {
-        const preview = document.getElementById('photo_preview');
-        const placeholder = document.getElementById('photo_placeholder');
+    function previewImage(input, previewId = 'photo_preview') {
+        const preview = document.getElementById(previewId);
+        const placeholderId = previewId.replace('Preview', 'Placeholder');
+        const placeholder = document.getElementById(placeholderId) || document.getElementById('photo_placeholder');
+
         if (input.files && input.files[0]) {
             const reader = new FileReader();
-            reader.onload = function (e) { preview.src = e.target.result; preview.style.display = 'block'; placeholder.style.display = 'none'; }
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                if (placeholder) placeholder.style.display = 'none';
+            }
             reader.readAsDataURL(input.files[0]);
         }
     }

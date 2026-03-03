@@ -169,11 +169,41 @@ try {
         facebook VARCHAR(255),
         instagram VARCHAR(255),
         twitter VARCHAR(255),
+        tiktok VARCHAR(255),
+        linkedin VARCHAR(255),
+        telegram VARCHAR(255),
+        whatsapp VARCHAR(255),
         ceo_name VARCHAR(255),
         ceo_title VARCHAR(255),
         ceo_message TEXT,
-        ceo_image VARCHAR(255)
+        ceo_image VARCHAR(255),
+        hero_title VARCHAR(255),
+        hero_subtitle TEXT,
+        hero_button_text VARCHAR(100),
+        hero_image VARCHAR(255),
+        about_subtitle TEXT,
+        about_image_main VARCHAR(255),
+        about_image_sub1 VARCHAR(255),
+        about_image_sub2 VARCHAR(255),
+        history_title VARCHAR(255),
+        history_text1 TEXT,
+        history_text2 TEXT,
+        dev_name VARCHAR(255),
+        dev_photo VARCHAR(255),
+        dev_email VARCHAR(255),
+        dev_phone VARCHAR(50),
+        copyright_text VARCHAR(255)
     );
+
+    CREATE TABLE IF NOT EXISTS team_members (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        role VARCHAR(100) NOT NULL,
+        image_url VARCHAR(255),
+        order_index INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE TABLE IF NOT EXISTS gallery (
         id INT AUTO_INCREMENT PRIMARY KEY,
         image_url VARCHAR(255) NOT NULL,
@@ -188,7 +218,8 @@ try {
         full_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL,
-        role VARCHAR(50) DEFAULT 'Admin',
+        role ENUM('Admin', 'Manager', 'Supervisor', 'Waiter') DEFAULT 'Admin',
+        permissions TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -228,6 +259,27 @@ try {
     $check_company = $pdo->query("SELECT COUNT(*) FROM company_info")->fetchColumn();
     if ($check_company == 0) {
         $pdo->exec("INSERT INTO company_info (company_name, email, phone, address, about_text) VALUES ('Bloom Africa Restaurant', 'info@bloomafrica.com', '+251 900 123 456', 'Addis Ababa, Ethiopia', 'Experience authentic African cuisine.')");
+    }
+
+    // Seed tables if empty
+    $check_tables = $pdo->query("SELECT COUNT(*) FROM tables")->fetchColumn();
+    if ($check_tables == 0) {
+        $tables_to_seed = [
+            [1, 2],
+            [2, 2],
+            [3, 2],
+            [4, 2],
+            [5, 4],
+            [6, 4],
+            [7, 4],
+            [8, 6],
+            [9, 8],
+            [10, 12]
+        ];
+        $stmt = $pdo->prepare("INSERT INTO tables (table_number, capacity) VALUES (?, ?)");
+        foreach ($tables_to_seed as $t) {
+            $stmt->execute($t);
+        }
     }
 
 } catch (PDOException $e) {

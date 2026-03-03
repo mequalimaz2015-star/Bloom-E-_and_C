@@ -101,6 +101,33 @@
         box-shadow: 0 4px 15px rgba(255, 238, 88, 0.4);
     }
 
+    .nav-badge {
+        background: #ff2d55;
+        color: white;
+        font-size: 10px;
+        padding: 2px 7px;
+        border-radius: 20px;
+        font-weight: 800;
+        margin-left: auto;
+        box-shadow: 0 4px 10px rgba(255, 45, 85, 0.4);
+        border: 2px solid var(--sidebar);
+        animation: pulseBadge 2s infinite;
+    }
+
+    @keyframes pulseBadge {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.1);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
     /* Sidebar Dropdown Styles */
     .nav-dropdown {
         margin-bottom: 8px;

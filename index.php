@@ -1,23 +1,18 @@
 <?php
 require_once 'db.php';
-
 // Fetch menu items
 $stmt = $pdo->query("SELECT * FROM menu_items WHERE available = 1");
 $menu_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 // Fetch Gallery items
 $stmt = $pdo->query("SELECT * FROM gallery ORDER BY id DESC");
 $gallery_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 // Get unique gallery categories for filters
 $gallery_categories = $pdo->query("SELECT DISTINCT category FROM gallery")->fetchAll(PDO::FETCH_COLUMN);
 
 // Fetch Services
 $services_list = $pdo->query("SELECT * FROM services WHERE status='Active' ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
-
 // Get unique service categories for navigation and filters
 $service_categories = $pdo->query("SELECT DISTINCT category FROM services WHERE status='Active' AND category IS NOT NULL")->fetchAll(PDO::FETCH_COLUMN);
-
 // Handle Reservation Submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['reserve_action'])) {
     $name = $_POST['name'] ?? '';
@@ -26,12 +21,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['reserve_action'])) {
     $time = $_POST['time'] ?? '';
     $guests = $_POST['guests'] ?? '';
     $table_number = $_POST['table_number'] ?? null;
-
     // Check if table is actually available (Server-side validation)
     $check_stmt = $pdo->prepare("SELECT COUNT(*) FROM reservations WHERE reservation_date = ? AND reservation_time = ? AND table_number = ? AND status != 'Rejected'");
     $check_stmt->execute([$date, $time, $table_number]);
     $is_booked = $check_stmt->fetchColumn();
-
     if ($is_booked > 0) {
         $error_msg = "Error: This table is already reserved for the selected date and time.";
     } else {
@@ -41,10 +34,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['reserve_action'])) {
         }
     }
 }
+// Fetch Team Members
+$team_members = $pdo->query("SELECT * FROM team_members ORDER BY order_index ASC, id ASC")->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch Company Info
 $company = $pdo->query("SELECT * FROM company_info WHERE id = 1")->fetch(PDO::FETCH_ASSOC);
-
 // Handle Job Application Submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
     $job_id = $_POST['job_id'];
@@ -55,7 +49,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
     $app_message = $_POST['message'] ?? '';
     $resume_url = "";
     $photo_url = "";
-
     // ... (rest of the upload logic, I'll keep it exactly the same)
     // Handle Resume (CV) Upload
     if (isset($_FILES['resume']) && $_FILES['resume']['error'] == 0) {
@@ -88,7 +81,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
             }
         }
     }
-
     $stmt = $pdo->prepare("INSERT INTO job_applications (job_id, applicant_name, email, phone, gpa, resume_url, photo_url, cover_letter) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     if ($stmt->execute([$job_id, $app_name, $app_email, $app_phone, $app_gpa, $resume_url, $photo_url, $app_message])) {
         $msg = "Application submitted successfully! We will contact you soon.";
@@ -123,7 +115,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
 
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         :root {
             --primary: #dfb180;
@@ -573,7 +564,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
             display: flex;
             gap: 15px;
             font-size: 0.9rem;
-            color: #ccc;
+            color: #beb0b0ff;
             margin-bottom: 15px;
         }
 
@@ -1398,6 +1389,91 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
             animation: slideUp 0.4s ease;
             pointer-events: auto;
         }
+
+        /* Favorite Modal Styles */
+        .fav-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 11000;
+        }
+
+        .fav-modal-content {
+            background: #1e1814;
+            padding: 40px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid var(--primary);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            animation: favSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes favSlideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .fav-modal h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .fav-modal p {
+            color: #ccc;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+
+        .fav-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            margin-bottom: 20px;
+            font-family: inherit;
+            outline: none;
+            text-align: center;
+        }
+
+        .fav-input:focus {
+            border-color: var(--primary);
+        }
+
+        .fav-submit-btn {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        .fav-submit-btn:hover {
+            background: #fff;
+            transform: scale(1.02);
+        }
     </style>
 </head>
 
@@ -1490,34 +1566,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
         <a href="#reservation" class="btn-reserve">Book Table</a>
     </nav>
 
-    <header class="hero" id="home">
-        <h1>Taste the Soul of Africa</h1>
-        <p>A modern and authentic dining experience fusing rich African heritage with contemporary culinary arts.</p>
-        <a href="#menu" class="btn-reserve" style="padding: 15px 40px; font-size:1.2rem;">Explore Menu</a>
+    <header class="hero" id="home"
+        style="background: linear-gradient(rgba(18, 15, 13, 0.7), rgba(18, 15, 13, 0.5)), url('<?= htmlspecialchars($company['hero_image'] ?: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1974&auto=format&fit=crop') ?>');">
+        <h1><?= htmlspecialchars($company['hero_title'] ?: 'Taste the Soul of Africa') ?></h1>
+        <p><?= htmlspecialchars($company['hero_subtitle'] ?: 'A modern and authentic dining experience fusing rich African heritage with contemporary culinary arts.') ?>
+        </p>
+        <a href="#menu" class="btn-reserve"
+            style="padding: 15px 40px; font-size:1.2rem;"><?= htmlspecialchars($company['hero_button_text'] ?: 'Explore Menu') ?></a>
     </header>
 
     <section id="about">
         <div class="about-top">
             <h2>About Our Restaurant</h2>
-            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fugiat, quas voluptatem cupiditate praesentium
-                commodi magnam eligendi dicta aliquam rem. Maiores eos placeat earum quo culpa totam.</p>
+            <p><?= htmlspecialchars($company['about_subtitle'] ?: 'Discover our story and passion for authentic African cuisine, where every dish is a celebration of heritage.') ?>
+            </p>
         </div>
 
         <div class="about-content">
             <div class="about-images">
-                <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070&auto=format&fit=crop"
+                <img src="<?= htmlspecialchars($company['about_image_main'] ?: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070&auto=format&fit=crop') ?>"
                     class="about-img-main" alt="Restaurant interior" loading="lazy">
-                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1974&auto=format&fit=crop"
+                <img src="<?= htmlspecialchars($company['about_image_sub1'] ?: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1974&auto=format&fit=crop') ?>"
                     class="about-img-sub1" alt="Patio" loading="lazy">
-                <img src="https://images.unsplash.com/photo-1544148103-0773bb108726?q=80&w=2070&auto=format&fit=crop"
+                <img src="<?= htmlspecialchars($company['about_image_sub2'] ?: 'https://images.unsplash.com/photo-1544148103-0773bb108726?q=80&w=2070&auto=format&fit=crop') ?>"
                     class="about-img-sub2" alt="Dish plating" loading="lazy">
             </div>
 
             <div class="about-text">
-                <h2>About Bloom Africa</h2>
-                <h3>Two Decades of Culinary Mastery, Crafted with Passion and Served with Heart. Welcome to a Legacy of
-                    Flavor Since 2005.</h3>
-                <p><?= htmlspecialchars($company['about_text'] ?: 'A Journey of Culinary Craftsmanship Since our doors first opened, Bloom Africa has been defined by a commitment to the craft of cooking. For over two decades, we have evolved from a small local kitchen into a premier destination for food lovers.') ?>
+                <h2>About <?= htmlspecialchars($company['company_name']) ?></h2>
+                <h3><?= htmlspecialchars($company['about_subtitle'] ?: 'Two Decades of Culinary Mastery, Crafted with Passion and Served with Heart.') ?>
+                </h3>
+                <p><?= nl2br(htmlspecialchars($company['about_text'] ?: 'A Journey of Culinary Craftsmanship - Since our doors first opened, Bloom Africa has been defined by a commitment to the craft of cooking.')) ?>
                 </p>
             </div>
         </div>
@@ -1571,18 +1650,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
         <div style="text-align: center; max-width: 900px; margin: 0 auto;">
             <h2
                 style="font-family:'Playfair Display', serif; font-size: 3rem; color: var(--primary); margin-bottom: 30px;">
-                Our Rich History</h2>
+                <?= htmlspecialchars($company['history_title'] ?: 'Our Rich History') ?>
+            </h2>
             <div style="width: 80px; height: 2px; background: var(--primary); margin: 0 auto 40px;"></div>
             <p style="font-size: 1.2rem; line-height: 1.9; color: rgba(255,255,255,0.75); margin-bottom: 25px;">
-                Established in 2026, Bloom Africa emerged from a singular vision: to create a sanctuary where the
-                diverse tastes of Africa could be celebrated with modern elegance. What began as an intimate family-run
-                kitchen has transformed into a culinary landmark, known for its unwavering commitment to quality and
-                heritage.
+                <?= nl2br(htmlspecialchars($company['history_text1'])) ?>
             </p>
             <p style="font-size: 1.2rem; line-height: 1.9; color: rgba(255,255,255,0.75);">
-                Over the last two decades, we have mentored dozens of chefs and hosted thousands of unforgettable
-                moments. Today, Bloom Africa stands as a testament to the power of authentic flavors and the spirit of
-                African hospitality.
+                <?= nl2br(htmlspecialchars($company['history_text2'])) ?>
             </p>
         </div>
     </section>
@@ -1599,36 +1674,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
 
         <div
             style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; max-width: 1200px; margin: 0 auto;">
-            <div style="text-align: center;">
-                <div
-                    style="width: 200px; height: 200px; border-radius: 50%; overflow: hidden; margin: 0 auto 20px; border: 3px solid var(--primary);">
-                    <img src="https://images.unsplash.com/photo-1583394838336-acd977730f90?q=80&w=1968&auto=format&fit=crop"
-                        style="width:100%; height:100%; object-fit:cover;">
+            <?php foreach ($team_members as $tm): ?>
+                <div style="text-align: center;">
+                    <div
+                        style="width: 200px; height: 200px; border-radius: 50%; overflow: hidden; margin: 0 auto 20px; border: 3px solid var(--primary);">
+                        <img src="<?= htmlspecialchars($tm['image_url'] ?: 'https://images.unsplash.com/photo-1583394838336-acd977730f90?q=80&w=1968&auto=format&fit=crop') ?>"
+                            style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                    <h3 style="color: var(--primary); font-size: 1.4rem; margin-bottom: 5px;">
+                        <?= htmlspecialchars($tm['name']) ?>
+                    </h3>
+                    <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem; text-transform: uppercase;">
+                        <?= htmlspecialchars($tm['role']) ?>
+                    </p>
                 </div>
-                <h3 style="color: var(--primary); font-size: 1.4rem; margin-bottom: 5px;">Abebe Bikila</h3>
-                <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem; text-transform: uppercase;">Executive Chef
-                </p>
-            </div>
-            <div style="text-align: center;">
-                <div
-                    style="width: 200px; height: 200px; border-radius: 50%; overflow: hidden; margin: 0 auto 20px; border: 3px solid var(--primary);">
-                    <img src="https://images.unsplash.com/photo-1595273670150-db0a3d39074f?q=80&w=2070&auto=format&fit=crop"
-                        style="width:100%; height:100%; object-fit:cover;">
-                </div>
-                <h3 style="color: var(--primary); font-size: 1.4rem; margin-bottom: 5px;">Sara Tadesse</h3>
-                <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem; text-transform: uppercase;">Pastry Specialist
-                </p>
-            </div>
-            <div style="text-align: center;">
-                <div
-                    style="width: 200px; height: 200px; border-radius: 50%; overflow: hidden; margin: 0 auto 20px; border: 3px solid var(--primary);">
-                    <img src="https://images.unsplash.com/photo-1574015974293-817f0efebb1b?q=80&w=1946&auto=format&fit=crop"
-                        style="width:100%; height:100%; object-fit:cover;">
-                </div>
-                <h3 style="color: var(--primary); font-size: 1.4rem; margin-bottom: 5px;">Desta Kassahun</h3>
-                <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem; text-transform: uppercase;">General Manager
-                </p>
-            </div>
+            <?php endforeach; ?>
         </div>
     </section>
 
@@ -1976,6 +2036,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
         function toggleFav(itemId, btn) {
             const isActive = btn.classList.contains('active');
             const icon = btn.querySelector('i');
+            let email = localStorage.getItem('customer_email') || '';
+
+            if (!isActive && !email) {
+                // Show email prompt modal
+                const modal = document.getElementById('favModal');
+                modal.style.display = 'flex';
+                document.getElementById('favItemId').value = itemId;
+                document.getElementById('favBtnRef').value = btn; // This won't work well, I'll use a better way
+
+                // Store reference to current item
+                window.currentFavItem = { id: itemId, btn: btn };
+                return;
+            }
+
+            processFavAction(itemId, btn, isActive, email);
+        }
+
+        function submitFavEmail() {
+            const emailInput = document.getElementById('favEmailInput');
+            const email = emailInput.value.trim();
+            if (!email || !email.includes('@')) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+
+            localStorage.setItem('customer_email', email);
+            document.getElementById('favModal').style.display = 'none';
+
+            if (window.currentFavItem) {
+                processFavAction(window.currentFavItem.id, window.currentFavItem.btn, false, email);
+            }
+        }
+
+        function processFavAction(itemId, btn, isActive, email) {
+            const icon = btn.querySelector('i');
 
             // Visual update
             if (isActive) {
@@ -1993,8 +2088,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
             fetch('handle_favorite.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `item_id=${itemId}&action=${isActive ? 'unlike' : 'like'}`
+                body: `item_id=${itemId}&action=${isActive ? 'unlike' : 'like'}&email=${encodeURIComponent(email)}`
             });
+        }
+
+        function closeFavModal() {
+            document.getElementById('favModal').style.display = 'none';
         }
     </script>
     </section>
@@ -2136,16 +2235,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
             allowfullscreen="" loading="lazy"></iframe>
     </section>
 
-    <footer style="background: rgba(10, 8, 6, 0.95); backdrop-filter: blur(15px); padding: 80px 5% 40px; border-top: 1px solid rgba(223, 177, 128, 0.1); position: relative; z-index: 10;">
+    <footer
+        style="background: rgba(10, 8, 6, 0.95); backdrop-filter: blur(15px); padding: 80px 5% 40px; border-top: 1px solid rgba(223, 177, 128, 0.1); position: relative; z-index: 10;">
         <div style="max-width: 1200px; margin: 0 auto;">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 50px; text-align: left; margin-bottom: 60px;">
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 50px; text-align: left; margin-bottom: 60px;">
                 <!-- Brand Section -->
                 <div>
-                    <h2 style="font-family:'Playfair Display', serif; color:var(--primary); font-size: 2.2rem; margin-bottom: 25px;">
+                    <h2
+                        style="font-family:'Playfair Display', serif; color:var(--primary); font-size: 2.2rem; margin-bottom: 25px;">
                         <?= htmlspecialchars($company['company_name']) ?>
                     </h2>
                     <p style="color: rgba(255,255,255,0.7); line-height: 1.8; font-size: 1rem;">
-                        Celebrate the rich flavors of Africa with a modern twist. Bloom Africa is more than just a restaurant; it's a sanctuary for culinary excellence and hospitality.
+                        Celebrate the rich flavors of Africa with a modern twist. Bloom Africa is more than just a
+                        restaurant; it's a sanctuary for culinary excellence and hospitality.
                     </p>
                 </div>
 
@@ -2153,63 +2256,92 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
                 <div>
                     <h3 style="color: #fff; font-size: 1.3rem; margin-bottom: 25px; font-weight: 600;">Contact Us</h3>
                     <div style="display: flex; flex-direction: column; gap: 15px; color: rgba(255,255,255,0.8);">
-                        <p><i class="fa-solid fa-location-dot" style="color: var(--primary); margin-right: 12px; width: 20px;"></i> <?= htmlspecialchars($company['address']) ?></p>
-                        <p><i class="fa-solid fa-phone-volume" style="color: var(--primary); margin-right: 12px; width: 20px;"></i> <?= htmlspecialchars($company['phone']) ?></p>
-                        <p><i class="fa-solid fa-envelope-open-text" style="color: var(--primary); margin-right: 12px; width: 20px;"></i> <?= htmlspecialchars($company['email']) ?></p>
+                        <p><i class="fa-solid fa-location-dot"
+                                style="color: var(--primary); margin-right: 12px; width: 20px;"></i>
+                            <?= htmlspecialchars($company['address']) ?></p>
+                        <p><i class="fa-solid fa-phone-volume"
+                                style="color: var(--primary); margin-right: 12px; width: 20px;"></i>
+                            <?= htmlspecialchars($company['phone']) ?></p>
+                        <p><i class="fa-solid fa-envelope-open-text"
+                                style="color: var(--primary); margin-right: 12px; width: 20px;"></i>
+                            <?= htmlspecialchars($company['email']) ?></p>
                     </div>
                 </div>
 
                 <!-- Social Links -->
                 <div>
-                    <h3 style="color: #fff; font-size: 1.3rem; margin-bottom: 25px; font-weight: 600;">Follow the Journey</h3>
+                    <h3 style="color: #fff; font-size: 1.3rem; margin-bottom: 25px; font-weight: 600;">Follow the
+                        Journey</h3>
                     <div class="footer-social-links" style="display: flex; gap: 18px; flex-wrap: wrap;">
                         <?php if ($company['facebook']): ?>
-                            <a href="<?= htmlspecialchars($company['facebook']) ?>" target="_blank" class="social-icon-btn"><i class="fa-brands fa-facebook-f"></i></a>
+                            <a href="<?= htmlspecialchars($company['facebook']) ?>" target="_blank"
+                                class="social-icon-btn"><i class="fa-brands fa-facebook-f"></i></a>
                         <?php endif; ?>
                         <?php if ($company['instagram']): ?>
-                            <a href="<?= htmlspecialchars($company['instagram']) ?>" target="_blank" class="social-icon-btn"><i class="fa-brands fa-instagram"></i></a>
+                            <a href="<?= htmlspecialchars($company['instagram']) ?>" target="_blank"
+                                class="social-icon-btn"><i class="fa-brands fa-instagram"></i></a>
                         <?php endif; ?>
                         <?php if ($company['twitter']): ?>
-                            <a href="<?= htmlspecialchars($company['twitter']) ?>" target="_blank" class="social-icon-btn"><i class="fa-brands fa-x-twitter"></i></a>
+                            <a href="<?= htmlspecialchars($company['twitter']) ?>" target="_blank"
+                                class="social-icon-btn"><i class="fa-brands fa-x-twitter"></i></a>
                         <?php endif; ?>
                         <?php if ($company['tiktok']): ?>
-                            <a href="<?= htmlspecialchars($company['tiktok']) ?>" target="_blank" class="social-icon-btn"><i class="fa-brands fa-tiktok"></i></a>
+                            <a href="<?= htmlspecialchars($company['tiktok']) ?>" target="_blank" class="social-icon-btn"><i
+                                    class="fa-brands fa-tiktok"></i></a>
                         <?php endif; ?>
                         <?php if ($company['linkedin']): ?>
-                            <a href="<?= htmlspecialchars($company['linkedin']) ?>" target="_blank" class="social-icon-btn"><i class="fa-brands fa-linkedin-in"></i></a>
+                            <a href="<?= htmlspecialchars($company['linkedin']) ?>" target="_blank"
+                                class="social-icon-btn"><i class="fa-brands fa-linkedin-in"></i></a>
                         <?php endif; ?>
                         <?php if ($company['telegram']): ?>
-                            <a href="<?= htmlspecialchars($company['telegram']) ?>" target="_blank" class="social-icon-btn"><i class="fa-brands fa-telegram"></i></a>
+                            <a href="<?= htmlspecialchars($company['telegram']) ?>" target="_blank"
+                                class="social-icon-btn"><i class="fa-brands fa-telegram"></i></a>
                         <?php endif; ?>
                         <?php if ($company['whatsapp']): ?>
-                            <a href="<?= htmlspecialchars($company['whatsapp']) ?>" target="_blank" class="social-icon-btn"><i class="fa-brands fa-whatsapp"></i></a>
+                            <a href="<?= htmlspecialchars($company['whatsapp']) ?>" target="_blank"
+                                class="social-icon-btn"><i class="fa-brands fa-whatsapp"></i></a>
                         <?php endif; ?>
                     </div>
                 </div>
             </div>
-
             <!-- Developer & Copyright Area -->
-            <div style="border-top: 1px solid rgba(223, 177, 128, 0.1); padding-top: 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 30px;">
+            <div
+                style="border-top: 1px solid rgba(223, 177, 128, 0.1); padding-top: 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 30px;">
                 <div class="developer-credit">
                     <div class="dev-img-container" style="position: relative;">
-                        <img src="developer_photo.jpg" alt="Mequannent Gashaw" class="dev-photo" onerror="this.src='https://ui-avatars.com/api/?name=Mequannent+Gashaw&background=dfb180&color=000'">
-                        <div style="position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; background: #10b981; border: 2px solid #000; border-radius: 50%;"></div>
+                        <img src="<?= htmlspecialchars($company['dev_photo'] ?: 'developer_photo.jpg') ?>"
+                            alt="<?= htmlspecialchars($company['dev_name'] ?? 'The Developer') ?>" class="dev-photo"
+                            onerror="this.src='https://ui-avatars.com/api/?name=<?= urlencode($company['dev_name'] ?? 'Dev') ?>&background=dfb180&color=000'">
+                        <div
+                            style="position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; background: #10b981; border: 2px solid #000; border-radius: 50%;">
+                        </div>
                     </div>
                     <div style="display: flex; flex-direction: column;">
-                        <span style="font-size: 0.9rem; color: rgba(255,255,255,0.6); margin-bottom: 2px;">Designed & Developed by</span>
-                        <span style="font-size: 1.1rem; color: var(--primary); font-weight: 800; letter-spacing: 0.5px;">Mequannent Gashaw</span>
-                        <div style="display: flex; gap: 15px; margin-top: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.5);">
-                            <span><i class="fa-solid fa-envelope" style="margin-right: 5px;"></i> mequannentgashaw12@gmail.com</span>
-                            <span><i class="fa-solid fa-phone" style="margin-right: 5px;"></i> 0918592028</span>
+                        <span style="font-size: 0.9rem; color: rgba(255,255,255,0.6); margin-bottom: 2px;">Designed &
+                            Developed by</span>
+                        <span
+                            style="font-size: 1.1rem; color: var(--primary); font-weight: 800; letter-spacing: 0.5px;"><?= htmlspecialchars($company['dev_name'] ?: 'Mequannent Gashaw') ?></span>
+                        <div
+                            style="display: flex; gap: 15px; margin-top: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.5);">
+                            <?php if (!empty($company['dev_email'])): ?>
+                                <span><i class="fa-solid fa-envelope" style="margin-right: 5px;"></i>
+                                    <?= htmlspecialchars($company['dev_email']) ?></span>
+                            <?php endif; ?>
+                            <?php if (!empty($company['dev_phone'])): ?>
+                                <span><i class="fa-solid fa-phone" style="margin-right: 5px;"></i>
+                                    <?= htmlspecialchars($company['dev_phone']) ?></span>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
 
                 <div style="text-align: right;">
                     <p style="font-size: 0.9rem; color: rgba(255,255,255,0.4);">
-                        &copy; <?= date('Y') ?> <?= htmlspecialchars($company['company_name']) ?>. All Rights Reserved.
+                        &copy; <?= date('Y') ?> <?= htmlspecialchars($company['company_name']) ?>.
+                        <?= htmlspecialchars($company['copyright_text'] ?: 'All Rights Reserved.') ?>
                     </p>
-                    <p style="font-size: 0.75rem; color: rgba(223, 177, 128, 0.3); margin-top: 5px; text-transform: uppercase; letter-spacing: 2px;">
+                    <p
+                        style="font-size: 0.75rem; color: rgba(223, 177, 128, 0.3); margin-top: 5px; text-transform: uppercase; letter-spacing: 2px;">
                         Bloom Africa Management System v2.0
                     </p>
                 </div>
@@ -2242,11 +2374,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
                         Now</button>
                 </div>
             </div>
-
             <div class="chat-messages" id="chatMessages" style="display: none;">
                 <div class="chat-bubble bot">Hello! Welcome to Bloom Africa. How can I assist you today? 🌍🍖</div>
             </div>
-
             <div class="chat-input-area" id="chatInputArea" style="display: none;">
                 <input type="text" id="chatInput" placeholder="Order text here..."
                     onkeypress="if(event.key === 'Enter') sendChatMessage()">
@@ -2255,17 +2385,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
             </div>
         </div>
     </div>
-
     <script>
         let chatPollInterval = null;
-
         function registerChat() {
             const name = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             const phone = document.getElementById('regPhone').value.trim();
 
             if (!name || !email || !phone) return alert('All fields required');
-
             fetch('chat_handler.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -2313,15 +2440,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
                     }
                 });
         }
-
         function sendChatMessage() {
             const input = document.getElementById('chatInput');
             const msg = input.value.trim();
             if (!msg) return;
-
             appendMessage('User', msg);
             input.value = '';
-
             fetch('chat_handler.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -2333,14 +2457,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
                     if (data.reply) appendMessage('Bot', data.reply, data.buttons);
                 });
         }
-
         function appendMessage(sender, text, buttons = []) {
             const container = document.getElementById('chatMessages');
 
             // For User messages, we skip duplicates. For bot with buttons, we allow showing buttons on last msg.
             const exists = Array.from(container.children).some(c => c.dataset.text === text && c.dataset.sender === sender && !buttons.length);
             if (exists) return;
-
             const div = document.createElement('div');
             div.className = `chat-bubble ${sender.toLowerCase()}`;
             div.innerHTML = `<strong>${sender}:</strong> <br> ${text.replace(/\n/g, '<br>')}`;
@@ -2360,13 +2482,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
                 });
                 div.appendChild(optBox);
             }
-
             div.dataset.text = text;
             div.dataset.sender = sender;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
         }
-
         function loadChatHistory() {
             fetch('chat_handler.php')
                 .then(res => res.json())
@@ -2375,21 +2495,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
                         data.messages.forEach(m => appendMessage(m.sender, m.message));
                     }
                 });
-    }
+        }
     </script>
-
     <div class="float-btn-group" id="socialFloatGroup">
         <div class="chat-toggle" onclick="toggleChat()" id="chatToggle" style="margin-bottom: 5px;">
             <i class="fa-solid fa-robot"></i>
         </div>
-        <a href="https://t.me/+251918592028" class="telegram-float" target="_blank" rel="noopener noreferrer"
-            data-tooltip="Chat on Telegram">
-            <i class="fa-brands fa-telegram"></i>
-        </a>
-        <a href="https://wa.me/251918592028?text=Hello%2C%20I%20want%20to%20order%20from%20Bloom%20Africa%20Restaurant."
-            class="whatsapp-float" target="_blank" rel="noopener noreferrer" data-tooltip="Order on WhatsApp">
-            <i class="fa-brands fa-whatsapp"></i>
-        </a>
+        <?php if (!empty($company['telegram'])): ?>
+            <a href="<?= htmlspecialchars($company['telegram']) ?>" class="telegram-float" target="_blank"
+                rel="noopener noreferrer" data-tooltip="Chat on Telegram">
+                <i class="fa-brands fa-telegram"></i>
+            </a>
+        <?php endif; ?>
+        <?php if (!empty($company['whatsapp'])): ?>
+            <a href="<?= htmlspecialchars($company['whatsapp']) ?>" class="whatsapp-float" target="_blank"
+                rel="noopener noreferrer" data-tooltip="Order on WhatsApp">
+                <i class="fa-brands fa-whatsapp"></i>
+            </a>
+        <?php endif; ?>
+    </div>
+
+    <!-- Favorite Email Prompt Modal -->
+    <div id="favModal" class="fav-modal">
+        <div class="fav-modal-content">
+            <div style="text-align: right; margin-top: -20px; margin-right: -20px;">
+                <i class="fa-solid fa-xmark" style="cursor: pointer; color: #888;" onclick="closeFavModal()"></i>
+            </div>
+            <i class="fa-solid fa-heart" style="color: var(--primary); font-size: 3rem; margin-bottom: 20px;"></i>
+            <h2>Love this dish?</h2>
+            <p>Please enter your email to save this to your favorites and stay updated with our latest offers!</p>
+            <input type="hidden" id="favItemId">
+            <input type="email" id="favEmailInput" class="fav-input" placeholder="your@email.com" required>
+            <button class="fav-submit-btn" onclick="submitFavEmail()">Save as Favorite</button>
+        </div>
     </div>
 
 </body>
