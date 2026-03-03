@@ -7,24 +7,26 @@ services:
     healthCheckPath: /
     envVars:
       - key: DB_HOST
-        fromDatabase:
-          name: bloom-db
-          property: host
+        value: mysql
       - key: DB_NAME
-        fromDatabase:
-          name: bloom-db
-          property: database
+        value: bloom_africa
       - key: DB_USER
-        fromDatabase:
-          name: bloom-db
-          property: user
+        value: bloom_user
       - key: DB_PASS
-        fromDatabase:
-          name: bloom-db
-          property: password
+        value: bloom_password
 
-databases:
-  - name: bloom-db
+  - type: pvt
+    name: mysql
+    env: docker
+    region: ohio
     plan: free
-    databaseName: bloom_africa
-    user: bloom_user
+    dockerFilePath: Dockerfile.mysql
+    envVars:
+      - key: MYSQL_DATABASE
+        value: bloom_africa
+      - key: MYSQL_USER
+        value: bloom_user
+      - key: MYSQL_PASSWORD
+        value: bloom_password
+      - key: MYSQL_ROOT_PASSWORD
+        value: root_password
