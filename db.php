@@ -9,20 +9,21 @@ $port = getenv('BLOOM_DB_PORT') ?: '3306';
 
 // 2. Environment Failsafes
 if (!$host) {
-    // If on Render but BLOOM_DB_HOST is missing, use the service name
+    // If on Render but BLOOM_DB_HOST is missing, use the service name 'mysql'
     $host = getenv('RENDER') ? 'mysql' : '127.0.0.1';
 }
 
-// Ensure we NEVER use 'localhost' (which triggers socket files)
+// Ensure we NEVER use 'localhost' (which triggers socket files on Linux)
 if ($host === 'localhost') {
     $host = '127.0.0.1';
 }
 
-// 3. Failsafe: Handle injected Render PostgreSQL hosts
+// 3. Failsafe: Handle injected Render PostgreSQL hosts (dpg-...)
 if (strpos($host, 'dpg-') !== false && strpos($host, '.onrender.com') === false) {
     $host = 'mysql';
 }
 
+// 4. Connection Loop with Retries
 $max_retries = 5;
 $retry_delay = 5; // seconds
 $pdo = null;
@@ -34,7 +35,7 @@ for ($i = 0; $i < $max_retries; $i++) {
         $pdo = new PDO($dsn, $username, $password ?: '');
         break; // Success!
     } catch (PDOException $e) {
-        // Attempt 2: Connect to host only and create DB
+        // Attempt 2: Connect to host only and create DB (if it doesn't exist)
         try {
             $pdo = new PDO("mysql:host=$host;port=$port;charset=utf8mb4", $username, $password ?: '');
             $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
@@ -49,14 +50,15 @@ for ($i = 0; $i < $max_retries; $i++) {
     }
 }
 
+// 5. Final Connection Check
 if (!$pdo) {
     die("Critical: Could not establish a database connection.");
 }
 
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+// 6. Table Creation and Seeding (All wrapped in one block)
 try {
-    // Create required tables
     $setup_queries = "
     CREATE TABLE IF NOT EXISTS menu_items (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -148,6 +150,7 @@ try {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
     );
+
     CREATE TABLE IF NOT EXISTS payroll (
         id INT AUTO_INCREMENT PRIMARY KEY,
         employee_id INT NOT NULL,
@@ -298,6 +301,7 @@ try {
 
     $pdo->exec($setup_queries);
 
+    // 7. Data Seeding
     // Seed company_info if it's empty
     $check_company = $pdo->query("SELECT COUNT(*) FROM company_info")->fetchColumn();
     if ($check_company == 0) {
@@ -326,13 +330,13 @@ try {
             [9, 8],
             [10, 12]
         ];
-        $stmt = $pdo->prepare("INSERT INTO tables (table_number, capacity) VALUES (?, ?)");
+        $stmt_seed = $pdo->prepare("INSERT INTO tables (table_number, capacity) VALUES (?, ?)");
         foreach ($tables_to_seed as $t) {
-            $stmt->execute($t);
+            $stmt_seed->execute($t);
         }
     }
 
 } catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+    die("Database Setup Error: " . $e->getMessage());
 }
 ?>
