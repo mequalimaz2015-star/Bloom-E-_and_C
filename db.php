@@ -1,9 +1,16 @@
 <?php
 // Support both local XAMPP and cloud hosting (Render/Railway)
-$host = getenv('BLOOM_DB_HOST') ?: 'localhost';
-$dbname = getenv('BLOOM_DB_NAME') ?: 'bloom_africa';
-$username = getenv('BLOOM_DB_USER') ?: 'root';
-$password = getenv('BLOOM_DB_PASS') ?: '';
+// 1. Get Environment Variables (Check multiple sources for Render compatibility)
+$host = getenv('BLOOM_DB_HOST') ?: ($_ENV['BLOOM_DB_HOST'] ?? ($_SERVER['BLOOM_DB_HOST'] ?? 'localhost'));
+$dbname = getenv('BLOOM_DB_NAME') ?: ($_ENV['BLOOM_DB_NAME'] ?? ($_SERVER['BLOOM_DB_NAME'] ?? 'bloom_africa'));
+$username = getenv('BLOOM_DB_USER') ?: ($_ENV['BLOOM_DB_USER'] ?? ($_SERVER['BLOOM_DB_USER'] ?? 'root'));
+$password = getenv('BLOOM_DB_PASS') ?: ($_ENV['BLOOM_DB_PASS'] ?? ($_SERVER['BLOOM_DB_PASS'] ?? ''));
+
+// 2. Failsafe: Render often injects PostgreSQL 'dpg-' hosts into MySQL logic.
+// If the host looks like a Render PostgreSQL host (dpg-...), force it to the 'mysql' internal service name.
+if (strpos($host, 'dpg-') !== false && strpos($host, '.onrender.com') === false) {
+    $host = 'mysql';
+}
 
 try {
     $pdo = new PDO("mysql:host=$host", $username, $password);
