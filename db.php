@@ -1,9 +1,9 @@
 <?php
 // Support both local XAMPP and cloud hosting (Render/Railway)
-$host = getenv('DB_HOST') ?: 'localhost';
-$dbname = getenv('DB_NAME') ?: 'bloom_africa';
-$username = getenv('DB_USER') ?: 'root';
-$password = getenv('DB_PASS') ?: '';
+$host = getenv('BLOOM_DB_HOST') ?: 'localhost';
+$dbname = getenv('BLOOM_DB_NAME') ?: 'bloom_africa';
+$username = getenv('BLOOM_DB_USER') ?: 'root';
+$password = getenv('BLOOM_DB_PASS') ?: '';
 
 try {
     $pdo = new PDO("mysql:host=$host", $username, $password);

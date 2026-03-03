@@ -6,13 +6,13 @@ services:
     plan: free
     healthCheckPath: /
     envVars:
-      - key: DB_HOST
+      - key: BLOOM_DB_HOST
         value: mysql
-      - key: DB_NAME
+      - key: BLOOM_DB_NAME
         value: bloom_africa
-      - key: DB_USER
+      - key: BLOOM_DB_USER
         value: bloom_user
-      - key: DB_PASS
+      - key: BLOOM_DB_PASS
         value: bloom_password
 
   - type: pvt
