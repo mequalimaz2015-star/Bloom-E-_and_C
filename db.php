@@ -23,23 +23,39 @@ if (strpos($host, 'dpg-') !== false && strpos($host, '.onrender.com') === false)
     $host = 'mysql';
 }
 
-try {
-    // Attempt 1: Connect directly to the database (Efficient if DB exists)
-    $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
-    $pdo = new PDO($dsn, $username, $password ?: '');
-} catch (PDOException $e) {
-    // Attempt 2: Connect to host only and create DB (Required for first run)
+$max_retries = 5;
+$retry_delay = 5; // seconds
+$pdo = null;
+
+for ($i = 0; $i < $max_retries; $i++) {
     try {
-        $pdo = new PDO("mysql:host=$host;port=$port;charset=utf8mb4", $username, $password ?: '');
-        $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-        $pdo->exec("USE `$dbname`");
-    } catch (PDOException $e2) {
-        die("Critical: Database connection failed. Host: $host. Error: " . $e2->getMessage());
+        // Attempt 1: Connect directly to the database
+        $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
+        $pdo = new PDO($dsn, $username, $password ?: '');
+        break; // Success!
+    } catch (PDOException $e) {
+        // Attempt 2: Connect to host only and create DB
+        try {
+            $pdo = new PDO("mysql:host=$host;port=$port;charset=utf8mb4", $username, $password ?: '');
+            $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+            $pdo->exec("USE `$dbname`");
+            break; // Success!
+        } catch (PDOException $e2) {
+            if ($i === $max_retries - 1) {
+                die("Critical: Database connection failed after $max_retries attempts. Target Host: $host:$port. Error: " . $e2->getMessage());
+            }
+            sleep($retry_delay);
+        }
     }
+}
+
+if (!$pdo) {
+    die("Critical: Could not establish a database connection.");
 }
 
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+try {
     // Create required tables
     $setup_queries = "
     CREATE TABLE IF NOT EXISTS menu_items (
