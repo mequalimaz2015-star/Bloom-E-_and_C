@@ -566,11 +566,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $dev_image = $new_path;
         }
 
+        // Handle Hero Video
+        $hero_video = $_POST['existing_hero_video'] ?? '';
+        if (isset($_FILES['hero_video_photo']) && $_FILES['hero_video_photo']['error'] == 0) {
+            $new_path = "uploads/site/video_" . time() . "." . pathinfo($_FILES['hero_video_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/site/"))
+                mkdir(__DIR__ . "/../uploads/site/", 0777, true);
+            if (move_uploaded_file($_FILES['hero_video_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $hero_video = $new_path;
+        } elseif (!empty($_POST['hero_video_url'])) {
+            $hero_video = $_POST['hero_video_url'];
+        }
+
+        // Handle Hero Audio
+        $hero_audio = $_POST['existing_hero_audio'] ?? '';
+        if (isset($_FILES['hero_audio_photo']) && $_FILES['hero_audio_photo']['error'] == 0) {
+            $new_path = "uploads/site/audio_" . time() . "." . pathinfo($_FILES['hero_audio_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/site/"))
+                mkdir(__DIR__ . "/../uploads/site/", 0777, true);
+            if (move_uploaded_file($_FILES['hero_audio_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $hero_audio = $new_path;
+        }
+
+        // Handle Hero 2 Image
+        $hero2_image = $_POST['existing_hero2_image'] ?? '';
+        if (isset($_FILES['hero2_photo']) && $_FILES['hero2_photo']['error'] == 0) {
+            $new_path = "uploads/site/hero2_" . time() . "." . pathinfo($_FILES['hero2_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/site/"))
+                mkdir(__DIR__ . "/../uploads/site/", 0777, true);
+            if (move_uploaded_file($_FILES['hero2_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $hero2_image = $new_path;
+        }
+
+        // Handle Hero 3 Image
+        $hero3_image = $_POST['existing_hero3_image'] ?? '';
+        if (isset($_FILES['hero3_photo']) && $_FILES['hero3_photo']['error'] == 0) {
+            $new_path = "uploads/site/hero3_" . time() . "." . pathinfo($_FILES['hero3_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/site/"))
+                mkdir(__DIR__ . "/../uploads/site/", 0777, true);
+            if (move_uploaded_file($_FILES['hero3_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $hero3_image = $new_path;
+        }
+
         $stmt = $pdo->prepare("UPDATE company_info SET 
             company_name=?, email=?, phone=?, address=?, about_text=?, 
             facebook=?, instagram=?, twitter=?, tiktok=?, linkedin=?, telegram=?, whatsapp=?, 
             ceo_name=?, ceo_title=?, ceo_message=?, ceo_image=?,
             hero_title=?, hero_subtitle=?, hero_button_text=?, hero_image=?,
+            hero_video=?, hero_audio=?,
+            hero2_title=?, hero2_subtitle=?, hero2_button_text=?, hero2_image=?,
+            hero3_title=?, hero3_subtitle=?, hero3_button_text=?, hero3_image=?,
             about_subtitle=?, about_image_main=?, about_image_sub1=?, about_image_sub2=?,
             history_title=?, history_text1=?, history_text2=?,
             dev_name=?, dev_email=?, dev_phone=?, dev_photo=?, copyright_text=?
@@ -597,6 +642,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['hero_subtitle'],
             $_POST['hero_button_text'],
             $hero_image,
+            $hero_video,
+            $hero_audio,
+            $_POST['hero2_title'],
+            $_POST['hero2_subtitle'],
+            $_POST['hero2_button_text'],
+            $hero2_image,
+            $_POST['hero3_title'],
+            $_POST['hero3_subtitle'],
+            $_POST['hero3_button_text'],
+            $hero3_image,
             $_POST['about_subtitle'],
             $about_main,
             $about_sub1,
@@ -610,9 +665,239 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $dev_image,
             $_POST['copyright_text']
         ]);
+        logActivity($pdo, "Updated global portal configuration");
+        $msg = "Global settings updated successfully!";
+    } elseif (isset($_POST['update_construction_info'])) {
+        // Handle Review Image
+        $review_image = $_POST['existing_review_image'] ?? '';
+        if (isset($_FILES['review_photo']) && $_FILES['review_photo']['error'] == 0) {
+            $new_path = "uploads/const/review_" . time() . "." . pathinfo($_FILES['review_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/const/"))
+                mkdir(__DIR__ . "/../uploads/const/", 0777, true);
+            if (move_uploaded_file($_FILES['review_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $review_image = $new_path;
+        }
 
-        logActivity($pdo, "Updated detailed site content and credits");
-        $msg = "All site content and footer credits updated successfully!";
+        // Handle Hero Image
+        $hero_image = $_POST['existing_hero_image'] ?? '';
+        if (isset($_FILES['hero_photo']) && $_FILES['hero_photo']['error'] == 0) {
+            $new_path = "uploads/const/hero_" . time() . "." . pathinfo($_FILES['hero_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/const/"))
+                mkdir(__DIR__ . "/../uploads/const/", 0777, true);
+            if (move_uploaded_file($_FILES['hero_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $hero_image = $new_path;
+        }
+
+        // Handle Hero Video
+        $hero_video = $_POST['existing_hero_video'] ?? '';
+        if (isset($_FILES['hero_video_photo']) && $_FILES['hero_video_photo']['error'] == 0) {
+            $new_path = "uploads/const/video_" . time() . "." . pathinfo($_FILES['hero_video_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/const/"))
+                mkdir(__DIR__ . "/../uploads/const/", 0777, true);
+            if (move_uploaded_file($_FILES['hero_video_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $hero_video = $new_path;
+        } elseif (!empty($_POST['hero_video_url'])) {
+            $hero_video = $_POST['hero_video_url'];
+        }
+
+        $stmt = $pdo->prepare("UPDATE construction_info SET 
+            company_name=?, hero_title=?, hero_subtitle=?, hero_description=?, hero_image=?, hero_video=?,
+            why_choose_us_title=?, why_choose_us_subtitle=?, services_title=?, services_subtitle=?,
+            projects_title=?, projects_subtitle=?, reviews_title=?, reviews_subtitle=?, quote_title=?, quote_subtitle=?,
+            email=?, phone=?, address=?, 
+            ome_page_url=?, blog_url=?, portfolio_url=?, 
+            why_choose_us_msg=?, services_desc=?, review_image=?, review_text=?, 
+            facebook=?, twitter=?, linkedin=?, google_plus=?, youtube=?, instagram=? 
+            WHERE id=1");
+
+        $stmt->execute([
+            $_POST['company_name'],
+            $_POST['hero_title'],
+            $_POST['hero_subtitle'],
+            $_POST['hero_description'],
+            $hero_image,
+            $hero_video,
+            $_POST['why_choose_us_title'],
+            $_POST['why_choose_us_subtitle'],
+            $_POST['services_title'],
+            $_POST['services_subtitle'],
+            $_POST['projects_title'],
+            $_POST['projects_subtitle'],
+            $_POST['reviews_title'],
+            $_POST['reviews_subtitle'],
+            $_POST['quote_title'],
+            $_POST['quote_subtitle'],
+            $_POST['email'],
+            $_POST['phone'],
+            $_POST['address'],
+            $_POST['ome_page_url'],
+            $_POST['blog_url'],
+            $_POST['portfolio_url'],
+            $_POST['why_choose_us_msg'],
+            $_POST['services_desc'],
+            $review_image,
+            $_POST['review_text'],
+            $_POST['facebook'],
+            $_POST['twitter'],
+            $_POST['linkedin'],
+            $_POST['google_plus'],
+            $_POST['youtube'],
+            $_POST['instagram']
+        ]);
+        logActivity($pdo, "Updated construction portal info");
+        $msg = "Construction portal info updated successfully!";
+    } elseif (isset($_POST['save_const_project'])) {
+        $name = $_POST['name'];
+        $desc = $_POST['description'];
+        $status = $_POST['status'];
+        $start = $_POST['start_date'];
+        $completion = $_POST['completion_date'];
+        $id = $_POST['id'] ?? '';
+        $image_url = $_POST['existing_image'] ?? '';
+
+        if (isset($_FILES['project_photo']) && $_FILES['project_photo']['error'] == 0) {
+            $new_path = "uploads/projects/proj_" . time() . "." . pathinfo($_FILES['project_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/projects/"))
+                mkdir(__DIR__ . "/../uploads/projects/", 0777, true);
+            if (move_uploaded_file($_FILES['project_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $image_url = $new_path;
+        }
+
+        if ($id) {
+            $stmt = $pdo->prepare("UPDATE construction_projects SET name=?, description=?, status=?, start_date=?, completion_date=?, image_url=? WHERE id=?");
+            $stmt->execute([$name, $desc, $status, $start, $completion, $image_url, $id]);
+            logActivity($pdo, "Updated construction project: " . $name);
+        } else {
+            $stmt = $pdo->prepare("INSERT INTO construction_projects (name, description, status, start_date, completion_date, image_url) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$name, $desc, $status, $start, $completion, $image_url]);
+            logActivity($pdo, "Added new construction project: " . $name);
+        }
+        $msg = "Project saved successfully!";
+    } elseif (isset($_POST['delete_const_project'])) {
+        $id = $_POST['id'];
+        $pdo->prepare("DELETE FROM construction_projects WHERE id=?")->execute([$id]);
+        logActivity($pdo, "Removed construction project ID: " . $id);
+        $msg = "Project removed.";
+    } elseif (isset($_POST['save_const_feature'])) {
+        $title = $_POST['title'];
+        $desc = $_POST['description'];
+        $icon = $_POST['icon_class'];
+        $id = $_POST['id'] ?? '';
+
+        if ($id) {
+            $stmt = $pdo->prepare("UPDATE construction_features SET title=?, description=?, icon_class=? WHERE id=?");
+            $stmt->execute([$title, $desc, $icon, $id]);
+            logActivity($pdo, "Updated construction highlight: " . $title);
+        } else {
+            $stmt = $pdo->prepare("INSERT INTO construction_features (title, description, icon_class) VALUES (?, ?, ?)");
+            $stmt->execute([$title, $desc, $icon]);
+            logActivity($pdo, "Added new construction highlight: " . $title);
+        }
+        $msg = "Highlight saved successfully!";
+    } elseif (isset($_POST['delete_const_feature'])) {
+        $id = $_POST['id'];
+        $pdo->prepare("DELETE FROM construction_features WHERE id=?")->execute([$id]);
+        logActivity($pdo, "Removed construction highlight ID: " . $id);
+        $msg = "Highlight removed.";
+    } elseif (isset($_POST['save_const_service'])) {
+        $title = $_POST['title'];
+        $desc = $_POST['description'];
+        $btn_text = $_POST['button_text'];
+        $btn_url = $_POST['button_url'];
+        $id = $_POST['id'] ?? '';
+        $image_url = $_POST['existing_image'] ?? '';
+
+        if (isset($_FILES['service_photo']) && $_FILES['service_photo']['error'] == 0) {
+            $new_path = "uploads/const/serv_" . time() . "." . pathinfo($_FILES['service_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/const/"))
+                mkdir(__DIR__ . "/../uploads/const/", 0777, true);
+            if (move_uploaded_file($_FILES['service_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $image_url = $new_path;
+        }
+
+        if ($id) {
+            $stmt = $pdo->prepare("UPDATE `construction_services` SET `title`=?, `description`=?, `image_url`=?, `button_text`=?, `button_url`=? WHERE `id`=?");
+            $stmt->execute([$title, $desc, $image_url, $btn_text, $btn_url, $id]);
+            logActivity($pdo, "Updated construction service: " . $title);
+        } else {
+            $stmt = $pdo->prepare("INSERT INTO `construction_services` (`title`, `description`, `image_url`, `button_text`, `button_url`) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$title, $desc, $image_url, $btn_text, $btn_url]);
+            logActivity($pdo, "Added new construction service: " . $title);
+        }
+        $msg = "Service saved successfully!";
+    } elseif (isset($_POST['delete_const_service'])) {
+        $id = $_POST['id'];
+        $pdo->prepare("DELETE FROM construction_services WHERE id=?")->execute([$id]);
+        logActivity($pdo, "Removed construction service ID: " . $id);
+        $msg = "Service removed.";
+    } elseif (isset($_POST['save_const_testimonial'])) {
+        $name = $_POST['client_name'];
+        $role = $_POST['client_role'];
+        $msg_text = $_POST['message'];
+        $rating = $_POST['rating'] ?? 5;
+        $id = $_POST['id'] ?? '';
+        $image_url = $_POST['existing_image'] ?? '';
+
+        if (isset($_FILES['testimonial_photo']) && $_FILES['testimonial_photo']['error'] == 0) {
+            $new_path = "uploads/const/testi_" . time() . "." . pathinfo($_FILES['testimonial_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/const/"))
+                mkdir(__DIR__ . "/../uploads/const/", 0777, true);
+            if (move_uploaded_file($_FILES['testimonial_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $image_url = $new_path;
+        }
+
+        if ($id) {
+            $stmt = $pdo->prepare("UPDATE construction_testimonials SET client_name=?, client_role=?, message=?, image_url=?, rating=? WHERE id=?");
+            $stmt->execute([$name, $role, $msg_text, $image_url, $rating, $id]);
+            logActivity($pdo, "Updated construction testimonial from: " . $name);
+        } else {
+            $stmt = $pdo->prepare("INSERT INTO construction_testimonials (client_name, client_role, message, image_url, rating) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$name, $role, $msg_text, $image_url, $rating]);
+            logActivity($pdo, "Added new construction testimonial from: " . $name);
+        }
+        $msg = "Testimonial saved successfully!";
+    } elseif (isset($_POST['delete_const_testimonial'])) {
+        $id = $_POST['id'];
+        $pdo->prepare("DELETE FROM construction_testimonials WHERE id=?")->execute([$id]);
+        logActivity($pdo, "Removed construction testimonial ID: " . $id);
+        $msg = "Testimonial removed.";
+    } elseif (isset($_POST['save_const_equipment'])) {
+        $name = $_POST['name'];
+        $serial = $_POST['serial_number'];
+        $desc = $_POST['description'];
+        $status = $_POST['status'];
+        $id = $_POST['id'] ?? '';
+        $image_url = $_POST['existing_image'] ?? '';
+
+        if (isset($_FILES['equipment_photo']) && $_FILES['equipment_photo']['error'] == 0) {
+            $new_path = "uploads/equipment/equip_" . time() . "." . pathinfo($_FILES['equipment_photo']['name'], PATHINFO_EXTENSION);
+            if (!is_dir(__DIR__ . "/../uploads/equipment/"))
+                mkdir(__DIR__ . "/../uploads/equipment/", 0777, true);
+            if (move_uploaded_file($_FILES['equipment_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
+                $image_url = $new_path;
+        }
+
+        if ($id) {
+            $stmt = $pdo->prepare("UPDATE construction_equipment SET name=?, serial_number=?, description=?, status=?, image_url=? WHERE id=?");
+            $stmt->execute([$name, $serial, $desc, $status, $image_url, $id]);
+            logActivity($pdo, "Updated equipment: " . $name);
+        } else {
+            $stmt = $pdo->prepare("INSERT INTO construction_equipment (name, serial_number, description, status, image_url) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$name, $serial, $desc, $status, $image_url]);
+            logActivity($pdo, "Added new equipment: " . $name);
+        }
+        $msg = "Equipment details saved!";
+    } elseif (isset($_POST['delete_const_equipment'])) {
+        $id = $_POST['id'];
+        $pdo->prepare("DELETE FROM construction_equipment WHERE id=?")->execute([$id]);
+        logActivity($pdo, "Removed equipment ID: " . $id);
+        $msg = "Equipment removed from inventory.";
+    } elseif (isset($_POST['update_const_quote'])) {
+        $id = $_POST['id'];
+        $status = $_POST['status'];
+        $pdo->prepare("UPDATE construction_quotes SET status=? WHERE id=?")->execute([$status, $id]);
+        logActivity($pdo, "Updated construction quote ID " . $id . " to " . $status);
+        $msg = "Quote status updated.";
     } elseif (isset($_POST['update_application_status'])) {
         $status = $_POST['status'];
         $id = $_POST['id'];
@@ -896,6 +1181,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$new_pass, $user_id]);
         logActivity($pdo, "Reset password for user ID: " . $user_id);
         $msg = "Password reset successfully!";
+    } elseif (isset($_POST['update_const_quote'])) {
+        $id = $_POST['id'];
+        $status = $_POST['status'];
+        $admin_reply = $_POST['admin_reply'] ?? '';
+
+        $pdo->prepare("UPDATE construction_quotes SET status=?, admin_reply=? WHERE id=?")->execute([$status, $admin_reply, $id]);
+        logActivity($pdo, "Updated construction quote ID $id to $status");
+        $msg = "Quote status updated and reply saved!";
+    } elseif (isset($_POST['send_chat_reply'])) {
+        $sid = $_POST['session_id'];
+        $reply = trim($_POST['reply']);
+        if ($sid && $reply) {
+            $stmt = $pdo->prepare("INSERT INTO chat_messages (session_id, sender, message, is_read) VALUES (?, 'Admin', ?, 1)");
+            $stmt->execute([$sid, $reply]);
+            logActivity($pdo, "Replied to chat session: $sid");
+            $msg = "Reply sent successfully!";
+        }
     } elseif (isset($_POST['delete_gallery'])) {
         $id = $_POST['id'];
         $pdo->prepare("DELETE FROM gallery WHERE id=?")->execute([$id]);

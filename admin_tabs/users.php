@@ -24,6 +24,12 @@ $permission_groups = [
         'jobs' => ['label' => 'Job Listings', 'icon' => 'fa-briefcase'],
         'applications' => ['label' => 'Applications', 'icon' => 'fa-file-signature'],
     ],
+    'Construction' => [
+        'const_info' => ['label' => 'Company Info', 'icon' => 'fa-building'],
+        'const_projects' => ['label' => 'Projects', 'icon' => 'fa-building'],
+        'const_equipment' => ['label' => 'Equipment', 'icon' => 'fa-truck-pickup'],
+        'const_info' => ['label' => 'Construction Info', 'icon' => 'fa-info-circle'],
+    ],
     'Access & Comms' => [
         'services' => ['label' => 'Our Services', 'icon' => 'fa-concierge-bell'],
         'company' => ['label' => 'Portal Info', 'icon' => 'fa-info-circle'],
@@ -127,17 +133,26 @@ $permission_groups = [
                                     <?php endif; ?>
                                 </td>
                                 <td style="padding: 20px; text-align:right;">
-                                    <div style="display:flex; justify-content:flex-end; gap:10px;">
-                                        <button type="submit" name="update_user_permissions" class="btn-action primary" title="Save Permissions">
-                                            <i class="fa-solid fa-cloud-arrow-up"></i>
-                                        </button>
-                                        <button type="button" onclick="promptPassword(<?= $user['id'] ?>)" class="btn-action warning" title="Reset Credentials">
-                                            <i class="fa-solid fa-shield-keyhole"></i>
-                                        </button>
-                                        <?php if (!$is_root && !$is_self): ?>
-                                            <button type="submit" name="delete_admin_user" class="btn-action danger" onclick="return confirm('🚨 WARN: This will wipe this admin account. Proceed?')" title="Delete Account">
-                                                <i class="fa-solid fa-trash-xmark"></i>
+                                    <div style="display:flex; justify-content:flex-end; gap:12px;">
+                                        <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                                            <button type="submit" name="update_user_permissions" class="btn-action primary" title="Save Permissions">
+                                                <i class="fa-solid fa-cloud-arrow-up"></i>
                                             </button>
+                                            <span style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">Update</span>
+                                        </div>
+                                        <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                                            <button type="button" onclick="promptPassword(<?= $user['id'] ?>)" class="btn-action warning" title="Reset Credentials">
+                                                <i class="fa-solid fa-shield-keyhole"></i>
+                                            </button>
+                                            <span style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">Reset</span>
+                                        </div>
+                                        <?php if (!$is_root && !$is_self): ?>
+                                            <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                                                <button type="submit" name="delete_admin_user" class="btn-action danger" onclick="return confirm('🚨 WARN: This will wipe this admin account. Proceed?')" title="Delete Account">
+                                                    <i class="fa-solid fa-trash-xmark"></i>
+                                                </button>
+                                                <span style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">Delete</span>
+                                            </div>
                                         <?php endif; ?>
                                     </div>
                                 </td>

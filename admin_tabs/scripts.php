@@ -319,4 +319,14 @@
             if (dropdown && dropdown.classList.contains('show')) { dropdown.classList.remove('show'); }
         }
     }
+
+    // Preloader Logic
+    window.addEventListener('load', function () {
+        const preloader = document.getElementById('preloader');
+        if (preloader) {
+            setTimeout(() => {
+                preloader.classList.add('fade-out');
+            }, 600);
+        }
+    });
 </script>

@@ -60,6 +60,8 @@ if (!isset($_SESSION['admin_logged_in'])) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Bloom Africa | Admin Login</title>
+        <link rel="icon" href="uploads/gallery/BLOOM.jpg?v=1.0" type="image/jpeg">
+        <link rel="shortcut icon" href="uploads/gallery/BLOOM.jpg?v=1.0" type="image/jpeg">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <style>
             :root {
@@ -157,10 +159,108 @@ if (!isset($_SESSION['admin_logged_in'])) {
                 text-align: center;
                 margin-bottom: 25px;
             }
+
+            /* Preloader Styles */
+            .preloader {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: #1a1512;
+                z-index: 999999;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;
+            }
+
+            .preloader.fade-out {
+                opacity: 0;
+                visibility: hidden;
+            }
+
+            .loader-container {
+                position: relative;
+                width: 100px;
+                height: 100px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .loader-circle {
+                width: 60px;
+                height: 60px;
+                border: 4px solid transparent;
+                border-top: 4px solid var(--primary-gold);
+                border-bottom: 4px solid var(--primary-gold);
+                border-radius: 50%;
+                animation: rotateLoader 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+            }
+
+            .loader-inner {
+                position: absolute;
+                width: 30px;
+                height: 30px;
+                border: 3px solid transparent;
+                border-left: 3px solid rgba(255, 255, 255, 0.2);
+                border-right: 3px solid rgba(255, 255, 255, 0.2);
+                border-radius: 50%;
+                animation: rotateLoader 0.8s linear infinite reverse;
+                opacity: 0.5;
+            }
+
+            @keyframes rotateLoader {
+                0% {
+                    transform: rotate(0deg) scale(1);
+                }
+
+                50% {
+                    transform: rotate(180deg) scale(1.1);
+                }
+
+                100% {
+                    transform: rotate(360deg) scale(1);
+                }
+            }
+
+            .loader-text {
+                position: absolute;
+                bottom: -40px;
+                font-size: 10px;
+                letter-spacing: 4px;
+                text-transform: uppercase;
+                color: var(--primary-gold);
+                font-weight: 800;
+                opacity: 0.8;
+                animation: pulseText 2s ease-in-out infinite;
+            }
+
+            @keyframes pulseText {
+
+                0%,
+                100% {
+                    opacity: 0.4;
+                    transform: translateY(0);
+                }
+
+                50% {
+                    opacity: 1;
+                    transform: translateY(-3px);
+                }
+            }
         </style>
     </head>
 
     <body>
+        <div class="preloader" id="preloader">
+            <div class="loader-container">
+                <div class="loader-circle"></div>
+                <div class="loader-inner"></div>
+                <div class="loader-text">Bloom</div>
+            </div>
+        </div>
         <div class="login-box">
             <h2>Bloom Admin</h2>
 
@@ -235,10 +335,18 @@ if (!isset($_SESSION['admin_logged_in'])) {
             </form>
         </div>
 
-        <script>         function toggleAuth(type) {
+        <script>
+            function toggleAuth(type) {
                 const forms = ['loginForm', 'signupForm', 'forgotForm']; forms.forEach(f => document.getElementById(f).style.display = 'none'); document.getElementById(type + 'Form').style.display = 'block';
                 const titles = { login: 'Bloom Admin', signup: 'Sign Up', forgot: 'Reset Password' }; document.querySelector('.login-box h2').innerText = titles[type];
             }
+
+            window.addEventListener('load', function () {
+                const preloader = document.getElementById('preloader');
+                setTimeout(() => {
+                    preloader.classList.add('fade-out');
+                }, 600);
+            });
         </script>
     </body>
 
@@ -321,10 +429,19 @@ $perf_data_json = json_encode($perf_percent);
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="uploads/gallery/BLOOM.jpg?v=1.0" type="image/jpeg">
+    <link rel="shortcut icon" href="uploads/gallery/BLOOM.jpg?v=1.0" type="image/jpeg">
     <?php include 'admin_tabs/styles.php'; ?>
 </head>
 
 <body>
+    <div class="preloader" id="preloader">
+        <div class="loader-container">
+            <div class="loader-circle"></div>
+            <div class="loader-inner"></div>
+            <div class="loader-text">Bloom</div>
+        </div>
+    </div>
 
     <div class="sidebar">
         <a href="index.php" class="brand">
@@ -372,6 +489,49 @@ $perf_data_json = json_encode($perf_percent);
                         <?php if (hasPermission('gallery')): ?>
                             <a href="?tab=gallery" class="nav-item <?= $active_tab == 'gallery' ? 'active' : '' ?>"><i
                                     class="fa-solid fa-images"></i> Gallery</a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!-- Construction Management Dropdown -->
+            <?php if (hasPermission('const_projects') || hasPermission('const_equipment') || hasPermission('const_quotes')): ?>
+                <div
+                    class="nav-dropdown <?= in_array($active_tab, ['const_projects', 'const_equipment', 'const_quotes']) ? 'open' : '' ?>">
+                    <div class="nav-dropdown-toggle" onclick="this.parentElement.classList.toggle('open')">
+                        <span style="display: flex; align-items: center; gap: 15px;">
+                            <i class="fa-solid fa-hard-hat"></i> Construction Mgmt
+                        </span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="submenu">
+                        <?php if (hasPermission('const_projects')): ?>
+                            <a href="?tab=const_projects"
+                                class="nav-item <?= $active_tab == 'const_projects' ? 'active' : '' ?>"><i
+                                    class="fa-solid fa-building"></i> Projects</a>
+                        <?php endif; ?>
+                        <?php if (hasPermission('const_services')): ?>
+                            <a href="?tab=const_services"
+                                class="nav-item <?= $active_tab == 'const_services' ? 'active' : '' ?>"><i
+                                    class="fa-solid fa-screwdriver-wrench"></i> Our Services</a>
+                        <?php endif; ?>
+                        <?php if (hasPermission('const_features')): ?>
+                            <a href="?tab=const_features"
+                                class="nav-item <?= $active_tab == 'const_features' ? 'active' : '' ?>"><i
+                                    class="fa-solid fa-lightbulb"></i> Why Choose Us</a>
+                        <?php endif; ?>
+                        <?php if (hasPermission('const_equipment')): ?>
+                            <a href="?tab=const_equipment"
+                                class="nav-item <?= $active_tab == 'const_equipment' ? 'active' : '' ?>"><i
+                                    class="fa-solid fa-truck-pickup"></i> Equipment</a>
+                        <?php endif; ?>
+                        <?php if (hasPermission('const_quotes')): ?>
+                            <a href="?tab=const_quotes" class="nav-item <?= $active_tab == 'const_quotes' ? 'active' : '' ?>"><i
+                                    class="fa-solid fa-file-invoice-dollar"></i> Quotes</a>
+                        <?php endif; ?>
+                        <?php if (hasPermission('const_info')): ?>
+                            <a href="?tab=const_info" class="nav-item <?= $active_tab == 'const_info' ? 'active' : '' ?>"><i
+                                    class="fa-solid fa-gears"></i> Portal Settings</a>
                         <?php endif; ?>
                     </div>
                 </div>

@@ -71,22 +71,30 @@
                             </small>
                         </td>
                         <td>
-                            <div style="display: flex; gap: 8px;">
-                                <form method="POST" style="display: inline;">
-                                    <input type="hidden" name="trash_id" value="<?= $item['id'] ?>">
-                                    <button type="submit" name="restore_item" class="btn"
-                                        style="background: #10b981; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12px; border: none; font-weight: 600; cursor: pointer;">
-                                        <i class="fa-solid fa-rotate-left"></i> Restore
-                                    </button>
-                                </form>
-                                <form method="POST" style="display: inline;"
-                                    onsubmit="return confirm('WARNING: This will permanently delete the data. This action cannot be undone. Proceed?');">
-                                    <input type="hidden" name="trash_id" value="<?= $item['id'] ?>">
-                                    <button type="submit" name="purge_item" class="btn"
-                                        style="background: #ef4444; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12px; border: none; font-weight: 600; cursor: pointer;">
-                                        <i class="fa-solid fa-fire"></i> Purge
-                                    </button>
-                                </form>
+                            <div style="display: flex; gap: 12px;">
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                                    <form method="POST">
+                                        <input type="hidden" name="trash_id" value="<?= $item['id'] ?>">
+                                        <button type="submit" name="restore_item" class="btn-icon"
+                                            style="background: #10b981; color: #fff; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: none; cursor: pointer;">
+                                            <i class="fa-solid fa-rotate-left"></i>
+                                        </button>
+                                    </form>
+                                    <span
+                                        style="font-size: 8px; font-weight: 700; color: #64748b; text-transform: uppercase;">Restore</span>
+                                </div>
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                                    <form method="POST"
+                                        onsubmit="return confirm('WARNING: This will permanently delete the data. This action cannot be undone. Proceed?');">
+                                        <input type="hidden" name="trash_id" value="<?= $item['id'] ?>">
+                                        <button type="submit" name="purge_item" class="btn-icon"
+                                            style="background: #ef4444; color: #fff; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: none; cursor: pointer;">
+                                            <i class="fa-solid fa-fire"></i>
+                                        </button>
+                                    </form>
+                                    <span
+                                        style="font-size: 8px; font-weight: 700; color: #64748b; text-transform: uppercase;">Purge</span>
+                                </div>
                             </div>
                         </td>
                     </tr>

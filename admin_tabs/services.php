@@ -252,16 +252,24 @@
                 </p>
                 <div
                     style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 15px;">
-                    <button class="btn-icon edit-service-btn"
-                        style="color: #a855f7; background: #f5f3ff; border-radius: 8px; padding: 8px 12px;"
-                        data-service="<?= $service_json ?>">
-                        <i class="fa-solid fa-pen"></i> Edit
-                    </button>
-                    <button type="button" class="btn-icon"
-                        style="color: #ef4444; border:none; background:none; cursor:pointer;"
-                        onclick="modernDelete('delete_service', '<?= $s['id'] ?>', '<?= htmlspecialchars($s['title'], ENT_QUOTES) ?>', 'Service')">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <button class="btn-icon edit-service-btn"
+                            style="color: #a855f7; background: #f5f3ff; border-radius: 8px; padding: 8px 12px; border: none; cursor: pointer;"
+                            data-service="<?= $service_json ?>">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <span
+                            style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">Edit</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <button type="button" class="btn-icon"
+                            style="color: #ef4444; border:none; background:#fee2e2; border-radius: 8px; padding: 8px 12px; cursor:pointer;"
+                            onclick="modernDelete('delete_service', '<?= $s['id'] ?>', '<?= htmlspecialchars($s['title'], ENT_QUOTES) ?>', 'Service')">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                        <span
+                            style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">Delete</span>
+                    </div>
                 </div>
             </div>
         </div>

@@ -98,17 +98,31 @@
                         <?= $job['status'] ?>
                     </span></td>
                 <td>
-                    <div class="action-flex">
-                        <button class="btn-icon btn-view" title="View Job"
-                            onclick="viewJob(<?= htmlspecialchars(json_encode($job)) ?>)"><i
-                                class="fa-solid fa-eye"></i></button>
-                        <button class="btn-icon btn-edit" title="Edit Job"
-                            onclick="editJob(<?= htmlspecialchars(json_encode($job)) ?>)"><i
-                                class="fa-solid fa-pen-to-square"></i></button>
-                        <button type="button" class="btn-icon btn-delete" title="Delete"
-                            onclick="modernDelete('delete_job', '<?= $job['id'] ?>', '<?= htmlspecialchars($job['title'], ENT_QUOTES) ?>', 'Job Listing')">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
+                    <div class="action-flex" style="gap: 12px;">
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                            <button class="btn-icon btn-view" title="View Job"
+                                onclick="viewJob(<?= htmlspecialchars(json_encode($job)) ?>)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <span
+                                style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">View</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                            <button class="btn-icon btn-edit" title="Edit Job"
+                                onclick="editJob(<?= htmlspecialchars(json_encode($job)) ?>)">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <span
+                                style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">Edit</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                            <button type="button" class="btn-icon btn-delete" title="Delete"
+                                onclick="modernDelete('delete_job', '<?= $job['id'] ?>', '<?= htmlspecialchars($job['title'], ENT_QUOTES) ?>', 'Job Listing')">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                            <span
+                                style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">Delete</span>
+                        </div>
                     </div>
                 </td>
             </tr>

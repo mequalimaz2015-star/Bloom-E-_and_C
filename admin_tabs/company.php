@@ -28,7 +28,8 @@
                                 style="width: 100%; height: 100%; object-fit: cover;">
                             <div
                                 style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.7); padding: 5px; color: #fff; font-size: 10px;">
-                                <i class="fa-solid fa-camera"></i> Change Photo</div>
+                                <i class="fa-solid fa-camera"></i> Change Photo
+                            </div>
                         </div>
                         <input type="file" name="ceo_photo" id="ceoPhotoInput" accept="image/*" style="display: none;"
                             onchange="if(this.files[0]){ let r=new FileReader(); r.onload=function(e){ document.getElementById('ceoPhotoPreview').src=e.target.result; document.getElementById('ceoPreviewThumb').src=e.target.result; }; r.readAsDataURL(this.files[0]); }">
@@ -69,9 +70,11 @@
                             style="font-size: 11px; color: #dfb180; font-weight: 700; text-transform: uppercase; margin: 0 0 2px;">
                             Website View Preview</p>
                         <p style="font-size: 14px; font-weight: 700; color: #1a1512; margin: 0;">
-                            <?= htmlspecialchars($c['ceo_name'] ?: 'CEO Name') ?></p>
+                            <?= htmlspecialchars($c['ceo_name'] ?: 'CEO Name') ?>
+                        </p>
                         <p style="font-size: 12px; color: #666; font-style: italic; margin: 0;">
-                            <?= htmlspecialchars($c['ceo_title'] ?: 'Position Title') ?></p>
+                            <?= htmlspecialchars($c['ceo_title'] ?: 'Position Title') ?>
+                        </p>
                     </div>
                     <div style="margin-left: auto; font-size: 20px; color: #dfb180;"><i
                             class="fa-solid fa-quote-right"></i></div>
@@ -143,20 +146,22 @@
             </div>
         </div>
 
-        <!-- 3. Company Information Management -->
         <div class="card" style="border-radius: 16px; margin-bottom: 30px;">
-            <div class="card-header"><span class="card-title"><i class="fa-solid fa-building-circle-check"></i> Company
-                    Information Management</span></div>
+            <div class="card-header"><span class="card-title"><i class="fa-solid fa-building-circle-check"></i>
+                    Company Information Management</span></div>
             <div style="padding: 25px;">
                 <div class="form-row">
                     <div>
                         <label style="font-size:12px; font-weight:600; color:#666;">Company Name</label>
-                        <input type="text" name="company_name" value="<?= htmlspecialchars($c['company_name']) ?>"
-                            required>
+                        <input type="text" name="company_name"
+                            value="<?= htmlspecialchars($c['company_name'] ?? 'Bloom Africa Restaurant') ?>"
+                            placeholder="e.g. Bloom Africa Restaurant" required>
                     </div>
                     <div>
                         <label style="font-size:12px; font-weight:600; color:#666;">Public Email</label>
-                        <input type="email" name="email" value="<?= htmlspecialchars($c['email']) ?>" required>
+                        <input type="email" name="email"
+                            value="<?= htmlspecialchars($c['email'] ?? 'info@bloomafrica.com') ?>"
+                            placeholder="e.g. info@bloomafrica.com" required>
                     </div>
                 </div>
                 <div class="form-row">
@@ -267,6 +272,157 @@
                         <input type="hidden" name="existing_hero_image"
                             value="<?= htmlspecialchars($c['hero_image'] ?? '') ?>">
                         <p style="font-size: 10px; color: #999; margin-top: 8px;">Recommended: 1920 x 1080 px</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4b. Hero Video Configuration -->
+        <div class="card" style="border-radius: 16px; border-left: 6px solid #dfb180; margin-bottom: 30px;">
+            <div class="card-header"
+                style="background: linear-gradient(135deg, #1a1512, #2a2018); padding: 15px 25px; border-bottom: 1px solid #dfb18022;">
+                <span class="card-title"
+                    style="font-size: 18px; color: #dfb180; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-video"></i> Hero Video Configuration
+                </span>
+            </div>
+            <div style="padding: 25px;">
+                <div style="display: flex; gap: 30px; align-items: flex-start; flex-wrap: wrap;">
+                    <div style="flex: 1.5; min-width: 300px;">
+                        <label style="font-size:12px; font-weight:600; color:#666;">Video Source / URL</label>
+                        <input type="text" name="hero_video_url" value="<?= htmlspecialchars($c['hero_video'] ?? '') ?>"
+                            placeholder="e.g. assets/videos/home-video.mp4 or YouTube Link">
+                        <p style="font-size: 11px; color: #999; margin-top: 5px;">This will be used for the Home Video
+                            variation. You can use a local path or external link.</p>
+                    </div>
+                    <div
+                        style="flex: 1; text-align: center; background: #fdfaf7; padding: 20px; border-radius: 12px; border: 2px dashed #dfb18066;">
+                        <label
+                            style="font-size:11px; font-weight:700; color:#dfb180; display:block; margin-bottom:10px; text-transform: uppercase;">Upload
+                            Home Video</label>
+                        <i class="fa-solid fa-cloud-arrow-up"
+                            style="font-size: 24px; color: #dfb180; margin-bottom: 10px; display: block;"></i>
+                        <input type="file" name="hero_video_photo" accept="video/mp4,video/webm"
+                            style="font-size: 11px; width: 100%;">
+                        <input type="hidden" name="existing_hero_video"
+                            value="<?= htmlspecialchars($c['hero_video'] ?? '') ?>">
+                        <p style="font-size: 9px; color: #999; margin-top: 5px;">Max size recommended: 20MB</p>
+                    </div>
+                    <div
+                        style="flex: 1; text-align: center; background: #fdfaf7; padding: 20px; border-radius: 12px; border: 2px dashed #dfb18066;">
+                        <label
+                            style="font-size:11px; font-weight:700; color:#dfb180; display:block; margin-bottom:10px; text-transform: uppercase;">Upload
+                            Video Audio</label>
+                        <i class="fa-solid fa-cloud-arrow-up"
+                            style="font-size: 24px; color: #dfb180; margin-bottom: 10px; display: block;"></i>
+                        <input type="file" name="hero_audio_photo" accept="audio/mp3,audio/wav,audio/ogg"
+                            style="font-size: 11px; width: 100%;">
+                        <input type="hidden" name="existing_hero_audio"
+                            value="<?= htmlspecialchars($c['hero_audio'] ?? '') ?>">
+                        <p style="font-size: 9px; color: #999; margin-top: 5px;">Optional Background Audio</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4c. Hero Carousel (Additional Slides) -->
+        <div class="card" style="border-radius: 16px; border-left: 6px solid #dfb180; margin-bottom: 30px;">
+            <div class="card-header"
+                style="background: linear-gradient(135deg, #1a1512, #2a2018); padding: 15px 25px; border-bottom: 1px solid #dfb18022;">
+                <span class="card-title"
+                    style="font-size: 18px; color: #dfb180; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-images"></i> Hero Carousel (Additional Slides)
+                </span>
+            </div>
+            <div style="padding: 25px;">
+                <!-- Slide 2 -->
+                <div style="margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #eee;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h5
+                            style="color: #dfb180; margin:0; font-weight: 700; text-transform: uppercase; font-size: 13px;">
+                            Carousel Slide #2</h5>
+                        <span
+                            style="font-size: 10px; background: rgba(223,177,128,0.1); color: #dfb180; padding: 4px 10px; border-radius: 20px;">Secondary
+                            Slide</span>
+                    </div>
+                    <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 250px;">
+                            <div class="form-row">
+                                <div>
+                                    <label style="font-size:12px; font-weight:600; color:#666;">Slide 2 Title</label>
+                                    <input type="text" name="hero2_title"
+                                        value="<?= htmlspecialchars($c['hero2_title'] ?? '') ?>"
+                                        placeholder="e.g. Exquisite Fine Dining">
+                                </div>
+                                <div>
+                                    <label style="font-size:12px; font-weight:600; color:#666;">Button Text</label>
+                                    <input type="text" name="hero2_button_text"
+                                        value="<?= htmlspecialchars($c['hero2_button_text'] ?? '') ?>"
+                                        placeholder="e.g. Book a Table">
+                                </div>
+                            </div>
+                            <label
+                                style="font-size:12px; font-weight:600; color:#666; margin-top:10px; display:block;">Slide
+                                2 Subtitle</label>
+                            <textarea name="hero2_subtitle" rows="2"
+                                placeholder="Brief description for the second slide..."><?= htmlspecialchars($c['hero2_subtitle'] ?? '') ?></textarea>
+                        </div>
+                        <div
+                            style="width: 180px; text-align: center; background: #fafafa; padding: 15px; border-radius: 12px; border: 1px solid #eee;">
+                            <img id="hero2Preview"
+                                src="<?= htmlspecialchars($c['hero2_image'] ?: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=400') ?>"
+                                style="width:100%; height:90px; object-fit:cover; border-radius:8px; border:1px solid #ddd; margin-bottom:12px;">
+                            <input type="file" name="hero2_photo" onchange="previewImage(this, 'hero2Preview')"
+                                style="font-size: 10px; width: 100%;">
+                            <input type="hidden" name="existing_hero2_image"
+                                value="<?= htmlspecialchars($c['hero2_image'] ?? '') ?>">
+                        </div>
+                    </div>
+                </div>
+                <!-- Slide 3 -->
+                <div>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h5
+                            style="color: #dfb180; margin:0; font-weight: 700; text-transform: uppercase; font-size: 13px;">
+                            Carousel Slide #3</h5>
+                        <span
+                            style="font-size: 10px; background: rgba(223,177,128,0.1); color: #dfb180; padding: 4px 10px; border-radius: 20px;">Third
+                            Slide</span>
+                    </div>
+                    <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 250px;">
+                            <div class="form-row">
+                                <div>
+                                    <label style="font-size:12px; font-weight:600; color:#666;">Slide 3 Title</label>
+                                    <input type="text" name="hero3_title"
+                                        value="<?= htmlspecialchars($c['hero3_title'] ?? '') ?>"
+                                        placeholder="e.g. Authentic Flavors">
+                                </div>
+                                <div>
+                                    <label style="font-size:12px; font-weight:600; color:#666;">Button Text</label>
+                                    <input type="text" name="hero3_button_text"
+                                        value="<?= htmlspecialchars($c['hero3_button_text'] ?? '') ?>"
+                                        placeholder="e.g. Our Specialities">
+                                </div>
+                            </div>
+                            <label
+                                style="font-size:12px; font-weight:600; color:#666; margin-top:10px; display:block;">Slide
+                                3 Subtitle</label>
+                            <textarea name="hero3_subtitle" rows="2"
+                                placeholder="Brief description for the third slide..."><?= htmlspecialchars($c['hero3_subtitle'] ?? '') ?></textarea>
+                        </div>
+                        <div
+                            style="width: 180px; text-align: center; background: #fafafa; padding: 15px; border-radius: 12px; border: 1px solid #eee;">
+                            <img id="hero3Preview"
+                                src="<?= htmlspecialchars($c['hero3_image'] ?: 'https://images.unsplash.com/photo-1544148103-0773bb108726?q=80&w=400') ?>"
+                                style="width:100%; height:90px; object-fit:cover; border-radius:8px; border:1px solid #ddd; margin-bottom:12px;">
+                            <input type="file" name="hero3_photo" onchange="previewImage(this, 'hero3Preview')"
+                                style="font-size: 10px; width: 100%;">
+                            <input type="hidden" name="existing_hero3_image"
+                                value="<?= htmlspecialchars($c['hero3_image'] ?? '') ?>">
+                        </div>
                     </div>
                 </div>
             </div>

@@ -57,7 +57,6 @@
             $sql .= " WHERE a.gpa >= :min_gpa";
         }
         $sql .= " ORDER BY a.id DESC";
-
         $stmt = $pdo->prepare($sql);
         if ($min_gpa > 0) {
             $stmt->execute(['min_gpa' => $min_gpa]);
@@ -110,28 +109,36 @@
                     <?php endif; ?>
                 </td>
                 <td>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <form method="POST">
-                            <input type="hidden" name="id" value="<?= $app['id'] ?>">
-                            <input type="hidden" name="update_application_status" value="1">
-                            <select name="status" onchange="this.form.submit()"
-                                style="width: auto; padding: 5px; font-size:12px;">
-                                <option value="Pending" <?= $app['status'] == 'Pending' ? 'selected' : '' ?>>Pending
-                                </option>
-                                <option value="Reviewed" <?= $app['status'] == 'Reviewed' ? 'selected' : '' ?>>Reviewed
-                                </option>
-                                <option value="Accepted" <?= $app['status'] == 'Accepted' ? 'selected' : '' ?>>Accepted
-                                </option>
-                                <option value="Rejected" <?= $app['status'] == 'Rejected' ? 'selected' : '' ?>>Rejected
-                                </option>
-                            </select>
-                        </form>
-                        <button type="button" class="btn-icon btn-delete"
-                            onclick="modernDelete('delete_application', '<?= $app['id'] ?>', '<?= htmlspecialchars($app['applicant_name'], ENT_QUOTES) ?>', 'Application')"
-                            title="Remove Application"
-                            style="background: #fee2e2; color: #ef4444; border: none; padding: 6px; border-radius: 4px; cursor: pointer;">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                            <form method="POST">
+                                <input type="hidden" name="id" value="<?= $app['id'] ?>">
+                                <input type="hidden" name="update_application_status" value="1">
+                                <select name="status" onchange="this.form.submit()"
+                                    style="width: auto; padding: 4px; font-size:11px; border-radius: 6px; border: 1px solid #cbd5e1;">
+                                    <option value="Pending" <?= $app['status'] == 'Pending' ? 'selected' : '' ?>>Pending
+                                    </option>
+                                    <option value="Reviewed" <?= $app['status'] == 'Reviewed' ? 'selected' : '' ?>>Reviewed
+                                    </option>
+                                    <option value="Accepted" <?= $app['status'] == 'Accepted' ? 'selected' : '' ?>>Accepted
+                                    </option>
+                                    <option value="Rejected" <?= $app['status'] == 'Rejected' ? 'selected' : '' ?>>Rejected
+                                    </option>
+                                </select>
+                            </form>
+                            <span
+                                style="font-size: 8px; font-weight: 700; color: #64748b; text-transform: uppercase;">Update</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                            <button type="button" class="btn-icon btn-delete"
+                                onclick="modernDelete('delete_application', '<?= $app['id'] ?>', '<?= htmlspecialchars($app['applicant_name'], ENT_QUOTES) ?>', 'Application')"
+                                title="Remove Application"
+                                style="background: #fee2e2; color: #ef4444; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer;">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                            <span
+                                style="font-size: 8px; font-weight: 700; color: #64748b; text-transform: uppercase;">Delete</span>
+                        </div>
                     </div>
                 </td>
             </tr>
@@ -145,7 +152,6 @@
         checkboxes.forEach(cb => cb.checked = source.checked);
         updateBulkUI();
     }
-
     function updateBulkUI() {
         const checkboxes = document.querySelectorAll('.app-checkbox:checked');
         const bulkDiv = document.getElementById('bulk_actions');

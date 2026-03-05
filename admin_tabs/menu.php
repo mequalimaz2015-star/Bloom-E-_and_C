@@ -225,18 +225,33 @@
                         </div>
                     </td>
                     <td>
-                        <div class="action-flex" style="justify-content: center;">
-                            <button class="action-btn-circle btn-circle-view"
-                                onclick="viewMenu(<?= htmlspecialchars(json_encode($m)) ?>)" title="View Details"
-                                style="border-color: #0ea5e9; color: #0ea5e9;"><i class="fa-solid fa-eye"></i></button>
-                            <button class="action-btn-circle btn-circle-edit"
-                                onclick="editMenu(<?= htmlspecialchars(json_encode($m)) ?>)" title="Edit Item"><i
-                                    class="fa-solid fa-pen"></i></button>
-                            <button type="button" class="action-btn-circle btn-circle-delete"
-                                onclick="modernDelete('delete_menu', '<?= $m['id'] ?>', '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', 'Menu Item')"
-                                title="Delete Item">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
+                        <div class="action-flex" style="justify-content: center; gap: 12px;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                                <button class="action-btn-circle btn-circle-view"
+                                    onclick="viewMenu(<?= htmlspecialchars(json_encode($m)) ?>)" title="View Details"
+                                    style="border-color: #0ea5e9; color: #0ea5e9;">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                                <span
+                                    style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">View</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                                <button class="action-btn-circle btn-circle-edit"
+                                    onclick="editMenu(<?= htmlspecialchars(json_encode($m)) ?>)" title="Edit Item">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <span
+                                    style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">Edit</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                                <button type="button" class="action-btn-circle btn-circle-delete"
+                                    onclick="modernDelete('delete_menu', '<?= $m['id'] ?>', '<?= htmlspecialchars($m['name'], ENT_QUOTES) ?>', 'Menu Item')"
+                                    title="Delete Item">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                                <span
+                                    style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">Delete</span>
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -330,47 +345,56 @@
 </div>
 
 <!-- Interested Customers Modal -->
-<div class="modal-overlay" id="loversModal" style="display: none; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999;">
-    <div class="modal-content" style="max-width: 500px; background: #fff; border-radius: 15px; width: 90%; overflow: hidden;">
-        <div class="card-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #f8fafc;">
-            <span class="card-title" style="font-weight: 700; color: #1e293b;"><i class="fa-solid fa-heart" style="color: #e74c3c;"></i> Interested Customers</span>
-            <button type="button" onclick="document.getElementById('loversModal').style.display='none'" class="btn" style="background:none; border:none; font-size:24px; cursor:pointer; color: #64748b;">&times;</button>
+<div class="modal-overlay" id="loversModal"
+    style="display: none; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999;">
+    <div class="modal-content"
+        style="max-width: 500px; background: #fff; border-radius: 15px; width: 90%; overflow: hidden;">
+        <div class="card-header"
+            style="padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #f8fafc;">
+            <span class="card-title" style="font-weight: 700; color: #1e293b;"><i class="fa-solid fa-heart"
+                    style="color: #e74c3c;"></i> Interested Customers</span>
+            <button type="button" onclick="document.getElementById('loversModal').style.display='none'" class="btn"
+                style="background:none; border:none; font-size:24px; cursor:pointer; color: #64748b;">&times;</button>
         </div>
         <div style="padding: 25px;">
-            <h3 id="loverDishName" style="margin-bottom: 20px; color: #1e293b; font-size: 18px; font-weight: 800;">Dish Name</h3>
-            <div id="loverEmailsList" style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; padding-right: 5px;">
+            <h3 id="loverDishName" style="margin-bottom: 20px; color: #1e293b; font-size: 18px; font-weight: 800;">Dish
+                Name</h3>
+            <div id="loverEmailsList"
+                style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; padding-right: 5px;">
                 <!-- Emails will be injected here -->
             </div>
         </div>
-        <div style="padding: 15px 25px; background: #f8fafc; border-top: 1px solid #eee; display: flex; justify-content: flex-end;">
-            <button type="button" onclick="document.getElementById('loversModal').style.display='none'" class="btn btn-primary" style="padding: 10px 25px; border-radius: 10px;">Close Window</button>
+        <div
+            style="padding: 15px 25px; background: #f8fafc; border-top: 1px solid #eee; display: flex; justify-content: flex-end;">
+            <button type="button" onclick="document.getElementById('loversModal').style.display='none'"
+                class="btn btn-primary" style="padding: 10px 25px; border-radius: 10px;">Close Window</button>
         </div>
     </div>
 </div>
 
 <script>
-function showAllLovers(dishName, emails) {
-    document.getElementById('loverDishName').innerText = "Loved by customers for: " + dishName;
-    const list = document.getElementById('loverEmailsList');
-    list.innerHTML = '';
-    
-    const emailArray = emails.split(', ');
-    emailArray.forEach(email => {
-        const div = document.createElement('div');
-        div.style.padding = '14px 18px';
-        div.style.background = '#ffffff';
-        div.style.borderRadius = '12px';
-        div.style.border = '1px solid #e2e8f0';
-        div.style.display = 'flex';
-        div.style.alignItems = 'center';
-        div.style.gap = '12px';
-        div.style.fontSize = '14px';
-        div.style.color = '#334155';
-        div.style.boxShadow = '0 2px 4px rgba(0,0,0,0.02)';
-        div.innerHTML = `<i class="fa-solid fa-envelope" style="color: var(--primary); font-size: 16px;"></i> <strong style="font-weight: 600;">${email}</strong>`;
-        list.appendChild(div);
-    });
-    
-    document.getElementById('loversModal').style.display = 'flex';
-}
+    function showAllLovers(dishName, emails) {
+        document.getElementById('loverDishName').innerText = "Loved by customers for: " + dishName;
+        const list = document.getElementById('loverEmailsList');
+        list.innerHTML = '';
+
+        const emailArray = emails.split(', ');
+        emailArray.forEach(email => {
+            const div = document.createElement('div');
+            div.style.padding = '14px 18px';
+            div.style.background = '#ffffff';
+            div.style.borderRadius = '12px';
+            div.style.border = '1px solid #e2e8f0';
+            div.style.display = 'flex';
+            div.style.alignItems = 'center';
+            div.style.gap = '12px';
+            div.style.fontSize = '14px';
+            div.style.color = '#334155';
+            div.style.boxShadow = '0 2px 4px rgba(0,0,0,0.02)';
+            div.innerHTML = `<i class="fa-solid fa-envelope" style="color: var(--primary); font-size: 16px;"></i> <strong style="font-weight: 600;">${email}</strong>`;
+            list.appendChild(div);
+        });
+
+        document.getElementById('loversModal').style.display = 'flex';
+    }
 </script>

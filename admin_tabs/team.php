@@ -7,7 +7,6 @@ $team = $pdo->query("SELECT * FROM team_members ORDER BY order_index ASC, id ASC
         <button class="btn btn-primary" onclick="openMemberModal()"><i class="fa-solid fa-plus"></i> Add New
             Member</button>
     </div>
-
     <div style="padding: 20px;">
         <table class="data-table">
             <thead>
@@ -36,15 +35,30 @@ $team = $pdo->query("SELECT * FROM team_members ORDER BY order_index ASC, id ASC
                                 <?= $m['order_index'] ?>
                             </span></td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary" onclick='editMember(<?= json_encode($m) ?>)'
-                                title="Edit"><i class="fa-solid fa-pen"></i></button>
-                            <form method="POST" style="display:inline;"
-                                onsubmit="return confirm('Remove this team member?')">
-                                <input type="hidden" name="delete_team_member" value="1">
-                                <input type="hidden" name="id" value="<?= $m['id'] ?>">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i
-                                        class="fa-solid fa-trash-can"></i></button>
-                            </form>
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                                    <button class="btn btn-sm btn-outline-primary"
+                                        style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid #3b82f6; color: #3b82f6; background: transparent; cursor: pointer;"
+                                        onclick='editMember(<?= json_encode($m) ?>)' title="Edit">
+                                        <i class="fa-solid fa-pen" style="font-size: 12px;"></i>
+                                    </button>
+                                    <span
+                                        style="font-size: 8px; font-weight: 700; color: #64748b; text-transform: uppercase;">Edit</span>
+                                </div>
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                                    <form method="POST" onsubmit="return confirm('Remove this team member?')">
+                                        <input type="hidden" name="delete_team_member" value="1">
+                                        <input type="hidden" name="id" value="<?= $m['id'] ?>">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid #ef4444; color: #ef4444; background: transparent; cursor: pointer;"
+                                            title="Delete">
+                                            <i class="fa-solid fa-trash-can" style="font-size: 12px;"></i>
+                                        </button>
+                                    </form>
+                                    <span
+                                        style="font-size: 8px; font-weight: 700; color: #64748b; text-transform: uppercase;">Delete</span>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -94,7 +108,6 @@ $team = $pdo->query("SELECT * FROM team_members ORDER BY order_index ASC, id ASC
         </form>
     </div>
 </div>
-
 <script>
     function openMemberModal() {
         document.getElementById('modalTitle').innerText = 'Add Team Member';
@@ -106,11 +119,9 @@ $team = $pdo->query("SELECT * FROM team_members ORDER BY order_index ASC, id ASC
         document.getElementById('tmPreview').src = 'admin_logo.png';
         document.getElementById('memberModal').style.display = 'flex';
     }
-
     function closeMemberModal() {
         document.getElementById('memberModal').style.display = 'none';
     }
-
     function editMember(m) {
         document.getElementById('modalTitle').innerText = 'Edit Team Member';
         document.getElementById('member_id').value = m.id;

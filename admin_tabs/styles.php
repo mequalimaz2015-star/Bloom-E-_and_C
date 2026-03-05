@@ -12,6 +12,99 @@
         --sidebar-text: #e0f2f1;
     }
 
+    /* Preloader Styles */
+    .preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at center, #ffffff, #f8fafc);
+        z-index: 999999;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s;
+        gap: 60px;
+    }
+
+    .preloader.fade-out {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .loader-container {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .loader-circle {
+        width: 80px;
+        height: 80px;
+        border: 4px solid rgba(255, 45, 85, 0.1);
+        border-top: 4px solid var(--primary);
+        border-bottom: 4px solid var(--primary);
+        border-radius: 50%;
+        animation: rotateLoader 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+    }
+
+    .loader-inner {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        border: 3px solid transparent;
+        border-left: 3px solid rgba(255, 45, 85, 0.3);
+        border-right: 3px solid rgba(255, 45, 85, 0.3);
+        border-radius: 50%;
+        animation: rotateLoader 1s linear infinite reverse;
+        opacity: 0.8;
+    }
+
+    @keyframes rotateLoader {
+        0% {
+            transform: rotate(0deg) scale(1);
+        }
+
+        50% {
+            transform: rotate(180deg) scale(1.15);
+        }
+
+        100% {
+            transform: rotate(360deg) scale(1);
+        }
+    }
+
+    .loader-text {
+        position: absolute;
+        bottom: -30px;
+        font-size: 11px;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        color: var(--primary);
+        font-weight: 900;
+        opacity: 0.9;
+        animation: pulseText 2s ease-in-out infinite;
+    }
+
+    @keyframes pulseText {
+
+        0%,
+        100% {
+            opacity: 0.4;
+            transform: translateY(0);
+        }
+
+        50% {
+            opacity: 1;
+            transform: translateY(-3px);
+        }
+    }
+
     * {
         margin: 0;
         padding: 0;

@@ -205,17 +205,40 @@
                         <?= $s['join_date'] ?>
                     </td>
                     <td>
-                        <div class="action-flex">
-                            <button onclick='viewEmp(<?= json_encode($s) ?>)' class="btn-icon btn-view"
-                                title="View Profile"><i class="fa-solid fa-eye"></i></button>
-                            <button onclick='showIDCard(<?= json_encode($s) ?>)' class="btn-icon"
-                                style="background: #e0f2fe; color: #0369a1;" title="Print ID Card"><i
-                                    class="fa-solid fa-id-card"></i></button>
-                            <button onclick='editEmp(<?= json_encode($s) ?>)' class="btn-icon btn-edit"
-                                title="Edit Profile"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="confirmDelete(<?= $s['id'] ?>, '<?= addslashes($s['name']) ?>')"
-                                class="btn-icon btn-danger" title="Delete Profile"><i
-                                    class="fa-solid fa-trash"></i></button>
+                        <div class="action-flex" style="gap: 12px;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                                <button onclick='viewEmp(<?= json_encode($s) ?>)' class="btn-icon btn-view"
+                                    title="View Profile">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                                <span
+                                    style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">View</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                                <button onclick='showIDCard(<?= json_encode($s) ?>)' class="btn-icon"
+                                    style="background: #e0f2fe; color: #0369a1;" title="Print ID Card">
+                                    <i class="fa-solid fa-id-card"></i>
+                                </button>
+                                <span
+                                    style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">ID
+                                    Card</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                                <button onclick='editEmp(<?= json_encode($s) ?>)' class="btn-icon btn-edit"
+                                    title="Edit Profile">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <span
+                                    style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">Edit</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                                <button onclick="confirmDelete(<?= $s['id'] ?>, '<?= addslashes($s['name']) ?>')"
+                                    class="btn-icon btn-danger" title="Delete Profile">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                                <span
+                                    style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">Delete</span>
+                            </div>
                         </div>
                     </td>
                 </tr>

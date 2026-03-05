@@ -183,8 +183,6 @@
         </table>
     </div>
 </div>
-
-
 <div class="card" style="margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e1e5ee;">
     <div class="card-header"
         style="background-color: #e6ebf2; border-bottom: 1px solid #d0d7e5; border-top-left-radius: 12px; border-top-right-radius: 12px; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">

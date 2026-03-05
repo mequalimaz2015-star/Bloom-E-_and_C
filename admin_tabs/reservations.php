@@ -35,19 +35,21 @@
                         <?= $r['status'] ?>
                     </span></td>
                 <td>
-                    <form method="POST" class="flex-actions">
-                        <input type="hidden" name="id" value="<?= $r['id'] ?>">
-                        <select name="status" onchange="this.form.submit()" style="width:120px; padding:5px;">
-                            <option value="Pending" <?= $r['status'] == 'Pending' ? 'selected' : '' ?>>Pending
-                            </option>
-                            <option value="Confirmed" <?= $r['status'] == 'Confirmed' ? 'selected' : '' ?>>
-                                Confirmed
-                            </option>
-                            <option value="Rejected" <?= $r['status'] == 'Rejected' ? 'selected' : '' ?>>Rejected
-                            </option>
-                        </select>
-                        <input type="hidden" name="update_reservation" value="1">
-                    </form>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <form method="POST" class="flex-actions">
+                            <input type="hidden" name="id" value="<?= $r['id'] ?>">
+                            <select name="status" onchange="this.form.submit()"
+                                style="width:110px; padding:5px; border-radius: 6px; border: 1px solid #ddd; font-size: 11px;">
+                                <option value="Pending" <?= $r['status'] == 'Pending' ? 'selected' : '' ?>>Pending</option>
+                                <option value="Confirmed" <?= $r['status'] == 'Confirmed' ? 'selected' : '' ?>>Confirmed
+                                </option>
+                                <option value="Rejected" <?= $r['status'] == 'Rejected' ? 'selected' : '' ?>>Rejected</option>
+                            </select>
+                            <input type="hidden" name="update_reservation" value="1">
+                        </form>
+                        <span
+                            style="font-size: 8px; font-weight: 700; color: #64748b; text-transform: uppercase;">Status</span>
+                    </div>
                 </td>
             </tr>
         <?php endforeach; ?>

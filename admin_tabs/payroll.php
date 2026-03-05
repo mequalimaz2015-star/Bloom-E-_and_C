@@ -143,21 +143,29 @@
                     </span>
                 </td>
                 <td>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <form method="POST">
-                            <input type="hidden" name="id" value="<?= $pay['id'] ?>">
-                            <input type="hidden" name="update_payroll_status" value="1">
-                            <select name="status" onchange="this.form.submit()"
-                                style="padding:4px; font-size:12px; border-radius: 6px; border: 1px solid #ddd;">
-                                <option value="Unpaid" <?= $pay['status'] == 'Unpaid' ? 'selected' : '' ?>>Unpaid
-                                </option>
-                                <option value="Paid" <?= $pay['status'] == 'Paid' ? 'selected' : '' ?>>Paid</option>
-                            </select>
-                        </form>
-                        <button class="btn"
-                            style="padding: 5px 10px; background: #3b82f6; color: #fff; border-radius: 6px; font-size: 11px; font-weight: 700;"
-                            onclick="viewPayslip(<?= htmlspecialchars(json_encode($pay)) ?>)"><i
-                                class="fa-solid fa-file-invoice-dollar"></i> View Slip</button>
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                            <form method="POST">
+                                <input type="hidden" name="id" value="<?= $pay['id'] ?>">
+                                <input type="hidden" name="update_payroll_status" value="1">
+                                <select name="status" onchange="this.form.submit()"
+                                    style="padding:4px; font-size:11px; border-radius: 6px; border: 1px solid #ddd; width: 85px;">
+                                    <option value="Unpaid" <?= $pay['status'] == 'Unpaid' ? 'selected' : '' ?>>Unpaid</option>
+                                    <option value="Paid" <?= $pay['status'] == 'Paid' ? 'selected' : '' ?>>Paid</option>
+                                </select>
+                            </form>
+                            <span
+                                style="font-size: 8px; font-weight: 700; color: #64748b; text-transform: uppercase;">Status</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                            <button class="btn"
+                                style="width: 38px; height: 38px; background: #3b82f6; color: #fff; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;"
+                                onclick="viewPayslip(<?= htmlspecialchars(json_encode($pay)) ?>)">
+                                <i class="fa-solid fa-file-invoice-dollar" style="font-size: 16px;"></i>
+                            </button>
+                            <span style="font-size: 8px; font-weight: 700; color: #64748b; text-transform: uppercase;">View
+                                Slip</span>
+                        </div>
                     </div>
                 </td>
             </tr>
