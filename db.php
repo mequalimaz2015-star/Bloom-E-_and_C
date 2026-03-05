@@ -29,42 +29,41 @@ if ($host === 'localhost') {
     $host = '127.0.0.1';
 }
 
-// 3. Final Connection Configuration
-$final_host = $host;
-if (empty($final_host))
-    $final_host = 'mysql';
-
-// 4. Connection Loop with Retries
-$max_retries = 3;
-$retry_delay = 3;
+// 3. Connection Strategy
 $pdo = null;
+$hosts_to_try = array_unique([$host, 'mysql', '127.0.0.1', '0.0.0.0']);
+$conn_error = "";
 
-for ($i = 0; $i < $max_retries; $i++) {
+foreach ($hosts_to_try as $attempt_host) {
+    if (empty($attempt_host))
+        continue;
+
+    // Skip 'localhost' literals to force TCP on Linux/Cloud
+    $connect_host = ($attempt_host === 'localhost') ? '127.0.0.1' : $attempt_host;
+
     try {
-        // Force TCP connection by ensuring we don't use 'localhost' literal
-        $connect_host = ($final_host === 'localhost') ? '127.0.0.1' : $final_host;
-
         $dsn = "mysql:host=$connect_host;port=$port;dbname=$dbname;charset=utf8mb4";
         $options = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_TIMEOUT => 5,
+            PDO::ATTR_TIMEOUT => 2, // Fast fail per host
         ];
 
         $pdo = new PDO($dsn, $username, $password ?: '', $options);
-        break; // Success!
+        if ($pdo)
+            break; // Success!
     } catch (PDOException $e) {
-        if ($i === $max_retries - 1) {
-            $error_msg = $e->getMessage();
-            $internal_host_tip = "";
-
-            if (getenv('RENDER')) {
-                $internal_host_tip = "\n\n[Render Troubleshooting]:\n1. Visit /check_env.php to see system status.\n2. Ensure your MySQL service 'Internal Hostname' is used if 'mysql' fails.\n3. Verify both services are in the same 'Region' (Ohio).";
-            }
-
-            die("Database Connection Failed: " . $error_msg . $internal_host_tip . "\n\nAttempted Host: " . $final_host);
-        }
-        sleep($retry_delay);
+        $conn_error = $e->getMessage();
     }
+}
+
+// 4. Final Fail Handler
+if (!$pdo) {
+    $internal_host_tip = "";
+    if (getenv('RENDER')) {
+        $internal_host_tip = "\n\n[RENDER FAST-FIX]:\n1. In Render Dashboard, click your MySQL service.\n2. Copy the 'Internal Hostname' (e.g. mysql-xyz1.onrender.com).\n3. In your Web Service -> Environment, set:\n   BLOOM_DB_HOST = (the internal hostname you copied)";
+    }
+
+    die("Database Connection Failed. Error: " . $conn_error . $internal_host_tip . "\n\n(Current Region: Ohio)");
 }
 
 
