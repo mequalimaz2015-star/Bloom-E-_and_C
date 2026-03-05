@@ -29,17 +29,15 @@ if ($host === 'localhost') {
     $host = '127.0.0.1';
 }
 
-// 3. Ultimate DNS Scouting & Connection Strategy
+// 3. User-Friendly Connection Strategy
 $pdo = null;
 $conn_error = "";
-// Simplified, unique list of common Render hostnames
 $possible_hosts = array_unique(array_filter([$host, 'mysql', 'mariadb', '127.0.0.1']));
 
 foreach ($possible_hosts as $try_host) {
-    // Total wait time per host: 2 minutes (30 attempts * 4s)
-    $max_wait_attempts = 30;
-
-    for ($i = 1; $i <= $max_wait_attempts; $i++) {
+    // Hidden retries: Only 2 attempts (Fast Feedback)
+    // We don't want the user stuck for 2 minutes behind a loading spinner.
+    for ($i = 1; $i <= 2; $i++) {
         try {
             $dsn = "mysql:host=$try_host;port=$port;dbname=$dbname;charset=utf8mb4";
             $pdo = new PDO($dsn, $username, $password ?: '', [
@@ -47,38 +45,32 @@ foreach ($possible_hosts as $try_host) {
                 PDO::ATTR_TIMEOUT => 2,
             ]);
             if ($pdo)
-                break 2; // SUCCESS! Stop everything and continue
+                break 2;
         } catch (PDOException $e) {
             $conn_error = $e->getMessage();
 
-            // If DNS is broken (Host Unknown), move to NEXT host immediately
+            // Fast-fail if host name is totally unknown
             if (strpos($conn_error, 'getaddrinfo') !== false || strpos($conn_error, 'not known') !== false) {
                 break;
             }
 
-            // If Connection Refused, the host exists but DB is still booting up.
-            // THIS IS THE KEY: We must be patient and wait.
-            if (strpos($conn_error, 'refused') !== false) {
-                if ($i % 5 === 0) {
-                    error_log("Bloom DB: '$try_host' found but still starting up... ($i/$max_wait_attempts)");
-                }
-                sleep(4);
+            // If refused, wait a tiny bit then one more try before showing UI
+            if (strpos($conn_error, 'refused') !== false && $i < 2) {
+                sleep(2);
                 continue;
             }
-
-            // Other errors (like Access Denied/Wrong Password) are fatal
             break;
         }
     }
 }
 
 if (!$pdo) {
-    echo "<div style='padding: 20px; background: #fff5f5; border: 1px solid #feb2b2; border-radius: 8px; font-family: sans-serif; max-width: 600px; margin: 40px auto;'>";
-    echo "<h2 style='color: #c53030; margin-top: 0;'>Database Still Waking Up</h2>";
-    echo "<p>Your Render database is currently performing its initial startup sequence. This usually takes 1-2 minutes on the Free plan.</p>";
-    echo "<p><strong>Details:</strong> $conn_error</p>";
-    echo "<hr style='border: none; border-top: 1px solid #feb2b2; margin: 15px 0;'>";
-    echo "<button onclick='window.location.reload()' style='background: #c53030; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;'>Try Refreshing Now</button>";
+    echo "<div style='padding: 30px; background: #fff; border-radius: 12px; font-family: sans-serif; max-width: 500px; margin: 100px auto; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1);'>";
+    echo "<div style='font-size: 50px; margin-bottom: 20px;'>☕</div>";
+    echo "<h2 style='color: #2d3748; margin-top: 0;'>Server is Warming Up</h2>";
+    echo "<p style='color: #718096; line-height: 1.6;'>The database is currently initializing on Render. This usually takes about 60 seconds on the free plan.</p>";
+    echo "<button onclick='window.location.reload()' style='background: #4a5568; color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.2s;'>Check Again</button>";
+    echo "<p style='font-size: 11px; color: #cbd5e0; margin-top: 20px;'>Status: $conn_error</p>";
     echo "</div>";
     die();
 }
