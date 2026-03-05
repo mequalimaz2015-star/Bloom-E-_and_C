@@ -29,44 +29,42 @@ if ($host === 'localhost') {
     $host = '127.0.0.1';
 }
 
-// 3. Connection Loop with Retries
+// 3. Final Connection Configuration
+$final_host = $host;
+if (empty($final_host))
+    $final_host = 'mysql';
+
+// 4. Connection Loop with Retries
 $max_retries = 3;
-$retry_delay = 2;
+$retry_delay = 3;
 $pdo = null;
 
-// The hosts we will try in order
-$hosts_to_try = [$host];
-if ($host === 'mysql') {
-    $hosts_to_try[] = '127.0.0.1';
-    $hosts_to_try[] = 'localhost';
-}
+for ($i = 0; $i < $max_retries; $i++) {
+    try {
+        // Force TCP connection by ensuring we don't use 'localhost' literal
+        $connect_host = ($final_host === 'localhost') ? '127.0.0.1' : $final_host;
 
-$conn_error = "";
-foreach ($hosts_to_try as $current_host) {
-    for ($i = 0; $i < $max_retries; $i++) {
-        try {
-            $dsn = "mysql:host=$current_host;port=$port;dbname=$dbname;charset=utf8mb4";
-            $options = [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_TIMEOUT => 3,
-            ];
-            $pdo = new PDO($dsn, $username, $password ?: '', $options);
-            break 2; // Success! Break both loops
-        } catch (PDOException $e) {
-            $conn_error = $e->getMessage();
-            // If it's a DNS error, don't retry this host, move to next host in the outer loop
-            if (strpos($conn_error, 'getaddrinfo failed') !== false || strpos($conn_error, 'Name or service not known') !== false) {
-                break;
+        $dsn = "mysql:host=$connect_host;port=$port;dbname=$dbname;charset=utf8mb4";
+        $options = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_TIMEOUT => 5,
+        ];
+
+        $pdo = new PDO($dsn, $username, $password ?: '', $options);
+        break; // Success!
+    } catch (PDOException $e) {
+        if ($i === $max_retries - 1) {
+            $error_msg = $e->getMessage();
+            $internal_host_tip = "";
+
+            if (getenv('RENDER')) {
+                $internal_host_tip = "\n\n[Render Troubleshooting]:\n1. Visit /check_env.php to see system status.\n2. Ensure your MySQL service 'Internal Hostname' is used if 'mysql' fails.\n3. Verify both services are in the same 'Region' (Ohio).";
             }
-            if ($i < $max_retries - 1)
-                sleep($retry_delay);
-        }
-    }
-}
 
-if (!$pdo) {
-    $diag = "\n\n[Troubleshooting]\n1. Diagnostics Page: /check_env.php\n2. Attempted Hosts: " . implode(' -> ', $hosts_to_try) . "\n3. Error: $conn_error";
-    die("Database Connection Error. Please verify your database service is running." . $diag);
+            die("Database Connection Failed: " . $error_msg . $internal_host_tip . "\n\nAttempted Host: " . $final_host);
+        }
+        sleep($retry_delay);
+    }
 }
 
 
