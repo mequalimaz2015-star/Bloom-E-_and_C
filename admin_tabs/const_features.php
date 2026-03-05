@@ -51,7 +51,6 @@ $features = $pdo->query("SELECT * FROM construction_features ORDER BY id DESC")-
             </div>
         <?php endforeach; ?>
     </div>
-
     <?php if (empty($features)): ?>
         <div
             style="text-align: center; padding: 100px 20px; background: #fafafa; border-radius: 20px; border: 2px dashed #eee;">
@@ -61,7 +60,6 @@ $features = $pdo->query("SELECT * FROM construction_features ORDER BY id DESC")-
         </div>
     <?php endif; ?>
 </div>
-
 <!-- Modal -->
 <div id="featureModal" class="modal"
     style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px);">

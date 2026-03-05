@@ -4,13 +4,19 @@
 $host = getenv('BLOOM_DB_HOST');
 $dbname = getenv('BLOOM_DB_NAME') ?: 'bloom_africa';
 $username = getenv('BLOOM_DB_USER') ?: 'root';
-$password = getenv('BLOOM_DB_PASS'); // Can be empty
+$password = getenv('BLOOM_DB_PASS');
 $port = getenv('BLOOM_DB_PORT') ?: '3306';
 
-// 2. Environment Failsafes
-if (!$host) {
-    // If on Render but BLOOM_DB_HOST is missing, use the service name 'mysql'
-    $host = getenv('RENDER') ? 'mysql' : '127.0.0.1';
+// 2. Environment Logic
+if (empty($host)) {
+    // Detect environment
+    if (getenv('RENDER')) {
+        // On Render, we expect a private service named 'mysql' if not provided
+        $host = 'mysql';
+    } else {
+        // Local XAMPP default
+        $host = '127.0.0.1';
+    }
 }
 
 // Ensure we NEVER use 'localhost' (which triggers socket files on Linux)
@@ -18,42 +24,36 @@ if ($host === 'localhost') {
     $host = '127.0.0.1';
 }
 
-// 3. Failsafe: Handle injected Render PostgreSQL hosts (dpg-...)
-if (strpos($host, 'dpg-') !== false && strpos($host, '.onrender.com') === false) {
-    $host = 'mysql';
-}
-
-// 4. Connection Loop with Retries
-$max_retries = 5;
-$retry_delay = 5; // seconds
+// 3. Connection Loop with Retries
+$max_retries = 3; // Reduced for faster feedback
+$retry_delay = 2; // Reduced for faster feedback
 $pdo = null;
 
 for ($i = 0; $i < $max_retries; $i++) {
     try {
         // Attempt 1: Connect directly to the database
         $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
-        $pdo = new PDO($dsn, $username, $password ?: '');
+        $options = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_TIMEOUT => 5, // 5 second timeout
+        ];
+        $pdo = new PDO($dsn, $username, $password ?: '', $options);
         break; // Success!
     } catch (PDOException $e) {
-        // Attempt 2: Connect to host only and create DB (if it doesn't exist)
-        try {
-            $pdo = new PDO("mysql:host=$host;port=$port;charset=utf8mb4", $username, $password ?: '');
-            $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-            $pdo->exec("USE `$dbname`");
-            break; // Success!
-        } catch (PDOException $e2) {
-            if ($i === $max_retries - 1) {
-                die("Critical: Database connection failed after $max_retries attempts. Target Host: $host:$port. Error: " . $e2->getMessage());
-            }
-            sleep($retry_delay);
+        // If the error is 'Name or service not known', it's a DNS issue
+        // If it's on Render and using 'mysql', maybe we should try 127.0.0.1 just in case it's a docker-link
+        if (strpos($e->getMessage(), 'getaddrinfo failed') !== false || strpos($e->getMessage(), 'Name or service not known') !== false) {
+            // Hostname resolution failed. On Render, this means the 'mysql' service is not found.
         }
+
+        if ($i === $max_retries - 1) {
+            $diag_info = "\n[Diagnostics] Host: $host, Port: $port, User: $username, env: " . (getenv('RENDER') ? 'Render' : 'Local');
+            die("Critical: Database connection failed. Error: " . $e->getMessage() . $diag_info);
+        }
+        sleep($retry_delay);
     }
 }
 
-// 5. Final Connection Check
-if (!$pdo) {
-    die("Critical: Could not establish a database connection.");
-}
 
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
