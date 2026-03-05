@@ -55,34 +55,29 @@ if ($db_url) {
 
 foreach (array_unique($possible_hosts) as $try_host) {
     // Persistent retry loop for each potential host
-    $host_attempts = 10;
-    for ($i = 0; $i < $host_attempts; $i++) {
+    $max_attempts = 15; // Increased to 15 (15 * 4s = 60s total wait)
+    for ($i = 1; $i <= $max_attempts; $i++) {
         try {
             $dsn = "mysql:host=$try_host;port=$port;dbname=$dbname;charset=utf8mb4";
             $pdo = new PDO($dsn, $username, $password ?: '', [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_TIMEOUT => 2,
+                PDO::ATTR_TIMEOUT => 3,
             ]);
             if ($pdo)
-                break 2; // Success! Break outer loop too
+                break 2;
         } catch (PDOException $e) {
             $conn_error = $e->getMessage();
 
-            // If DNS fails, move to next host immediately
             if (strpos($conn_error, 'getaddrinfo') !== false || strpos($conn_error, 'not known') !== false) {
                 break;
             }
 
-            // If connection refused, wait and retry this host specifically
             if (strpos($conn_error, 'refused') !== false) {
-                if ($i < $host_attempts - 1) {
-                    error_log("DB connecting to $try_host: Service starting... Retrying (" . ($i + 1) . "/$host_attempts)");
-                    sleep(4);
-                    continue;
-                }
+                error_log("DB connecting to $try_host: Engine starting ($i/$max_attempts)...");
+                sleep(4);
+                continue;
             }
 
-            // For other errors (like Access Denied), stop trying this host
             break;
         }
     }

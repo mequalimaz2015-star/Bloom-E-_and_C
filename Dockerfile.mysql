@@ -1,4 +1,8 @@
 FROM mariadb:10.6
 
-# Optimize for low-memory environments (512MB RAM)
-CMD ["mariadbd", "--innodb-buffer-pool-size=64M", "--performance-schema=OFF", "--innodb-log-buffer-size=1M", "--max-connections=20"]
+# Optimize for low-memory (512MB RAM) without breaking initialization
+RUN echo '[mariadb]\n\
+    innodb_buffer_pool_size=64M\n\
+    performance_schema=OFF\n\
+    innodb_log_buffer_size=1M\n\
+    max_connections=20\n' > /etc/mysql/conf.d/render_limits.cnf
