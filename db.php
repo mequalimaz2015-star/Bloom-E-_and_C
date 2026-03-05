@@ -1,20 +1,25 @@
 <?php
 // Support both local XAMPP and cloud hosting (Render/Railway)
 // 1. Get Environment Variables with robust detection and fallbacks
-$host = getenv('BLOOM_DB_HOST') ?: getenv('DB_HOST') ?: getenv('MYSQLHOST') ?: getenv('DATABASE_HOST');
+$raw_host = getenv('BLOOM_DB_HOST') ?: getenv('DB_HOST') ?: getenv('MYSQLHOST') ?: getenv('DATABASE_HOST');
+
+// 2. Render-Specific Fix: Ignore auto-injected Postgres hosts (starting with dpg-)
+if (strpos($raw_host, 'dpg-') !== false) {
+    $host = 'mysql'; // Force fallback to our private MySQL service name
+} else {
+    $host = $raw_host;
+}
+
 $dbname = getenv('BLOOM_DB_NAME') ?: getenv('DB_NAME') ?: getenv('MYSQLDATABASE') ?: 'bloom_africa';
 $username = getenv('BLOOM_DB_USER') ?: getenv('DB_USER') ?: getenv('MYSQLUSER') ?: 'root';
 $password = getenv('BLOOM_DB_PASS') ?: getenv('DB_PASS') ?: getenv('MYSQLPASSWORD') ?: '';
 $port = getenv('BLOOM_DB_PORT') ?: getenv('DB_PORT') ?: getenv('MYSQLPORT') ?: '3306';
 
-// 2. Environment Logic
-if (empty($host)) {
-    // Detect environment
+// 3. Environment Logic
+if (empty($host) || $host === 'localhost') {
     if (getenv('RENDER')) {
-        // On Render, default to 'mysql' service name
         $host = 'mysql';
     } else {
-        // Local XAMPP default
         $host = '127.0.0.1';
     }
 }
