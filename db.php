@@ -1,17 +1,17 @@
 <?php
 // Support both local XAMPP and cloud hosting (Render/Railway)
-// 1. Get Environment Variables with robust detection
-$host = getenv('BLOOM_DB_HOST');
-$dbname = getenv('BLOOM_DB_NAME') ?: 'bloom_africa';
-$username = getenv('BLOOM_DB_USER') ?: 'root';
-$password = getenv('BLOOM_DB_PASS');
-$port = getenv('BLOOM_DB_PORT') ?: '3306';
+// 1. Get Environment Variables with robust detection and fallbacks
+$host = getenv('BLOOM_DB_HOST') ?: getenv('DB_HOST') ?: getenv('MYSQLHOST') ?: getenv('DATABASE_HOST');
+$dbname = getenv('BLOOM_DB_NAME') ?: getenv('DB_NAME') ?: getenv('MYSQLDATABASE') ?: 'bloom_africa';
+$username = getenv('BLOOM_DB_USER') ?: getenv('DB_USER') ?: getenv('MYSQLUSER') ?: 'root';
+$password = getenv('BLOOM_DB_PASS') ?: getenv('DB_PASS') ?: getenv('MYSQLPASSWORD') ?: '';
+$port = getenv('BLOOM_DB_PORT') ?: getenv('DB_PORT') ?: getenv('MYSQLPORT') ?: '3306';
 
 // 2. Environment Logic
 if (empty($host)) {
     // Detect environment
     if (getenv('RENDER')) {
-        // On Render, we expect a private service named 'mysql' if not provided
+        // On Render, default to 'mysql' service name
         $host = 'mysql';
     } else {
         // Local XAMPP default
