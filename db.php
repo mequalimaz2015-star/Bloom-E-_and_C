@@ -35,8 +35,6 @@ $conn_error = "";
 $possible_hosts = array_unique(array_filter([$host, 'mysql', 'mysql.internal', 'mariadb', '127.0.0.1']));
 
 foreach ($possible_hosts as $try_host) {
-    // Hidden retries: Only 2 attempts (Fast Feedback)
-    // We don't want the user stuck for 2 minutes behind a loading spinner.
     for ($i = 1; $i <= 2; $i++) {
         try {
             $dsn = "mysql:host=$try_host;port=$port;dbname=$dbname;charset=utf8mb4";
@@ -49,14 +47,19 @@ foreach ($possible_hosts as $try_host) {
         } catch (PDOException $e) {
             $conn_error = $e->getMessage();
 
-            // Fast-fail if host name is totally unknown
+            // If connection refused, we found the right host! 
+            // Stop trying other hosts and just wait for this one to wake up.
+            if (strpos($conn_error, 'refused') !== false) {
+                $host = $try_host; // Stick to this host
+                break 2;
+            }
+
             if (strpos($conn_error, 'getaddrinfo') !== false || strpos($conn_error, 'not known') !== false) {
                 break;
             }
 
-            // If refused, wait a tiny bit then one more try before showing UI
-            if (strpos($conn_error, 'refused') !== false && $i < 2) {
-                sleep(2);
+            if ($i < 2) {
+                sleep(1);
                 continue;
             }
             break;
