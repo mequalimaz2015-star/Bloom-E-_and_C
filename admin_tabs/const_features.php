@@ -14,7 +14,6 @@ $features = $pdo->query("SELECT * FROM construction_features ORDER BY id DESC")-
             <i class="fa-solid fa-plus"></i> Add Highlight Item
         </button>
     </div>
-
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
         <?php foreach ($features as $f): ?>
             <div class="card"
@@ -108,7 +107,6 @@ $features = $pdo->query("SELECT * FROM construction_features ORDER BY id DESC")-
         </form>
     </div>
 </div>
-
 <script>
     function openModal(id) {
         document.getElementById(id).style.display = 'block';
@@ -132,11 +130,9 @@ $features = $pdo->query("SELECT * FROM construction_features ORDER BY id DESC")-
         document.getElementById('featureIcon').value = f.icon_class;
         updateIconPreview(f.icon_class);
     }
-
     document.getElementById('featureIcon').addEventListener('input', function (e) {
         updateIconPreview(e.target.value);
     });
-
     function updateIconPreview(val) {
         const preview = document.getElementById('iconPreview');
         preview.className = val || 'fa-solid fa-check';

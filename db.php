@@ -31,51 +31,35 @@ if ($host === 'localhost') {
 
 // 3. Connection Strategy
 $pdo = null;
-$hosts_to_try = array_unique([$host, 'mysql', '127.0.0.1']);
 $conn_error = "";
-$resolved_ip = "Unknown";
+$max_attempts = 5;
 
-foreach ($hosts_to_try as $attempt_host) {
-    if (empty($attempt_host))
-        continue;
-    $resolved_ip = gethostbyname($attempt_host);
-
-    // Retry each host for up to 60 seconds (6 * 10s)
-    for ($retry = 1; $retry <= 6; $retry++) {
-        try {
-            $dsn = "mysql:host=$attempt_host;port=$port;dbname=$dbname;charset=utf8mb4";
-            $options = [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_TIMEOUT => 5,
-            ];
-
-            $pdo = new PDO($dsn, $username, $password ?: '', $options);
-            if ($pdo)
-                break 2; // Success!
-        } catch (PDOException $e) {
-            $conn_error = $e->getMessage();
-
-            // Log for Render 'Logs' tab visibility
-            error_log("DB Attempt $retry: $attempt_host ($resolved_ip) - $conn_error");
-
-            if (strpos($conn_error, 'getaddrinfo') !== false || strpos($conn_error, 'not known') !== false) {
-                break; // If DNS is broken, don't retry this host
-            }
-
-            if (strpos($conn_error, 'refused') !== false || strpos($conn_error, 'reached') !== false) {
-                sleep(10); // Wait longer for MySQL 8 memory init
-                continue;
-            }
-
+for ($i = 1; $i <= $max_attempts; $i++) {
+    try {
+        $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
+        $pdo = new PDO($dsn, $username, $password ?: '', [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_TIMEOUT => 4,
+        ]);
+        if ($pdo)
             break;
+    } catch (PDOException $e) {
+        $conn_error = $e->getMessage();
+
+        // Fast-fail on DNS errors
+        if (strpos($conn_error, 'getaddrinfo') !== false || strpos($conn_error, 'not known') !== false) {
+            die("Critical Error: Database server '$host' not found. Ensure your Render service is named exactly 'mysql'. Error: $conn_error");
+        }
+
+        if ($i < $max_attempts) {
+            error_log("DB Attempt $i failed: $conn_error. Retrying in 3s...");
+            sleep(3);
         }
     }
 }
 
-// 4. Final Fail Handler
 if (!$pdo) {
-    $render_log_tip = "\n\n[PRO TIP]:\n1. Check your Render 'mysql' service logs.\n2. Ensure it reached the line 'ready for connections'.\n3. Memory limit (512MB) might be causing MySQL to restart.\n4. Last Host tried: $resolved_ip\n5. Error: $conn_error";
-    die("Database Connection Error. The database is likely still starting up." . $render_log_tip);
+    die("Database Connection Error. MariaDB is likely still starting up or crashed. Error: $conn_error. [TIP]: Check Render MySQL logs for 'Out of Memory'.");
 }
 
 
