@@ -240,6 +240,16 @@ try {
         hero_subtitle TEXT,
         hero_button_text VARCHAR(100),
         hero_image VARCHAR(255),
+        hero_video VARCHAR(255),
+        hero_audio VARCHAR(255),
+        hero2_title VARCHAR(255),
+        hero2_subtitle TEXT,
+        hero2_button_text VARCHAR(100),
+        hero2_image VARCHAR(255),
+        hero3_title VARCHAR(255),
+        hero3_subtitle TEXT,
+        hero3_button_text VARCHAR(100),
+        hero3_image VARCHAR(255),
         about_subtitle TEXT,
         about_image_main VARCHAR(255),
         about_image_sub1 VARCHAR(255),
@@ -445,6 +455,18 @@ try {
             'reviews_subtitle' => "TEXT",
             'quote_title' => "VARCHAR(255)",
             'quote_subtitle' => "TEXT"
+        ],
+        'company_info' => [
+            'hero_video' => "VARCHAR(255)",
+            'hero_audio' => "VARCHAR(255)",
+            'hero2_title' => "VARCHAR(255)",
+            'hero2_subtitle' => "TEXT",
+            'hero2_button_text' => "VARCHAR(100)",
+            'hero2_image' => "VARCHAR(255)",
+            'hero3_title' => "VARCHAR(255)",
+            'hero3_subtitle' => "TEXT",
+            'hero3_button_text' => "VARCHAR(100)",
+            'hero3_image' => "VARCHAR(255)"
         ],
         'chat_sessions' => ['department' => "VARCHAR(50) DEFAULT 'Restaurant' AFTER customer_phone"]
     ];
