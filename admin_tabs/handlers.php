@@ -158,10 +158,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->prepare("UPDATE employees SET id_number = ? WHERE id = ?")->execute([$id_number, $emp_id]);
 
             logActivity($pdo, "Registered new employee: $full_name ($id_number)");
-            $msg = "Employee '$full_name' registered with ID: $id_number";
+                        $msg = "Employee '$full_name' registered with ID: $id_number";
+            echo "<script>window.onload = function() { showIDCard(" . json_encode([
+                'id' => $emp_id,
+                'id_number' => $id_number,
+                'title' => $title,
+                'name' => $full_name,
+                'role' => $_POST['role'],
+                'photo' => $photo_url
+            ]) . "); }</script>";
+            exit;
         } catch (PDOException $e) {
-            error_log("Employee registration error: " . $e->getMessage());
-            $msg = "Error registering employee: " . $e->getMessage();
+            if ($e->getCode() == 23000) {
+                echo "<script>alert('Error: Data overlap detected (duplicate email or ID).'); window.location.href='admin.php?tab=staff';</script>";
+                exit;
+            } else {
+                error_log("Employee registration error: " . $e->getMessage());
+                $msg = "Error registering employee: " . $e->getMessage();
+            }
         }
     } elseif (isset($_POST['update_employee_status'])) {
         $pdo->prepare("UPDATE employees SET status=? WHERE id=?")->execute([$_POST['status'], $_POST['id']]);
