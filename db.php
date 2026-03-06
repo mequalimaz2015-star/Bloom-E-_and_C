@@ -1,31 +1,21 @@
 <?php
 // Support both local XAMPP and cloud hosting (Render/Railway)
 // 1. Get Environment Variables with robust detection
+// 1. Get Environment Variables with robust detection
 $host = getenv('BLOOM_DB_HOST');
 $dbname = getenv('BLOOM_DB_NAME') ?: 'bloom_africa';
 $username = getenv('BLOOM_DB_USER') ?: 'root';
 $password = getenv('BLOOM_DB_PASS'); // Can be empty
 $port = getenv('BLOOM_DB_PORT') ?: '3306';
 
-// 2. Environment Failsafes
-if (!$host) {
-    // Check common service names on Render
-    $host = getenv('RENDER') ? 'bloom-mysql' : '127.0.0.1';
-
-    // Final fallback if bloom-mysql isn't found
-    if (getenv('RENDER') && !gethostbyname($host)) {
-        $host = 'mysql';
-    }
+// 2. Default to internal connection (All-in-One Stack)
+if (!$host || $host === 'bloom-db' || $host === 'bloom-mysql' || $host === 'mysql') {
+    $host = '127.0.0.1';
 }
 
 // Ensure we NEVER use 'localhost' (which triggers socket files on Linux)
 if ($host === 'localhost') {
     $host = '127.0.0.1';
-}
-
-// 3. Failsafe: Handle injected Render PostgreSQL hosts (dpg-...)
-if (strpos($host, 'dpg-') !== false && strpos($host, '.onrender.com') === false) {
-    $host = 'mysql';
 }
 
 // 4. Connection Loop with Retries
