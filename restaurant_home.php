@@ -1657,6 +1657,131 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
             pointer-events: auto;
         }
 
+        .chat-header {
+            background: rgba(223, 177, 128, 0.1);
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(223, 177, 128, 0.2);
+            color: var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 15px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chat-bubble {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 15px;
+            font-size: 13.5px;
+            line-height: 1.5;
+            position: relative;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .chat-bubble.bot,
+        .chat-bubble.admin {
+            background: #333;
+            color: rgba(255, 255, 255, 0.9);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-bubble.user {
+            background: var(--primary);
+            color: #000;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            font-weight: 500;
+        }
+
+        .chat-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .chat-option-btn {
+            background: rgba(223, 177, 128, 0.15);
+            border: 1px solid rgba(223, 177, 128, 0.3);
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .chat-option-btn:hover {
+            background: rgba(223, 177, 128, 0.3);
+            transform: translateY(-2px);
+            color: #fff;
+        }
+
+        .chat-input-area {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 12px 15px;
+            border-radius: 20px;
+            font-family: inherit;
+        }
+
+        .chat-input-area input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .chat-send-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: none;
+            background: var(--primary);
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .chat-send-btn:hover {
+            transform: scale(1.1);
+            background: #fff;
+        }
+
         /* Favorite Modal Styles */
         .fav-modal {
             position: fixed;
@@ -1821,28 +1946,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
     </script>
 
     <?php if (!empty($msg)): ?>
-        <div class="notification" id="appNotification">
-            <i class="fa-solid fa-circle-check"></i>
-            <div>
-                <strong style="display: block; font-size: 1.1rem;">Success!</strong>
-                <span style="opacity: 0.9; font-weight: 400;"><?= htmlspecialchars($msg) ?></span>
+            <div class="notification" id="appNotification">
+                <i class="fa-solid fa-circle-check"></i>
+                <div>
+                    <strong style="display: block; font-size: 1.1rem;">Success!</strong>
+                    <span style="opacity: 0.9; font-weight: 400;"><?= htmlspecialchars($msg) ?></span>
+                </div>
             </div>
-        </div>
-        <script>
-            setTimeout(() => {
-                const notify = document.getElementById('appNotification');
-                if (notify) {
-                    notify.style.animation = 'fadeOut 0.6s forwards';
-                    setTimeout(() => notify.remove(), 600);
-                }
-            }, 6000);
-        </script>
+            <script>
+                setTimeout(() => {
+                    const notify = document.getElementById('appNotification');
+                    if (notify) {
+                        notify.style.animation = 'fadeOut 0.6s forwards';
+                        setTimeout(() => notify.remove(), 600);
+                    }
+                }, 6000);
+            </script>
     <?php endif; ?>
 
     <?php if (!empty($error_msg)): ?>
-        <div class="notification" style="background: #e74c3c;">
-            <?= htmlspecialchars($error_msg) ?>
-        </div>
+            <div class="notification" style="background: #e74c3c;">
+                <?= htmlspecialchars($error_msg) ?>
+            </div>
     <?php endif; ?>
 
     <nav>
@@ -1921,24 +2046,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
                         All Services
                     </a>
                     <?php if (!empty($service_categories)): ?>
-                        <?php foreach ($service_categories as $cat): ?>
-                            <a href="#services"
-                                onclick="filterServices('<?= htmlspecialchars($cat) ?>'); closeAllNavDropdowns();">
-                                <span class="nd-item-icon"><i class="fa-solid fa-tag"></i></span>
-                                <?= htmlspecialchars($cat) ?>
-                            </a>
-                        <?php endforeach; ?>
+                            <?php foreach ($service_categories as $cat): ?>
+                                    <a href="#services"
+                                        onclick="filterServices('<?= htmlspecialchars($cat) ?>'); closeAllNavDropdowns();">
+                                        <span class="nd-item-icon"><i class="fa-solid fa-tag"></i></span>
+                                        <?= htmlspecialchars($cat) ?>
+                                    </a>
+                            <?php endforeach; ?>
                     <?php else: ?>
-                        <a href="#services" onclick="filterServices('Food Delivery'); closeAllNavDropdowns();"><span
-                                class="nd-item-icon"><i class="fa-solid fa-truck"></i></span>Food Delivery</a>
-                        <a href="#services" onclick="filterServices('Catering Service'); closeAllNavDropdowns();"><span
-                                class="nd-item-icon"><i class="fa-solid fa-utensils"></i></span>Catering Service</a>
-                        <a href="#services" onclick="filterServices('Wedding Events'); closeAllNavDropdowns();"><span
-                                class="nd-item-icon"><i class="fa-solid fa-heart"></i></span>Wedding Events</a>
-                        <a href="#services" onclick="filterServices('Birthday Parties'); closeAllNavDropdowns();"><span
-                                class="nd-item-icon"><i class="fa-solid fa-cake-candles"></i></span>Birthday Parties</a>
-                        <a href="#services" onclick="filterServices('Corporate Events'); closeAllNavDropdowns();"><span
-                                class="nd-item-icon"><i class="fa-solid fa-briefcase"></i></span>Corporate Events</a>
+                            <a href="#services" onclick="filterServices('Food Delivery'); closeAllNavDropdowns();"><span
+                                    class="nd-item-icon"><i class="fa-solid fa-truck"></i></span>Food Delivery</a>
+                            <a href="#services" onclick="filterServices('Catering Service'); closeAllNavDropdowns();"><span
+                                    class="nd-item-icon"><i class="fa-solid fa-utensils"></i></span>Catering Service</a>
+                            <a href="#services" onclick="filterServices('Wedding Events'); closeAllNavDropdowns();"><span
+                                    class="nd-item-icon"><i class="fa-solid fa-heart"></i></span>Wedding Events</a>
+                            <a href="#services" onclick="filterServices('Birthday Parties'); closeAllNavDropdowns();"><span
+                                    class="nd-item-icon"><i class="fa-solid fa-cake-candles"></i></span>Birthday Parties</a>
+                            <a href="#services" onclick="filterServices('Corporate Events'); closeAllNavDropdowns();"><span
+                                    class="nd-item-icon"><i class="fa-solid fa-briefcase"></i></span>Corporate Events</a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -2151,19 +2276,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
         <div
             style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; max-width: 1200px; margin: 0 auto;">
             <?php foreach ($team_members as $tm): ?>
-                <div style="text-align: center;">
-                    <div
-                        style="width: 200px; height: 200px; border-radius: 50%; overflow: hidden; margin: 0 auto 20px; border: 3px solid var(--primary);">
-                        <img src="<?= htmlspecialchars($tm['image_url'] ?: 'https://images.unsplash.com/photo-1583394838336-acd977730f90?q=80&w=1968&auto=format&fit=crop') ?>"
-                            style="width:100%; height:100%; object-fit:cover;">
+                    <div style="text-align: center;">
+                        <div
+                            style="width: 200px; height: 200px; border-radius: 50%; overflow: hidden; margin: 0 auto 20px; border: 3px solid var(--primary);">
+                            <img src="<?= htmlspecialchars($tm['image_url'] ?: 'https://images.unsplash.com/photo-1583394838336-acd977730f90?q=80&w=1968&auto=format&fit=crop') ?>"
+                                style="width:100%; height:100%; object-fit:cover;">
+                        </div>
+                        <h3 style="color: var(--primary); font-size: 1.4rem; margin-bottom: 5px;">
+                            <?= htmlspecialchars($tm['name']) ?>
+                        </h3>
+                        <p style="color: #888; font-size: 0.9rem; text-transform: uppercase;">
+                            <?= htmlspecialchars($tm['role']) ?>
+                        </p>
                     </div>
-                    <h3 style="color: var(--primary); font-size: 1.4rem; margin-bottom: 5px;">
-                        <?= htmlspecialchars($tm['name']) ?>
-                    </h3>
-                    <p style="color: #888; font-size: 0.9rem; text-transform: uppercase;">
-                        <?= htmlspecialchars($tm['role']) ?>
-                    </p>
-                </div>
             <?php endforeach; ?>
         </div>
     </section>
@@ -2188,32 +2313,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
                     $mins = floor(($time_left % (60 * 60)) / 60);
                     $is_urgent = ($days < 10);
                     ?>
-                    <div class="job-card" style="<?= $is_urgent ? 'border-top: 3px solid #ef4444;' : '' ?>">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap: 10px;">
-                            <h3 style="margin-bottom:10px; flex: 1;"><?= htmlspecialchars($job['title']) ?></h3>
-                            <div style="text-align: right;">
-                                <div
-                                    style="font-size:10px; color:<?= $is_urgent ? '#ef4444' : '#10b981' ?>; font-weight:800; text-transform:uppercase; margin-bottom: 5px;">
-                                    <i class="fa-solid fa-hourglass-half"></i>
-                                    <?= $is_urgent ? 'Closing Soon' : 'Accepting Portfolios' ?>
+                            <div class="job-card" style="<?= $is_urgent ? 'border-top: 3px solid #ef4444;' : '' ?>">
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap: 10px;">
+                                    <h3 style="margin-bottom:10px; flex: 1;"><?= htmlspecialchars($job['title']) ?></h3>
+                                    <div style="text-align: right;">
+                                        <div
+                                            style="font-size:10px; color:<?= $is_urgent ? '#ef4444' : '#10b981' ?>; font-weight:800; text-transform:uppercase; margin-bottom: 5px;">
+                                            <i class="fa-solid fa-hourglass-half"></i>
+                                            <?= $is_urgent ? 'Closing Soon' : 'Accepting Portfolios' ?>
+                                        </div>
+                                        <div style="font-size: 14px; font-weight: 700; color: #fff;">
+                                            <?= $days ?>d <?= $hours ?>h <?= $mins ?>m
+                                        </div>
+                                    </div>
                                 </div>
-                                <div style="font-size: 14px; font-weight: 700; color: #fff;">
-                                    <?= $days ?>d <?= $hours ?>h <?= $mins ?>m
+                                <div class="job-meta">
+                                    <span><i class="fa-solid fa-tag"></i> <?= htmlspecialchars($job['category']) ?></span>
+                                    <span><i class="fa-solid fa-clock"></i> <?= htmlspecialchars($job['type']) ?></span>
+                                    <span style="color: #888; font-size: 11px;"><i class="fa-solid fa-calendar"></i>
+                                        <?= date("M d, Y", strtotime($job['closing_date'])) ?></span>
                                 </div>
+                                <p class="job-desc"><?= nl2br(htmlspecialchars($job['description'])) ?></p>
+                                <button class="apply-btn"
+                                    onclick="openApplication(<?= $job['id'] ?>, '<?= htmlspecialchars($job['title']) ?>')">Apply
+                                    Now</button>
                             </div>
-                        </div>
-                        <div class="job-meta">
-                            <span><i class="fa-solid fa-tag"></i> <?= htmlspecialchars($job['category']) ?></span>
-                            <span><i class="fa-solid fa-clock"></i> <?= htmlspecialchars($job['type']) ?></span>
-                            <span style="color: #888; font-size: 11px;"><i class="fa-solid fa-calendar"></i>
-                                <?= date("M d, Y", strtotime($job['closing_date'])) ?></span>
-                        </div>
-                        <p class="job-desc"><?= nl2br(htmlspecialchars($job['description'])) ?></p>
-                        <button class="apply-btn"
-                            onclick="openApplication(<?= $job['id'] ?>, '<?= htmlspecialchars($job['title']) ?>')">Apply
-                            Now</button>
-                    </div>
-                    <?php
+                            <?php
                 endforeach;
             else:
                 echo "<p style='text-align:center; width:100%; color:#888;'>No open positions at the moment. Check back later!</p>";
@@ -2307,77 +2432,77 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
         <h2 class="section-title">Our Services</h2>
         <div class="services-grid">
             <?php if (!empty($services_list)): ?>
-                <?php foreach ($services_list as $srv): ?>
-                    <div class="service-card" data-category="<?= htmlspecialchars($srv['category'] ?? 'Others') ?>">
+                    <?php foreach ($services_list as $srv): ?>
+                            <div class="service-card" data-category="<?= htmlspecialchars($srv['category'] ?? 'Others') ?>">
+                                <div class="service-media">
+                                    <?php if ($srv['video_url']): ?>
+                                            <video autoplay muted loop playsinline>
+                                                <source src="<?= htmlspecialchars($srv['video_url']) ?>" type="video/mp4">
+                                            </video>
+                                    <?php else: ?>
+                                            <img src="<?= htmlspecialchars($srv['image_url'] ?: 'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=2070&auto=format&fit=crop') ?>"
+                                                alt="<?= htmlspecialchars($srv['title']) ?>">
+                                    <?php endif; ?>
+                                </div>
+                                <div class="service-info">
+                                    <div class="service-icon"><i
+                                            class="fa-solid <?= htmlspecialchars($srv['icon'] ?: 'fa-concierge-bell') ?>"></i></div>
+                                    <span
+                                        style="font-size: 11px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; opacity: 0.8;"><?= htmlspecialchars($srv['category'] ?? 'Service') ?></span>
+                                    <h3><?= htmlspecialchars($srv['title']) ?></h3>
+                                    <p><?= nl2br(htmlspecialchars($srv['description'])) ?></p>
+                                </div>
+                            </div>
+                    <?php endforeach; ?>
+            <?php else: ?>
+                    <!-- Default Services if DB is empty -->
+                    <div class="service-card" data-category="Food Delivery">
                         <div class="service-media">
-                            <?php if ($srv['video_url']): ?>
-                                <video autoplay muted loop playsinline>
-                                    <source src="<?= htmlspecialchars($srv['video_url']) ?>" type="video/mp4">
-                                </video>
-                            <?php else: ?>
-                                <img src="<?= htmlspecialchars($srv['image_url'] ?: 'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=2070&auto=format&fit=crop') ?>"
-                                    alt="<?= htmlspecialchars($srv['title']) ?>">
-                            <?php endif; ?>
+                            <img src="https://images.unsplash.com/photo-1526367790999-015078648402?q=80&w=2070&auto=format&fit=crop"
+                                alt="Food Delivery">
                         </div>
                         <div class="service-info">
-                            <div class="service-icon"><i
-                                    class="fa-solid <?= htmlspecialchars($srv['icon'] ?: 'fa-concierge-bell') ?>"></i></div>
-                            <span
-                                style="font-size: 11px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; opacity: 0.8;"><?= htmlspecialchars($srv['category'] ?? 'Service') ?></span>
-                            <h3><?= htmlspecialchars($srv['title']) ?></h3>
-                            <p><?= nl2br(htmlspecialchars($srv['description'])) ?></p>
+                            <div class="service-icon"><i class="fa-solid fa-truck"></i></div>
+                            <h3>Food Delivery</h3>
+                            <p>Hot and fresh meals from our kitchen straight to your doorstep within 30 minutes.</p>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <!-- Default Services if DB is empty -->
-                <div class="service-card" data-category="Food Delivery">
-                    <div class="service-media">
-                        <img src="https://images.unsplash.com/photo-1526367790999-015078648402?q=80&w=2070&auto=format&fit=crop"
-                            alt="Food Delivery">
+                    <div class="service-card" data-category="Catering Service">
+                        <div class="service-media">
+                            <img src="https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=2070&auto=format&fit=crop"
+                                alt="Catering Service">
+                        </div>
+                        <div class="service-info">
+                            <div class="service-icon"><i class="fa-solid fa-utensils"></i></div>
+                            <h3>Catering Service</h3>
+                            <p>Professional catering for your events, offering a diverse menu from African to European cuisines.
+                            </p>
+                        </div>
                     </div>
-                    <div class="service-info">
-                        <div class="service-icon"><i class="fa-solid fa-truck"></i></div>
-                        <h3>Food Delivery</h3>
-                        <p>Hot and fresh meals from our kitchen straight to your doorstep within 30 minutes.</p>
+                    <div class="service-card" data-category="Wedding Events">
+                        <div class="service-media">
+                            <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2069&auto=format&fit=crop"
+                                alt="Wedding Events">
+                        </div>
+                        <div class="service-info">
+                            <div class="service-icon"><i class="fa-solid fa-heart"></i></div>
+                            <h3>Wedding Service</h3>
+                            <p>Creating magical wedding experiences with exquisite décor, world-class dining, and impeccable
+                                service.</p>
+                        </div>
                     </div>
-                </div>
-                <div class="service-card" data-category="Catering Service">
-                    <div class="service-media">
-                        <img src="https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=2070&auto=format&fit=crop"
-                            alt="Catering Service">
+                    <div class="service-card" data-category="Birthday Parties">
+                        <div class="service-media">
+                            <img src="https://images.unsplash.com/photo-1464306208223-e0b4495a0100?q=80&w=2070&auto=format&fit=crop"
+                                alt="Birthday Service">
+                        </div>
+                        <div class="service-info">
+                            <div class="service-icon"><i class="fa-solid fa-cake-candles"></i></div>
+                            <h3>Birthday Service</h3>
+                            <p>Celebrate your special day with custom cakes, vibrant themes, and a memorable atmosphere for your
+                                guests.</p>
+                        </div>
                     </div>
-                    <div class="service-info">
-                        <div class="service-icon"><i class="fa-solid fa-utensils"></i></div>
-                        <h3>Catering Service</h3>
-                        <p>Professional catering for your events, offering a diverse menu from African to European cuisines.
-                        </p>
-                    </div>
-                </div>
-                <div class="service-card" data-category="Wedding Events">
-                    <div class="service-media">
-                        <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2069&auto=format&fit=crop"
-                            alt="Wedding Events">
-                    </div>
-                    <div class="service-info">
-                        <div class="service-icon"><i class="fa-solid fa-heart"></i></div>
-                        <h3>Wedding Service</h3>
-                        <p>Creating magical wedding experiences with exquisite décor, world-class dining, and impeccable
-                            service.</p>
-                    </div>
-                </div>
-                <div class="service-card" data-category="Birthday Parties">
-                    <div class="service-media">
-                        <img src="https://images.unsplash.com/photo-1464306208223-e0b4495a0100?q=80&w=2070&auto=format&fit=crop"
-                            alt="Birthday Service">
-                    </div>
-                    <div class="service-info">
-                        <div class="service-icon"><i class="fa-solid fa-cake-candles"></i></div>
-                        <h3>Birthday Service</h3>
-                        <p>Celebrate your special day with custom cakes, vibrant themes, and a memorable atmosphere for your
-                            guests.</p>
-                    </div>
-                </div>
             <?php endif; ?>
         </div>
     </section>
@@ -2388,96 +2513,96 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
         <div class="gallery-filters">
             <button class="filter-btn active" onclick="filterGallery('all')">All</button>
             <?php foreach ($gallery_categories as $cat): ?>
-                <button class="filter-btn" onclick="filterGallery('<?= htmlspecialchars($cat) ?>')">
-                    <?= htmlspecialchars($cat) ?>
-                </button>
+                    <button class="filter-btn" onclick="filterGallery('<?= htmlspecialchars($cat) ?>')">
+                        <?= htmlspecialchars($cat) ?>
+                    </button>
             <?php endforeach; ?>
         </div>
 
         <div class="gallery">
             <div class="gallery-grid" id="galleryGrid">
                 <?php foreach ($gallery_items as $item): ?>
-                    <div class="gallery-card" data-category="<?= htmlspecialchars($item['category']) ?>">
-                        <div class="gallery-card-media">
-                            <img src="<?= htmlspecialchars($item['image_url']) ?>"
-                                alt="<?= htmlspecialchars($item['title'] ?: 'Gallery Image') ?>" loading="lazy">
-                        </div>
-                        <div class="gallery-card-content">
-                            <span
-                                style="font-size: 11px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px; opacity: 0.8;"><?= htmlspecialchars($item['category']) ?></span>
-                            <h4><?= htmlspecialchars($item['title'] ?: 'Signature Experience') ?></h4>
-                            <p><?= nl2br(htmlspecialchars($item['description'] ?: 'Experience the perfect blend of tradition and modern culinary arts at Bloom Africa.')) ?>
-                            </p>
-                            <div class="gallery-card-footer">
-                                <span class="date"><i class="fa-regular fa-calendar"></i>
-                                    <?= date("M d, Y", strtotime($item['created_at'])) ?></span>
-                                <a href="javascript:void(0)" class="read-more"
-                                    onclick="openGalleryModal('<?= addslashes($item['image_url']) ?>', '<?= addslashes($item['category']) ?>', '<?= addslashes($item['title'] ?: 'Signature Experience') ?>', '<?= addslashes(str_replace(["\r", "\n"], ' ', $item['description'] ?: 'Experience the perfect blend of tradition and modern culinary arts at Bloom Africa.')) ?>', '<?= date("M d, Y", strtotime($item['created_at'])) ?>')">Read
-                                    More <i class="fa-solid fa-arrow-right"></i></a>
+                        <div class="gallery-card" data-category="<?= htmlspecialchars($item['category']) ?>">
+                            <div class="gallery-card-media">
+                                <img src="<?= htmlspecialchars($item['image_url']) ?>"
+                                    alt="<?= htmlspecialchars($item['title'] ?: 'Gallery Image') ?>" loading="lazy">
+                            </div>
+                            <div class="gallery-card-content">
+                                <span
+                                    style="font-size: 11px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px; opacity: 0.8;"><?= htmlspecialchars($item['category']) ?></span>
+                                <h4><?= htmlspecialchars($item['title'] ?: 'Signature Experience') ?></h4>
+                                <p><?= nl2br(htmlspecialchars($item['description'] ?: 'Experience the perfect blend of tradition and modern culinary arts at Bloom Africa.')) ?>
+                                </p>
+                                <div class="gallery-card-footer">
+                                    <span class="date"><i class="fa-regular fa-calendar"></i>
+                                        <?= date("M d, Y", strtotime($item['created_at'])) ?></span>
+                                    <a href="javascript:void(0)" class="read-more"
+                                        onclick="openGalleryModal('<?= addslashes($item['image_url']) ?>', '<?= addslashes($item['category']) ?>', '<?= addslashes($item['title'] ?: 'Signature Experience') ?>', '<?= addslashes(str_replace(["\r", "\n"], ' ', $item['description'] ?: 'Experience the perfect blend of tradition and modern culinary arts at Bloom Africa.')) ?>', '<?= date("M d, Y", strtotime($item['created_at'])) ?>')">Read
+                                        More <i class="fa-solid fa-arrow-right"></i></a>
+                                </div>
                             </div>
                         </div>
-                    </div>
                 <?php endforeach; ?>
 
                 <?php if (empty($gallery_items)): ?>
-                    <!-- Fallback Cards if DB is empty -->
-                    <div class="gallery-card" data-category="Restaurant">
-                        <div class="gallery-card-media">
-                            <img src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=2070&auto=format&fit=crop"
-                                alt="Ambience">
-                        </div>
-                        <div class="gallery-card-content">
-                            <span
-                                style="font-size: 11px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px; opacity: 0.8;">Restaurant</span>
-                            <h4>The Elegant Ambience</h4>
-                            <p>Our restaurant offers a warm and inviting atmosphere, perfect for family gatherings and
-                                intimate dinners.</p>
-                            <div class="gallery-card-footer">
-                                <span class="date"><i class="fa-regular fa-calendar"></i> Dec 22, 2030</span>
-                                <a href="javascript:void(0)" class="read-more"
-                                    onclick="openGalleryModal('https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=2070&auto=format&fit=crop', 'Restaurant', 'The Elegant Ambience', 'Our restaurant offers a warm and inviting atmosphere, perfect for family gatherings and intimate dinners.', 'Dec 22, 2030')">Read
-                                    More <i class="fa-solid fa-arrow-right"></i></a>
+                        <!-- Fallback Cards if DB is empty -->
+                        <div class="gallery-card" data-category="Restaurant">
+                            <div class="gallery-card-media">
+                                <img src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=2070&auto=format&fit=crop"
+                                    alt="Ambience">
+                            </div>
+                            <div class="gallery-card-content">
+                                <span
+                                    style="font-size: 11px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px; opacity: 0.8;">Restaurant</span>
+                                <h4>The Elegant Ambience</h4>
+                                <p>Our restaurant offers a warm and inviting atmosphere, perfect for family gatherings and
+                                    intimate dinners.</p>
+                                <div class="gallery-card-footer">
+                                    <span class="date"><i class="fa-regular fa-calendar"></i> Dec 22, 2030</span>
+                                    <a href="javascript:void(0)" class="read-more"
+                                        onclick="openGalleryModal('https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=2070&auto=format&fit=crop', 'Restaurant', 'The Elegant Ambience', 'Our restaurant offers a warm and inviting atmosphere, perfect for family gatherings and intimate dinners.', 'Dec 22, 2030')">Read
+                                        More <i class="fa-solid fa-arrow-right"></i></a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="gallery-card" data-category="Food">
-                        <div class="gallery-card-media">
-                            <img src="https://images.unsplash.com/photo-1544025162-8111d4e06223?q=80&w=1969&auto=format&fit=crop"
-                                alt="Culinary">
-                        </div>
-                        <div class="gallery-card-content">
-                            <span
-                                style="font-size: 11px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px; opacity: 0.8;">Food</span>
-                            <h4>Masterpiece Creations</h4>
-                            <p>Every dish is a work of art, crafted with the freshest ingredients and traditional African
-                                spices.</p>
-                            <div class="gallery-card-footer">
-                                <span class="date"><i class="fa-regular fa-calendar"></i> Dec 24, 2030</span>
-                                <a href="javascript:void(0)" class="read-more"
-                                    onclick="openGalleryModal('https://images.unsplash.com/photo-1544025162-8111d4e06223?q=80&w=1969&auto=format&fit=crop', 'Food', 'Masterpiece Creations', 'Every dish is a work of art, crafted with the freshest ingredients and traditional African spices.', 'Dec 24, 2030')">Read
-                                    More <i class="fa-solid fa-arrow-right"></i></a>
+                        <div class="gallery-card" data-category="Food">
+                            <div class="gallery-card-media">
+                                <img src="https://images.unsplash.com/photo-1544025162-8111d4e06223?q=80&w=1969&auto=format&fit=crop"
+                                    alt="Culinary">
+                            </div>
+                            <div class="gallery-card-content">
+                                <span
+                                    style="font-size: 11px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px; opacity: 0.8;">Food</span>
+                                <h4>Masterpiece Creations</h4>
+                                <p>Every dish is a work of art, crafted with the freshest ingredients and traditional African
+                                    spices.</p>
+                                <div class="gallery-card-footer">
+                                    <span class="date"><i class="fa-regular fa-calendar"></i> Dec 24, 2030</span>
+                                    <a href="javascript:void(0)" class="read-more"
+                                        onclick="openGalleryModal('https://images.unsplash.com/photo-1544025162-8111d4e06223?q=80&w=1969&auto=format&fit=crop', 'Food', 'Masterpiece Creations', 'Every dish is a work of art, crafted with the freshest ingredients and traditional African spices.', 'Dec 24, 2030')">Read
+                                        More <i class="fa-solid fa-arrow-right"></i></a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="gallery-card" data-category="Ambience">
-                        <div class="gallery-card-media">
-                            <img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2070&auto=format&fit=crop"
-                                alt="Mixology">
-                        </div>
-                        <div class="gallery-card-content">
-                            <span
-                                style="font-size: 11px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px; opacity: 0.8;">Ambience</span>
-                            <h4>Evening Glow</h4>
-                            <p>Experience the vibrant nightlife at Bloom Africa with our curated selection of signature
-                                drinks.</p>
-                            <div class="gallery-card-footer">
-                                <span class="date"><i class="fa-regular fa-calendar"></i> Dec 28, 2030</span>
-                                <a href="javascript:void(0)" class="read-more"
-                                    onclick="openGalleryModal('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2070&auto=format&fit=crop', 'Ambience', 'Evening Glow', 'Experience the vibrant nightlife at Bloom Africa with our curated selection of signature drinks.', 'Dec 28, 2030')">Read
-                                    More <i class="fa-solid fa-arrow-right"></i></a>
+                        <div class="gallery-card" data-category="Ambience">
+                            <div class="gallery-card-media">
+                                <img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2070&auto=format&fit=crop"
+                                    alt="Mixology">
+                            </div>
+                            <div class="gallery-card-content">
+                                <span
+                                    style="font-size: 11px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px; opacity: 0.8;">Ambience</span>
+                                <h4>Evening Glow</h4>
+                                <p>Experience the vibrant nightlife at Bloom Africa with our curated selection of signature
+                                    drinks.</p>
+                                <div class="gallery-card-footer">
+                                    <span class="date"><i class="fa-regular fa-calendar"></i> Dec 28, 2030</span>
+                                    <a href="javascript:void(0)" class="read-more"
+                                        onclick="openGalleryModal('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2070&auto=format&fit=crop', 'Ambience', 'Evening Glow', 'Experience the vibrant nightlife at Bloom Africa with our curated selection of signature drinks.', 'Dec 28, 2030')">Read
+                                        More <i class="fa-solid fa-arrow-right"></i></a>
+                                </div>
                             </div>
                         </div>
-                    </div>
                 <?php endif; ?>
             </div>
         </div>
@@ -2627,47 +2752,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
         <h2 class="section-title">Our Signature Dishes</h2>
         <div class="menu-grid">
             <?php if (empty($menu_items)): ?>
-                <p style="text-align: center; grid-column: 1/-1;">Menu is currently being updated. Please check back later.
-                </p>
+                    <p style="text-align: center; grid-column: 1/-1;">Menu is currently being updated. Please check back later.
+                    </p>
             <?php endif; ?>
 
             <?php foreach ($menu_items as $item): ?>
-                <div class="menu-item">
-                    <img src="<?= htmlspecialchars($item['image_url'] ?: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=500&q=80') ?>"
-                        alt="<?= htmlspecialchars($item['name']) ?>" loading="lazy">
-                    <div class="menu-content">
-                        <div class="menu-header">
-                            <h3>
-                                <?= htmlspecialchars($item['name']) ?>
-                            </h3>
-                            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
-                                <span class="price">$
-                                    <?= number_format($item['price'], 2) ?>
-                                </span>
-                                <?php $is_fav = isset($_COOKIE['fav_' . $item['id']]); ?>
-                                <button class="fav-btn <?= $is_fav ? 'active' : '' ?>"
-                                    onclick="toggleFav(<?= $item['id'] ?>, this)">
-                                    <i class="<?= $is_fav ? 'fa-solid' : 'fa-regular' ?> fa-heart"></i>
-                                </button>
+                    <div class="menu-item">
+                        <img src="<?= htmlspecialchars($item['image_url'] ?: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=500&q=80') ?>"
+                            alt="<?= htmlspecialchars($item['name']) ?>" loading="lazy">
+                        <div class="menu-content">
+                            <div class="menu-header">
+                                <h3>
+                                    <?= htmlspecialchars($item['name']) ?>
+                                </h3>
+                                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
+                                    <span class="price">$
+                                        <?= number_format($item['price'], 2) ?>
+                                    </span>
+                                    <?php $is_fav = isset($_COOKIE['fav_' . $item['id']]); ?>
+                                    <button class="fav-btn <?= $is_fav ? 'active' : '' ?>"
+                                        onclick="toggleFav(<?= $item['id'] ?>, this)">
+                                        <i class="<?= $is_fav ? 'fa-solid' : 'fa-regular' ?> fa-heart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="menu-desc">
+                                <?= htmlspecialchars($item['description']) ?>
+                            </p>
+                            <div class="menu-order-btns">
+                                <a href="javascript:void(0)"
+                                    onclick="initiateChat('<?= addslashes($item['name']) ?>', '<?= $item['price'] ?>', 'WhatsApp', 'https://wa.me/251918592028?text=Hello%21+I+would+like+to+order+<?= urlencode($item['name']) ?>')"
+                                    class="buy-btn">
+                                    <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                                </a>
+                                <a href="javascript:void(0)"
+                                    onclick="initiateChat('<?= addslashes($item['name']) ?>', '<?= $item['price'] ?>', 'Telegram', 'https://t.me/+251918592028?text=Hello%21+I+would+like+to+order+<?= urlencode($item['name']) ?>')"
+                                    class="telegram-btn">
+                                    <i class="fa-brands fa-telegram"></i> Telegram
+                                </a>
                             </div>
                         </div>
-                        <p class="menu-desc">
-                            <?= htmlspecialchars($item['description']) ?>
-                        </p>
-                        <div class="menu-order-btns">
-                            <a href="javascript:void(0)"
-                                onclick="initiateChat('<?= addslashes($item['name']) ?>', '<?= $item['price'] ?>', 'WhatsApp', 'https://wa.me/251918592028?text=Hello%21+I+would+like+to+order+<?= urlencode($item['name']) ?>')"
-                                class="buy-btn">
-                                <i class="fa-brands fa-whatsapp"></i> WhatsApp
-                            </a>
-                            <a href="javascript:void(0)"
-                                onclick="initiateChat('<?= addslashes($item['name']) ?>', '<?= $item['price'] ?>', 'Telegram', 'https://t.me/+251918592028?text=Hello%21+I+would+like+to+order+<?= urlencode($item['name']) ?>')"
-                                class="telegram-btn">
-                                <i class="fa-brands fa-telegram"></i> Telegram
-                            </a>
-                        </div>
                     </div>
-                </div>
             <?php endforeach; ?>
         </div>
     </section>
@@ -2799,32 +2924,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
                         Journey</h3>
                     <div class="footer-social-links" style="display: flex; gap: 18px; flex-wrap: wrap;">
                         <?php if ($company['facebook']): ?>
-                            <a href="<?= htmlspecialchars($company['facebook']) ?>" target="_blank"
-                                class="social-icon-btn"><i class="fa-brands fa-facebook-f"></i></a>
+                                <a href="<?= htmlspecialchars($company['facebook']) ?>" target="_blank"
+                                    class="social-icon-btn"><i class="fa-brands fa-facebook-f"></i></a>
                         <?php endif; ?>
                         <?php if ($company['instagram']): ?>
-                            <a href="<?= htmlspecialchars($company['instagram']) ?>" target="_blank"
-                                class="social-icon-btn"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="<?= htmlspecialchars($company['instagram']) ?>" target="_blank"
+                                    class="social-icon-btn"><i class="fa-brands fa-instagram"></i></a>
                         <?php endif; ?>
                         <?php if ($company['twitter']): ?>
-                            <a href="<?= htmlspecialchars($company['twitter']) ?>" target="_blank"
-                                class="social-icon-btn"><i class="fa-brands fa-x-twitter"></i></a>
+                                <a href="<?= htmlspecialchars($company['twitter']) ?>" target="_blank"
+                                    class="social-icon-btn"><i class="fa-brands fa-x-twitter"></i></a>
                         <?php endif; ?>
                         <?php if ($company['tiktok']): ?>
-                            <a href="<?= htmlspecialchars($company['tiktok']) ?>" target="_blank" class="social-icon-btn"><i
-                                    class="fa-brands fa-tiktok"></i></a>
+                                <a href="<?= htmlspecialchars($company['tiktok']) ?>" target="_blank" class="social-icon-btn"><i
+                                        class="fa-brands fa-tiktok"></i></a>
                         <?php endif; ?>
                         <?php if ($company['linkedin']): ?>
-                            <a href="<?= htmlspecialchars($company['linkedin']) ?>" target="_blank"
-                                class="social-icon-btn"><i class="fa-brands fa-linkedin-in"></i></a>
+                                <a href="<?= htmlspecialchars($company['linkedin']) ?>" target="_blank"
+                                    class="social-icon-btn"><i class="fa-brands fa-linkedin-in"></i></a>
                         <?php endif; ?>
                         <?php if ($company['telegram']): ?>
-                            <a href="<?= htmlspecialchars($company['telegram']) ?>" target="_blank"
-                                class="social-icon-btn"><i class="fa-brands fa-telegram"></i></a>
+                                <a href="<?= htmlspecialchars($company['telegram']) ?>" target="_blank"
+                                    class="social-icon-btn"><i class="fa-brands fa-telegram"></i></a>
                         <?php endif; ?>
                         <?php if ($company['whatsapp']): ?>
-                            <a href="<?= htmlspecialchars($company['whatsapp']) ?>" target="_blank"
-                                class="social-icon-btn"><i class="fa-brands fa-whatsapp"></i></a>
+                                <a href="<?= htmlspecialchars($company['whatsapp']) ?>" target="_blank"
+                                    class="social-icon-btn"><i class="fa-brands fa-whatsapp"></i></a>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -2849,12 +2974,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
                         <div
                             style="display: flex; gap: 15px; margin-top: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.5);">
                             <?php if (!empty($company['dev_email'])): ?>
-                                <span><i class="fa-solid fa-envelope" style="margin-right: 5px;"></i>
-                                    <?= htmlspecialchars($company['dev_email']) ?></span>
+                                    <span><i class="fa-solid fa-envelope" style="margin-right: 5px;"></i>
+                                        <?= htmlspecialchars($company['dev_email']) ?></span>
                             <?php endif; ?>
                             <?php if (!empty($company['dev_phone'])): ?>
-                                <span><i class="fa-solid fa-phone" style="margin-right: 5px;"></i>
-                                    <?= htmlspecialchars($company['dev_phone']) ?></span>
+                                    <span><i class="fa-solid fa-phone" style="margin-right: 5px;"></i>
+                                        <?= htmlspecialchars($company['dev_phone']) ?></span>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -3055,16 +3180,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
             <i class="fa-solid fa-robot"></i>
         </div>
         <?php if (!empty($company['telegram'])): ?>
-            <a href="<?= htmlspecialchars($company['telegram']) ?>" class="telegram-float" target="_blank"
-                rel="noopener noreferrer" data-tooltip="Chat on Telegram">
-                <i class="fa-brands fa-telegram"></i>
-            </a>
+                <a href="<?= htmlspecialchars($company['telegram']) ?>" class="telegram-float" target="_blank"
+                    rel="noopener noreferrer" data-tooltip="Chat on Telegram">
+                    <i class="fa-brands fa-telegram"></i>
+                </a>
         <?php endif; ?>
         <?php if (!empty($company['whatsapp'])): ?>
-            <a href="<?= htmlspecialchars($company['whatsapp']) ?>" class="whatsapp-float" target="_blank"
-                rel="noopener noreferrer" data-tooltip="Order on WhatsApp">
-                <i class="fa-brands fa-whatsapp"></i>
-            </a>
+                <a href="<?= htmlspecialchars($company['whatsapp']) ?>" class="whatsapp-float" target="_blank"
+                    rel="noopener noreferrer" data-tooltip="Order on WhatsApp">
+                    <i class="fa-brands fa-whatsapp"></i>
+                </a>
         <?php endif; ?>
     </div>
 

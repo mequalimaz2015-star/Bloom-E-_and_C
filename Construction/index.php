@@ -992,7 +992,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
             }
         }
 
-        .chat-bubble.bot {
+        .chat-bubble.bot,
+        .chat-bubble.admin {
             background: #333;
             color: rgba(255, 255, 255, 0.9);
             align-self: flex-start;
@@ -1259,7 +1260,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
                         });
                     }
                 })
-                .catch(() => {  });
+                .catch(() => { });
         }
     </script>
     <div class="float-btn-group" id="socialFloatGroup">
