@@ -42,14 +42,24 @@ echo ">>> Configuring Database: $DB_NAME"
 
 # Create setup script to run all at once
 cat <<EOF > /tmp/db_setup.sql
+-- Ensure database exists
 CREATE DATABASE IF NOT EXISTS \`$DB_NAME\`;
-SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$DB_PASS');
+
+-- Clear any old root users for these hosts if they exist (to avoid 'already exists' errors)
+-- Then recreate and grant permissions
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' IDENTIFIED BY '$DB_PASS' WITH GRANT OPTION;
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' IDENTIFIED BY '$DB_PASS' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '$DB_PASS' WITH GRANT OPTION;
+
+-- Ensure the 'root' user exists for 127.0.0.1 specifically
+CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY '$DB_PASS';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
+
 FLUSH PRIVILEGES;
 EOF
 
-# Run setup using root (try both with and without password to be safe)
+echo ">>> Applying Database Permissions..."
+# Run setup using root (try without password first, then with password)
 mysql -u root < /tmp/db_setup.sql || mysql -u root -p"$DB_PASS" < /tmp/db_setup.sql
 rm /tmp/db_setup.sql
 
