@@ -1,5 +1,4 @@
-<?php
-session_start();
+<?php session_start();
 require_once 'db.php';
 
 // Auth logic
@@ -496,7 +495,8 @@ $perf_data_json = json_encode($perf_percent);
 
             <!-- Construction Management Dropdown -->
             <?php if (hasPermission('const_projects') || hasPermission('const_equipment') || hasPermission('const_quotes') || hasPermission('const_services') || hasPermission('const_features') || hasPermission('const_info')): ?>
-                <div class="nav-dropdown <?= in_array($active_tab, ['const_projects', 'const_equipment', 'const_quotes', 'const_services', 'const_features', 'const_info']) ? 'open' : '' ?>">
+                <div
+                    class="nav-dropdown <?= in_array($active_tab, ['const_projects', 'const_equipment', 'const_quotes', 'const_services', 'const_features', 'const_info']) ? 'open' : '' ?>">
                     <div class="nav-dropdown-toggle" onclick="this.parentElement.classList.toggle('open')">
                         <span style="display: flex; align-items: center; gap: 12px;">
                             <i class="fa-solid fa-hard-hat"></i> Construction Mgmt
@@ -505,19 +505,23 @@ $perf_data_json = json_encode($perf_percent);
                     </div>
                     <div class="submenu">
                         <?php if (hasPermission('const_projects')): ?>
-                            <a href="?tab=const_projects" class="nav-item <?= $active_tab == 'const_projects' ? 'active' : '' ?>"><i
+                            <a href="?tab=const_projects"
+                                class="nav-item <?= $active_tab == 'const_projects' ? 'active' : '' ?>"><i
                                     class="fa-solid fa-building"></i> Projects</a>
                         <?php endif; ?>
                         <?php if (hasPermission('const_services')): ?>
-                            <a href="?tab=const_services" class="nav-item <?= $active_tab == 'const_services' ? 'active' : '' ?>"><i
+                            <a href="?tab=const_services"
+                                class="nav-item <?= $active_tab == 'const_services' ? 'active' : '' ?>"><i
                                     class="fa-solid fa-screwdriver-wrench"></i> Our Services</a>
                         <?php endif; ?>
                         <?php if (hasPermission('const_features')): ?>
-                            <a href="?tab=const_features" class="nav-item <?= $active_tab == 'const_features' ? 'active' : '' ?>"><i
+                            <a href="?tab=const_features"
+                                class="nav-item <?= $active_tab == 'const_features' ? 'active' : '' ?>"><i
                                     class="fa-solid fa-lightbulb"></i> Why Choose Us</a>
                         <?php endif; ?>
                         <?php if (hasPermission('const_equipment')): ?>
-                            <a href="?tab=const_equipment" class="nav-item <?= $active_tab == 'const_equipment' ? 'active' : '' ?>"><i
+                            <a href="?tab=const_equipment"
+                                class="nav-item <?= $active_tab == 'const_equipment' ? 'active' : '' ?>"><i
                                     class="fa-solid fa-truck-pickup"></i> Equipment</a>
                         <?php endif; ?>
                         <?php if (hasPermission('const_quotes')): ?>
