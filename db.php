@@ -457,6 +457,7 @@ try {
             'quote_subtitle' => "TEXT"
         ],
         'company_info' => [
+            'hero_button_text' => "VARCHAR(100)",
             'hero_video' => "VARCHAR(255)",
             'hero_audio' => "VARCHAR(255)",
             'hero2_title' => "VARCHAR(255)",
