@@ -10,7 +10,7 @@ services:
     envVars:
       - key: BLOOM_DB_HOST
         fromService:
-          type: web
+          type: pserv
           name: bloom-mysql
           property: host
       - key: BLOOM_DB_NAME
@@ -19,7 +19,7 @@ services:
         value: root
       - key: BLOOM_DB_PASS
         fromService:
-          type: web
+          type: pserv
           name: bloom-mysql
           property: password
       - key: BLOOM_DB_PORT
@@ -37,6 +37,7 @@ services:
     env: docker
     plan: free
     region: oregon
+    dockerContext: .
     dockerfile: Dockerfile.mysql
     envVars:
       - key: MYSQL_ROOT_PASSWORD
