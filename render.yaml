@@ -1,9 +1,8 @@
-name: bloom-africa
 services:
   - type: pserv
     name: bloom-db
-    env: image
-    image: mysql:5.7
+    env: docker
+    dockerfilePath: Dockerfile.mysql
     plan: free
     region: oregon
     envVars:
