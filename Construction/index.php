@@ -270,6 +270,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
                     <?php endif; ?>
                     <a href="#sec-3">Services</a>
                     <a href="#sec-5">Contact</a>
+                    <a href="../admin.php" style="color: #f39c12 !important; font-weight: 800; border: 1px solid rgba(243, 156, 18, 0.4); padding: 5px 15px; border-radius: 20px; margin-left: 10px; background: rgba(243, 156, 18, 0.05); transition: all 0.3s;" onmouseover="this.style.background='rgba(243, 156, 18, 0.2)'; this.style.boxShadow='0 0 15px rgba(243, 156, 18, 0.2)';" onmouseout="this.style.background='rgba(243, 156, 18, 0.05)'; this.style.boxShadow='none';"><i class="fa-solid fa-gauge-high"></i> Admin</a>
                     <i class="fa-solid fa-magnifying-glass" id="search"></i>
                 </nav>
             </div>
