@@ -311,6 +311,7 @@ try {
         customer_name VARCHAR(255) NOT NULL,
         customer_email VARCHAR(255) NOT NULL,
         customer_phone VARCHAR(50) NOT NULL,
+        department VARCHAR(50) DEFAULT 'Restaurant',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -419,58 +420,53 @@ try {
 
     $pdo->exec($setup_queries);
 
-    // 6.5 Schema Updates (Ensure newer columns exist)
-    $update_cols = [
-        'hero_title' => "VARCHAR(255)",
-        'hero_subtitle' => "TEXT",
-        'hero_description' => "TEXT",
-        'hero_image' => "VARCHAR(255)",
-        'hero_video' => "VARCHAR(255)",
-        'why_choose_us_title' => "VARCHAR(255)",
-        'why_choose_us_subtitle' => "TEXT",
-        'services_title' => "VARCHAR(255)",
-        'services_subtitle' => "TEXT",
-        'projects_title' => "VARCHAR(255)",
-        'projects_subtitle' => "TEXT",
-        'reviews_title' => "VARCHAR(255)",
-        'reviews_subtitle' => "TEXT",
-        'quote_title' => "VARCHAR(255)",
-        'quote_subtitle' => "TEXT"
+    // --- ROBUST SCHEMA SYNC (Add missing columns to existing tables) ---
+    $sync_tasks = [
+        'activity_logs' => ['admin_name' => "VARCHAR(255) AFTER action"],
+        'menu_items' => ['likes' => "INT DEFAULT 0 AFTER price"],
+        'construction_projects' => [
+            'start_date' => "DATE AFTER image_url",
+            'completion_date' => "DATE AFTER start_date"
+        ],
+        'construction_equipment' => ['serial_number' => "VARCHAR(100) AFTER name"],
+        'construction_info' => [
+            'hero_title' => "VARCHAR(255)",
+            'hero_subtitle' => "TEXT",
+            'hero_description' => "TEXT",
+            'hero_image' => "VARCHAR(255)",
+            'hero_video' => "VARCHAR(255)",
+            'why_choose_us_title' => "VARCHAR(255)",
+            'why_choose_us_subtitle' => "TEXT",
+            'services_title' => "VARCHAR(255)",
+            'services_subtitle' => "TEXT",
+            'projects_title' => "VARCHAR(255)",
+            'projects_subtitle' => "TEXT",
+            'reviews_title' => "VARCHAR(255)",
+            'reviews_subtitle' => "TEXT",
+            'quote_title' => "VARCHAR(255)",
+            'quote_subtitle' => "TEXT"
+        ],
+        'chat_sessions' => ['department' => "VARCHAR(50) DEFAULT 'Restaurant' AFTER customer_phone"]
     ];
-    foreach ($update_cols as $col => $type) {
+
+    foreach ($sync_tasks as $table => $columns) {
         try {
-            $pdo->exec("ALTER TABLE construction_info ADD COLUMN `$col` $type");
-        } catch (Exception $e) {
+            $existing_cols = $pdo->query("DESCRIBE `$table`")->fetchAll(PDO::FETCH_COLUMN);
+            foreach ($columns as $col => $definition) {
+                if (!in_array($col, $existing_cols)) {
+                    $pdo->exec("ALTER TABLE `$table` ADD COLUMN `$col` $definition");
+                }
+            }
+        } catch (Exception $e) { /* Table might not exist yet, setup_queries will create it */
         }
     }
 
-    // Sync construction_projects column name (name -> title)
+    // Special case: Ensure construction_projects uses 'title' not 'name'
     try {
-        $pdo->exec("ALTER TABLE construction_projects CHANGE COLUMN `name` `title` VARCHAR(255) NOT NULL");
-    } catch (Exception $e) {
-    }
-
-    try {
-        $pdo->exec("ALTER TABLE construction_equipment ADD COLUMN serial_number VARCHAR(100) AFTER name");
-    } catch (Exception $e) {
-    }
-    try {
-        $pdo->exec("ALTER TABLE construction_projects ADD COLUMN start_date DATE AFTER image_url");
-    } catch (Exception $e) {
-    }
-    try {
-        $pdo->exec("ALTER TABLE construction_projects ADD COLUMN completion_date DATE AFTER start_date");
-    } catch (Exception $e) {
-    }
-
-    // Add likes column to menu_items if missing
-    try {
-        $pdo->exec("ALTER TABLE menu_items ADD COLUMN likes INT DEFAULT 0 AFTER price");
-    } catch (Exception $e) {
-    }
-
-    try {
-        $pdo->exec("ALTER TABLE activity_logs ADD COLUMN admin_name VARCHAR(255) AFTER action");
+        $cols = $pdo->query("DESCRIBE construction_projects")->fetchAll(PDO::FETCH_COLUMN);
+        if (in_array('name', $cols) && !in_array('title', $cols)) {
+            $pdo->exec("ALTER TABLE construction_projects CHANGE COLUMN `name` `title` VARCHAR(255) NOT NULL");
+        }
     } catch (Exception $e) {
     }
 
@@ -489,9 +485,23 @@ try {
         $pdo->exec("INSERT INTO construction_info (company_name, hero_title, hero_image, email, phone, address, why_choose_us_msg, services_desc, review_text, review_image) VALUES 
             ('Bloom Construction', 'WELCOME TO OUR COMPANY', 'uploads/const/hero_1772692960.jpg', 'info@bloomconstruction.et', '+251 911 222 333', 'Addis Ababa, Ethiopia', 'Quality and Excellence in every build.', 'Leading construction services in Ethiopia.', 'The team delivered our project ahead of schedule with exceptional attention to detail. Highly recommend for any major construction work in Addis.', 'uploads/const/review_1772692350.png')");
     } else {
-        // Force update user's specific image to ensure it matches local (Overriding a bad previous seed/initial state)
-        $pdo->exec("UPDATE construction_info SET hero_image = 'uploads/const/hero_1772692960.jpg', hero_title = 'WELCOME TO OUR COMPANY' WHERE id = 1");
+        // Force update user's specific image and messages back to local defaults for a perfect sync
+        $pdo->exec("UPDATE construction_info SET 
+            hero_image = 'uploads/const/hero_1772692960.jpg', 
+            hero_title = 'WELCOME TO OUR COMPANY',
+            company_name = 'Bloom Construction',
+            why_choose_us_msg = 'Quality and Excellence in every build.',
+            services_desc = 'Leading construction services in Ethiopia.',
+            review_text = 'The team delivered our project ahead of schedule with exceptional attention to detail. Highly recommend for any major construction work in Addis.',
+            review_image = 'uploads/const/review_1772692350.png'
+            WHERE id = 1");
     }
+
+    // Ensure uploads directory exists for chatbot images
+    if (!file_exists('uploads/chat')) {
+        @mkdir('uploads/chat', 0777, true);
+    }
+
 
     // Seed construction_services if empty (Using user's local images)
     $check_const_services = $pdo->query("SELECT COUNT(*) FROM construction_services")->fetchColumn();

@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $bot_reply = "Hello! 👋 Welcome back to Bloom Construction. How can we help you today?";
             $buttons = ['🏗️ Our Projects', '🛠️ Services', '📍 Location', '👤 Talk to Human'];
         } elseif (strpos($msg_lower, 'our projects') !== false || $msg_lower == 'projects' || $msg_lower == 'main menu') {
-            $stmt = $pdo->query("SELECT name FROM construction_projects WHERE status='Completed' LIMIT 5");
+            $stmt = $pdo->query("SELECT title FROM construction_projects WHERE status='Completed' LIMIT 5");
             $items = $stmt->fetchAll(PDO::FETCH_COLUMN);
             $bot_reply = "Here are some of our completed projects:\n" . implode("\n", array_map(function ($i) {
                 return "• $i";
