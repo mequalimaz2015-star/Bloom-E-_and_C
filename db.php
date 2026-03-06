@@ -440,7 +440,6 @@ try {
             'completion_date' => "DATE AFTER start_date"
         ],
         'construction_equipment' => ['serial_number' => "VARCHAR(100) UNIQUE AFTER name"],
-
         'company_info' => [
             'hero_button_text' => "VARCHAR(100)",
             'hero_video' => "VARCHAR(255)",
@@ -481,6 +480,36 @@ try {
             'video_url' => "VARCHAR(255) AFTER icon",
             'category' => "ENUM('Food Delivery', 'Catering Service', 'Wedding Events', 'Birthday Parties', 'Corporate Events', 'Others') DEFAULT 'Others' AFTER video_url",
             'status' => "ENUM('Active', 'Inactive') DEFAULT 'Active' AFTER category"
+        ],
+        'construction_info' => [
+            'hero_title' => "VARCHAR(255)",
+            'hero_subtitle' => "TEXT",
+            'hero_description' => "TEXT",
+            'hero_image' => "VARCHAR(255)",
+            'hero_video' => "VARCHAR(255)",
+            'why_choose_us_title' => "VARCHAR(255)",
+            'why_choose_us_subtitle' => "TEXT",
+            'services_title' => "VARCHAR(255)",
+            'services_subtitle' => "TEXT",
+            'projects_title' => "VARCHAR(255)",
+            'projects_subtitle' => "TEXT",
+            'reviews_title' => "VARCHAR(255)",
+            'reviews_subtitle' => "TEXT",
+            'quote_title' => "VARCHAR(255)",
+            'quote_subtitle' => "TEXT",
+            'ome_page_url' => "VARCHAR(255)",
+            'blog_url' => "VARCHAR(255)",
+            'portfolio_url' => "VARCHAR(255)",
+            'why_choose_us_msg' => "TEXT",
+            'services_desc' => "TEXT",
+            'review_image' => "VARCHAR(255)",
+            'review_text' => "TEXT",
+            'facebook' => "VARCHAR(255)",
+            'twitter' => "VARCHAR(255)",
+            'linkedin' => "VARCHAR(255)",
+            'google_plus' => "VARCHAR(255)",
+            'youtube' => "VARCHAR(255)",
+            'instagram' => "VARCHAR(255)"
         ]
     ];
 
@@ -516,17 +545,17 @@ try {
 
 
     // 7. Data Seeding
-    // Seed company_info if it's empty
+    // Seed company_info if it's empty (Guard: Only runs if count is 0)
     $check_company = $pdo->query("SELECT COUNT(*) FROM company_info")->fetchColumn();
     if ($check_company == 0) {
         $pdo->exec("INSERT INTO company_info (id, company_name, email, phone, address, about_text, dev_name, dev_email, dev_phone) VALUES (1, 'Bloom Africa Restaurant', 'info@bloomafrica.com', '+251 900 123 456', 'Addis Ababa, Ethiopia', 'Experience authentic African cuisine.', 'Mequannent Gashaw', 'meqalimaz2015@gmail.com', '+251 918 592 028')");
     }
 
-    // Seed construction_info if it's empty
+    // Seed construction_info if it's empty (Guard: Only runs if count is 0)
     $check_const = $pdo->query("SELECT COUNT(*) FROM construction_info")->fetchColumn();
     if ($check_const == 0) {
         $pdo->exec("INSERT INTO construction_info (id, company_name, hero_title, hero_subtitle, hero_image, email, phone, address, why_choose_us_msg, services_desc, review_text, review_image) VALUES 
-            (1, 'Bloom Construction', 'WELCOME TO OUR COMPANY', 'Building your vision with precision.', 'uploads/const/hero_1772692960.jpg', 'info@bloomconstruction.et', '+251 911 222 333', 'Addis Ababa, Ethiopia', 'Quality and Excellence in every build.', 'Leading construction services in Ethiopia.', 'The team delivered our project ahead of schedule with exceptional attention to detail.', 'uploads/const/review_1772692350.png')");
+            (1, 'Bloom Construction', 'WELCOME TO OUR COMPANY', 'Building your vision with precision.', 'https://images.unsplash.com/photo-1541888946425-d81bb19480c5?q=80&w=2070', 'info@bloomconstruction.et', '+251 911 222 333', 'Addis Ababa, Ethiopia', 'Quality and Excellence in every build.', 'Leading construction services in Ethiopia.', 'The team delivered our project ahead of schedule with exceptional attention to detail.', 'https://images.unsplash.com/photo-1504307651254-35682f94a1d3?q=80&w=800')");
     }
 
     // Ensure uploads directory exists for chatbot images
@@ -589,10 +618,6 @@ try {
             ('Executive Chef', 'Kitchen', 'Full-time', 'Addis Ababa', 'We are looking for a creative and experienced Executive Chef to lead our kitchen team, design menus, and maintain high standards of culinary excellence.', '2026-04-30', 'Active'),
             ('Restaurant Manager', 'Management', 'Full-time', 'Addis Ababa', 'Seeking a dynamic Restaurant Manager to oversee daily operations, ensure exceptional guest service, and manage staff to achieve business goals.', '2026-04-15', 'Active'),
             ('Senior Civil Engineer', 'Construction', 'Full-time', 'Project Site', 'Responsible for overseeing large-scale infrastructure projects, ensuring technical accuracy, and managing onsite engineering teams for Bloom Construction.', '2026-05-20', 'Active')");
-
-        $pdo->exec("UPDATE jobs SET category = 'Kitchen', type = 'Full-time', location = 'Addis Ababa' WHERE title='Executive Chef'");
-        $pdo->exec("UPDATE jobs SET category = 'Management', type = 'Full-time', location = 'Addis Ababa' WHERE title='Restaurant Manager'");
-        $pdo->exec("UPDATE jobs SET category = 'Construction', type = 'Full-time', location = 'Project Site' WHERE title='Senior Civil Engineer'");
 
         // --- NEW: Force Exactly 3 for Restaurant Services ---
         $pdo->exec("INSERT IGNORE INTO services (title, description, image_url, category, icon) VALUES 
