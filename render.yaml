@@ -1,32 +1,45 @@
 services:
+  # Web Service for the PHP Application
   - type: web
     name: bloom-restaurant
-    env: docker
-    region: ohio
-    plan: free
-    healthCheckPath: /
+    env: php
+    plan: free # Can be changed to 'starter' if a Disk is needed
+    region: oregon # Best to keep same region as DB
+    buildCommand: "echo 'No build command needed'"
+    startCommand: "apache2-foreground" # Default for Render PHP
     envVars:
       - key: BLOOM_DB_HOST
-        value: mysql
+        fromService:
+          type: web
+          name: bloom-mysql
+          property: host
       - key: BLOOM_DB_NAME
         value: bloom_africa
       - key: BLOOM_DB_USER
-        value: bloom_user
+        value: root
       - key: BLOOM_DB_PASS
-        value: bloom_password
+        fromService:
+          type: web
+          name: bloom-mysql
+          property: password
+      - key: BLOOM_DB_PORT
+        value: "3306"
+    # Uncomment the disk section if you upgrade to a paid 'starter' plan
+    # to maintain persistent image uploads
+    # disk:
+    #   name: uploads
+    #   mountPath: /var/www/html/uploads
+    #   sizeGB: 1
 
-  - type: pvt
-    name: mysql
+  # Private MySQL Service
+  - type: web
+    name: bloom-mysql
     env: docker
-    region: ohio
     plan: free
-    dockerFilePath: Dockerfile.mysql
+    region: oregon
+    dockerfile: Dockerfile.mysql
     envVars:
+      - key: MYSQL_ROOT_PASSWORD
+        generateValue: true
       - key: MYSQL_DATABASE
         value: bloom_africa
-      - key: MYSQL_USER
-        value: bloom_user
-      - key: MYSQL_PASSWORD
-        value: bloom_password
-      - key: MYSQL_ROOT_PASSWORD
-        value: root_password

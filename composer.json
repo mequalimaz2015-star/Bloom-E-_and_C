@@ -1,0 +1,16 @@
+{
+    "name": "bloom/restaurant-and-construction",
+    "description": "Bloom Africa Restaurant and Construction Portal",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "ext-pdo": "*",
+        "ext-pdo_mysql": "*"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mequannent Gashaw"
+        }
+    ]
+}

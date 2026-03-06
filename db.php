@@ -9,8 +9,13 @@ $port = getenv('BLOOM_DB_PORT') ?: '3306';
 
 // 2. Environment Failsafes
 if (!$host) {
-    // If on Render but BLOOM_DB_HOST is missing, use the service name 'mysql'
-    $host = getenv('RENDER') ? 'mysql' : '127.0.0.1';
+    // Check common service names on Render
+    $host = getenv('RENDER') ? 'bloom-mysql' : '127.0.0.1';
+
+    // Final fallback if bloom-mysql isn't found
+    if (getenv('RENDER') && !gethostbyname($host)) {
+        $host = 'mysql';
+    }
 }
 
 // Ensure we NEVER use 'localhost' (which triggers socket files on Linux)
