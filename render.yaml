@@ -1,19 +1,25 @@
+# Render Blueprint for Bloom Africa
 services:
+  # MySQL Private Service (Database)
   - type: pserv
-    name: bloom-db
+    name: bloom-db-pserv
     env: docker
+    dockerContext: .
     dockerfilePath: Dockerfile.mysql
     plan: free
-    region: oregon
+    region: oregon 
     envVars:
       - key: MYSQL_ROOT_PASSWORD
         value: bloom_root_pass
       - key: MYSQL_DATABASE
         value: bloom_africa
 
+  # PHP Web Service (Application)
   - type: web
-    name: bloom-web
+    name: bloom-web-app
     env: docker
+    dockerContext: .
+    dockerfilePath: Dockerfile
     plan: free
     region: oregon
     healthCheckPath: /
@@ -21,7 +27,7 @@ services:
       - key: BLOOM_DB_HOST
         fromService:
           type: pserv
-          name: bloom-db
+          name: bloom-db-pserv
           property: host
       - key: BLOOM_DB_NAME
         value: bloom_africa
