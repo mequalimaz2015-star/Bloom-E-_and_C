@@ -12,7 +12,26 @@ $gallery_count = count($gallery);
             <?= $gallery_count ?> image<?= $gallery_count !== 1 ? 's' : '' ?> in gallery
         </p>
     </div>
-    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <!-- Bulk Actions -->
+        <div id="gallery_bulk_actions" style="display: none; align-items: center; gap: 10px;">
+            <span id="gallery_selected_count" style="font-size: 13px; font-weight: 700; color: #2563eb;">0
+                selected</span>
+            <form method="POST" id="gallery_bulk_form" style="display: flex; gap: 5px;">
+                <input type="hidden" name="gallery_bulk_ids" id="gallery_bulk_ids_input">
+                <button type="submit" name="bulk_delete_gallery" class="btn"
+                    onclick="return confirm('Are you sure you want to delete the selected gallery images?')"
+                    style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 7px 16px; font-size: 12px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(239,68,68,0.3);">
+                    <i class="fa-solid fa-trash-can"></i> Delete Selected
+                </button>
+            </form>
+        </div>
+        <!-- Select All -->
+        <label
+            style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: #64748b; background: #f8fafc; padding: 6px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <input type="checkbox" id="select_all_gallery" onchange="toggleSelectAllGallery(this)"
+                style="width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb;"> Select All
+        </label>
         <!-- Import from Directory Button -->
         <a href="../import_gallery.php" target="_blank" class="btn"
             style="background: #7c3aed; color: #fff; border-radius: 10px; padding: 10px 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; text-decoration: none;"
@@ -34,6 +53,11 @@ $gallery_count = count($gallery);
             style="padding: 0; overflow: hidden; position: relative; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s;"
             onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.15)';"
             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.08)';">
+            <!-- Checkbox -->
+            <div style="position: absolute; top: 10px; right: 10px; z-index: 5;">
+                <input type="checkbox" class="gallery-checkbox" value="<?= $img['id'] ?>" onchange="updateGalleryBulkUI()"
+                    style="width: 18px; height: 18px; cursor: pointer; accent-color: #2563eb;">
+            </div>
             <!-- Image -->
             <div style="position: relative; height: 190px; overflow: hidden;">
                 <img src="../<?= htmlspecialchars($img['image_url']) ?>"
@@ -89,6 +113,29 @@ $gallery_count = count($gallery);
         </div>
     <?php endif; ?>
 </div>
+
+<script>
+    function toggleSelectAllGallery(source) {
+        document.querySelectorAll('.gallery-checkbox').forEach(cb => cb.checked = source.checked);
+        updateGalleryBulkUI();
+    }
+    function updateGalleryBulkUI() {
+        const checked = document.querySelectorAll('.gallery-checkbox:checked');
+        const all = document.querySelectorAll('.gallery-checkbox');
+        const bulk = document.getElementById('gallery_bulk_actions');
+        const count = document.getElementById('gallery_selected_count');
+        const ids = document.getElementById('gallery_bulk_ids_input');
+        const selAll = document.getElementById('select_all_gallery');
+        if (checked.length > 0) {
+            bulk.style.display = 'flex';
+            count.innerText = checked.length + ' selected';
+            ids.value = Array.from(checked).map(cb => cb.value).join(',');
+        } else { bulk.style.display = 'none'; }
+        if (all.length > 0 && checked.length === all.length) { selAll.checked = true; selAll.indeterminate = false; }
+        else if (checked.length > 0) { selAll.checked = false; selAll.indeterminate = true; }
+        else { selAll.checked = false; selAll.indeterminate = false; }
+    }
+</script>
 
 <!-- Add Gallery Modal -->
 <div class="modal-overlay" id="addGalleryModal" style="display: none;">

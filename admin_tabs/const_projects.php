@@ -4,21 +4,39 @@ $projects = $pdo->query("SELECT * FROM construction_projects ORDER BY created_at
 
 <div class="card" style="border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: none; overflow: hidden;">
     <div class="card-header"
-        style="background: #fff; border-bottom: 1px solid #f1f5f9; padding: 25px; display: flex; justify-content: space-between; align-items: center;">
+        style="background: #fff; border-bottom: 1px solid #f1f5f9; padding: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
         <span class="card-title"
             style="margin: 0; display: flex; align-items: center; gap: 12px; font-weight: 700; color: #1e293b;">
             <i class="fa-solid fa-building" style="color: #10b981;"></i> Construction Projects
         </span>
-        <button class="btn btn-primary btn-sm" onclick="showModal('addProjectModal')"
-            style="border-radius: 8px; padding: 8px 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; background: #10b981; border: none;">
-            <i class="fa-solid fa-plus"></i> Add New Project
-        </button>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <div id="cproj_bulk_actions" style="display: none; align-items: center; gap: 10px;">
+                <span id="cproj_selected_count" style="font-size: 13px; font-weight: 700; color: #2563eb;">0
+                    selected</span>
+                <form method="POST" style="display: flex; gap: 5px;">
+                    <input type="hidden" name="cproj_bulk_ids" id="cproj_bulk_ids_input">
+                    <button type="submit" name="bulk_delete_const_projects" class="btn"
+                        onclick="return confirm('Are you sure you want to delete the selected projects?')"
+                        style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 7px 16px; font-size: 12px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(239,68,68,0.3);">
+                        <i class="fa-solid fa-trash-can"></i> Delete Selected
+                    </button>
+                </form>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="showModal('addProjectModal')"
+                style="border-radius: 8px; padding: 8px 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; background: #10b981; border: none;">
+                <i class="fa-solid fa-plus"></i> Add New Project
+            </button>
+        </div>
     </div>
     <div style="padding: 25px;">
         <div style="overflow-x: auto;">
             <table class="data-table" style="width: 100%; border-collapse: separate; border-spacing: 0;">
                 <thead style="background: #f8fafc;">
                     <tr>
+                        <th style="padding: 15px; border-bottom: 2px solid #f1f5f9; width: 40px; text-align: center;">
+                            <input type="checkbox" id="select_all_cproj" onchange="toggleSelectAllCProj(this)"
+                                style="width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb;">
+                        </th>
                         <th
                             style="padding: 15px; border-bottom: 2px solid #f1f5f9; text-align: left; font-weight: 600; color: #64748b; font-size: 13px;">
                             Project Info</th>
@@ -46,6 +64,11 @@ $projects = $pdo->query("SELECT * FROM construction_projects ORDER BY created_at
                     <?php else: ?>
                         <?php foreach ($projects as $proj): ?>
                             <tr>
+                                <td style="padding: 20px; border-bottom: 1px solid #f1f5f9; text-align: center;">
+                                    <input type="checkbox" class="cproj-checkbox" value="<?= $proj['id'] ?>"
+                                        onchange="updateCProjBulkUI()"
+                                        style="width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb;">
+                                </td>
                                 <td style="padding: 20px; border-bottom: 1px solid #f1f5f9;">
                                     <div style="display: flex; align-items: center; gap: 15px;">
                                         <div
@@ -111,6 +134,29 @@ $projects = $pdo->query("SELECT * FROM construction_projects ORDER BY created_at
         </div>
     </div>
 </div>
+
+<script>
+    function toggleSelectAllCProj(source) {
+        document.querySelectorAll('.cproj-checkbox').forEach(cb => cb.checked = source.checked);
+        updateCProjBulkUI();
+    }
+    function updateCProjBulkUI() {
+        const checked = document.querySelectorAll('.cproj-checkbox:checked');
+        const all = document.querySelectorAll('.cproj-checkbox');
+        const bulk = document.getElementById('cproj_bulk_actions');
+        const count = document.getElementById('cproj_selected_count');
+        const ids = document.getElementById('cproj_bulk_ids_input');
+        const selAll = document.getElementById('select_all_cproj');
+        if (checked.length > 0) {
+            bulk.style.display = 'flex';
+            count.innerText = checked.length + ' selected';
+            ids.value = Array.from(checked).map(cb => cb.value).join(',');
+        } else { bulk.style.display = 'none'; }
+        if (all.length > 0 && checked.length === all.length) { selAll.checked = true; selAll.indeterminate = false; }
+        else if (checked.length > 0) { selAll.checked = false; selAll.indeterminate = true; }
+        else { selAll.checked = false; selAll.indeterminate = false; }
+    }
+</script>
 
 <!-- Add/Edit Project Modal -->
 <div id="addProjectModal" class="modal"

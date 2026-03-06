@@ -2,15 +2,35 @@
 $team = $pdo->query("SELECT * FROM team_members ORDER BY order_index ASC, id ASC")->fetchAll();
 ?>
 <div class="card">
-    <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+    <div class="card-header"
+        style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 10px;">
         <span class="card-title">Team Management</span>
-        <button class="btn btn-primary" onclick="openMemberModal()"><i class="fa-solid fa-plus"></i> Add New
-            Member</button>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <!-- Bulk Actions -->
+            <div id="team_bulk_actions" style="display: none; align-items: center; gap: 10px;">
+                <span id="team_selected_count" style="font-size: 13px; font-weight: 700; color: #2563eb;">0
+                    selected</span>
+                <form method="POST" id="team_bulk_form" style="display: flex; gap: 5px;">
+                    <input type="hidden" name="team_bulk_ids" id="team_bulk_ids_input">
+                    <button type="submit" name="bulk_delete_team" class="btn"
+                        onclick="return confirm('Are you sure you want to delete the selected team members?')"
+                        style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 7px 16px; font-size: 12px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(239,68,68,0.3);">
+                        <i class="fa-solid fa-trash-can"></i> Delete Selected
+                    </button>
+                </form>
+            </div>
+            <button class="btn btn-primary" onclick="openMemberModal()"><i class="fa-solid fa-plus"></i> Add New
+                Member</button>
+        </div>
     </div>
     <div style="padding: 20px;">
         <table class="data-table">
             <thead>
                 <tr>
+                    <th style="width: 40px; text-align: center;">
+                        <input type="checkbox" id="select_all_team" onchange="toggleSelectAllTeam(this)"
+                            style="width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb;">
+                    </th>
                     <th>Photo</th>
                     <th>Name</th>
                     <th>Role</th>
@@ -21,6 +41,11 @@ $team = $pdo->query("SELECT * FROM team_members ORDER BY order_index ASC, id ASC
             <tbody>
                 <?php foreach ($team as $m): ?>
                     <tr>
+                        <td style="text-align: center;">
+                            <input type="checkbox" class="team-checkbox" value="<?= $m['id'] ?>"
+                                onchange="updateTeamBulkUI()"
+                                style="width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb;">
+                        </td>
                         <td>
                             <img src="<?= htmlspecialchars($m['image_url'] ?: 'admin_logo.png') ?>"
                                 style="width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid #dfb180;">
@@ -72,6 +97,29 @@ $team = $pdo->query("SELECT * FROM team_members ORDER BY order_index ASC, id ASC
         </table>
     </div>
 </div>
+
+<script>
+    function toggleSelectAllTeam(source) {
+        document.querySelectorAll('.team-checkbox').forEach(cb => cb.checked = source.checked);
+        updateTeamBulkUI();
+    }
+    function updateTeamBulkUI() {
+        const checked = document.querySelectorAll('.team-checkbox:checked');
+        const all = document.querySelectorAll('.team-checkbox');
+        const bulk = document.getElementById('team_bulk_actions');
+        const count = document.getElementById('team_selected_count');
+        const ids = document.getElementById('team_bulk_ids_input');
+        const selAll = document.getElementById('select_all_team');
+        if (checked.length > 0) {
+            bulk.style.display = 'flex';
+            count.innerText = checked.length + ' selected';
+            ids.value = Array.from(checked).map(cb => cb.value).join(',');
+        } else { bulk.style.display = 'none'; }
+        if (all.length > 0 && checked.length === all.length) { selAll.checked = true; selAll.indeterminate = false; }
+        else if (checked.length > 0) { selAll.checked = false; selAll.indeterminate = true; }
+        else { selAll.checked = false; selAll.indeterminate = false; }
+    }
+</script>
 
 <!-- Add/Edit Member Modal -->
 <div id="memberModal" class="modal">

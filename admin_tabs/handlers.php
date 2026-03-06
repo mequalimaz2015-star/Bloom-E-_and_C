@@ -1218,6 +1218,127 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->prepare("DELETE FROM gallery WHERE id=?")->execute([$id]);
         logActivity($pdo, "Removed gallery image ID: " . $id);
         $msg = "Gallery image removed!";
+    } elseif (isset($_POST['delete_single_activity'])) {
+        $id = $_POST['id'];
+        logActivity($pdo, "Deleted activity log entry ID: " . $id);
+        $pdo->prepare("DELETE FROM activity_logs WHERE id=?")->execute([$id]);
+        $msg = "Activity log entry removed!";
+    } elseif (isset($_POST['bulk_delete_activities'])) {
+        $ids = explode(',', $_POST['activity_bulk_ids']);
+        $ids = array_filter($ids, 'is_numeric');
+        if (count($ids) > 0) {
+            $placeholders = str_repeat('?,', count($ids) - 1) . '?';
+            logActivity($pdo, "Bulk deleted " . count($ids) . " activity log entries");
+            $stmt = $pdo->prepare("DELETE FROM activity_logs WHERE id IN ($placeholders)");
+            $stmt->execute($ids);
+            $msg = count($ids) . " activity log entries deleted!";
+        } else {
+            $msg = "No entries selected for deletion.";
+        }
+    } elseif (isset($_POST['clear_all_activities'])) {
+        $count = $pdo->query("SELECT COUNT(*) FROM activity_logs")->fetchColumn();
+        $pdo->exec("DELETE FROM activity_logs");
+        logActivity($pdo, "Cleared all activity logs ($count entries)");
+        $msg = "All $count activity log entries have been cleared!";
+    } elseif (isset($_POST['bulk_delete_menu'])) {
+        $ids = array_filter(explode(',', $_POST['menu_bulk_ids']), 'is_numeric');
+        if (count($ids) > 0) {
+            $placeholders = str_repeat('?,', count($ids) - 1) . '?';
+            $pdo->prepare("DELETE FROM menu_items WHERE id IN ($placeholders)")->execute($ids);
+            logActivity($pdo, "Bulk deleted " . count($ids) . " menu items");
+            $msg = count($ids) . " menu items deleted!";
+        } else {
+            $msg = "No items selected.";
+        }
+    } elseif (isset($_POST['bulk_delete_staff'])) {
+        $ids = array_filter(explode(',', $_POST['staff_bulk_ids']), 'is_numeric');
+        if (count($ids) > 0) {
+            $placeholders = str_repeat('?,', count($ids) - 1) . '?';
+            $pdo->prepare("DELETE FROM employees WHERE id IN ($placeholders)")->execute($ids);
+            logActivity($pdo, "Bulk deleted " . count($ids) . " employees");
+            $msg = count($ids) . " employee records deleted!";
+        } else {
+            $msg = "No employees selected.";
+        }
+    } elseif (isset($_POST['bulk_delete_jobs'])) {
+        $ids = array_filter(explode(',', $_POST['jobs_bulk_ids']), 'is_numeric');
+        if (count($ids) > 0) {
+            $placeholders = str_repeat('?,', count($ids) - 1) . '?';
+            $pdo->prepare("DELETE FROM jobs WHERE id IN ($placeholders)")->execute($ids);
+            logActivity($pdo, "Bulk deleted " . count($ids) . " job listings");
+            $msg = count($ids) . " job listings deleted!";
+        } else {
+            $msg = "No jobs selected.";
+        }
+    } elseif (isset($_POST['bulk_delete_gallery'])) {
+        $ids = array_filter(explode(',', $_POST['gallery_bulk_ids']), 'is_numeric');
+        if (count($ids) > 0) {
+            $placeholders = str_repeat('?,', count($ids) - 1) . '?';
+            $pdo->prepare("DELETE FROM gallery WHERE id IN ($placeholders)")->execute($ids);
+            logActivity($pdo, "Bulk deleted " . count($ids) . " gallery images");
+            $msg = count($ids) . " gallery images deleted!";
+        } else {
+            $msg = "No images selected.";
+        }
+    } elseif (isset($_POST['bulk_delete_services'])) {
+        $ids = array_filter(explode(',', $_POST['services_bulk_ids']), 'is_numeric');
+        if (count($ids) > 0) {
+            $placeholders = str_repeat('?,', count($ids) - 1) . '?';
+            $pdo->prepare("DELETE FROM services WHERE id IN ($placeholders)")->execute($ids);
+            logActivity($pdo, "Bulk deleted " . count($ids) . " services");
+            $msg = count($ids) . " services deleted!";
+        } else {
+            $msg = "No services selected.";
+        }
+    } elseif (isset($_POST['bulk_delete_team'])) {
+        $ids = array_filter(explode(',', $_POST['team_bulk_ids']), 'is_numeric');
+        if (count($ids) > 0) {
+            $placeholders = str_repeat('?,', count($ids) - 1) . '?';
+            $pdo->prepare("DELETE FROM team_members WHERE id IN ($placeholders)")->execute($ids);
+            logActivity($pdo, "Bulk deleted " . count($ids) . " team members");
+            $msg = count($ids) . " team members deleted!";
+        } else {
+            $msg = "No team members selected.";
+    } elseif (isset($_POST['bulk_delete_const_equipment'])) {
+        $ids = array_filter(explode(',', $_POST['equip_bulk_ids']), 'is_numeric');
+        if (count($ids) > 0) {
+            $placeholders = str_repeat('?,', count($ids) - 1) . '?';
+            $pdo->prepare("DELETE FROM construction_equipment WHERE id IN ($placeholders)")->execute($ids);
+            logActivity($pdo, "Bulk deleted " . count($ids) . " construction equipment");
+            $msg = count($ids) . " equipment items deleted!";
+        } else { $msg = "No equipment selected."; }
+    } elseif (isset($_POST['bulk_delete_const_features'])) {
+        $ids = array_filter(explode(',', $_POST['cfeatures_bulk_ids']), 'is_numeric');
+        if (count($ids) > 0) {
+            $placeholders = str_repeat('?,', count($ids) - 1) . '?';
+            $pdo->prepare("DELETE FROM construction_features WHERE id IN ($placeholders)")->execute($ids);
+            logActivity($pdo, "Bulk deleted " . count($ids) . " construction highlights");
+            $msg = count($ids) . " highlights deleted!";
+        } else { $msg = "No highlights selected."; }
+    } elseif (isset($_POST['bulk_delete_const_projects'])) {
+        $ids = array_filter(explode(',', $_POST['cproj_bulk_ids']), 'is_numeric');
+        if (count($ids) > 0) {
+            $placeholders = str_repeat('?,', count($ids) - 1) . '?';
+            $pdo->prepare("DELETE FROM construction_projects WHERE id IN ($placeholders)")->execute($ids);
+            logActivity($pdo, "Bulk deleted " . count($ids) . " construction projects");
+            $msg = count($ids) . " projects deleted!";
+        } else { $msg = "No projects selected."; }
+    } elseif (isset($_POST['bulk_delete_const_services'])) {
+        $ids = array_filter(explode(',', $_POST['csvc_bulk_ids']), 'is_numeric');
+        if (count($ids) > 0) {
+            $placeholders = str_repeat('?,', count($ids) - 1) . '?';
+            $pdo->prepare("DELETE FROM construction_services WHERE id IN ($placeholders)")->execute($ids);
+            logActivity($pdo, "Bulk deleted " . count($ids) . " construction services");
+            $msg = count($ids) . " construction services deleted!";
+        } else { $msg = "No services selected."; }
+    } elseif (isset($_POST['bulk_delete_const_quotes'])) {
+        $ids = array_filter(explode(',', $_POST['cquotes_bulk_ids']), 'is_numeric');
+        if (count($ids) > 0) {
+            $placeholders = str_repeat('?,', count($ids) - 1) . '?';
+            $pdo->prepare("DELETE FROM construction_quotes WHERE id IN ($placeholders)")->execute($ids);
+            logActivity($pdo, "Bulk deleted " . count($ids) . " construction quotes");
+            $msg = count($ids) . " quote requests deleted!";
+        } else { $msg = "No quotes selected."; }
     }
 
     header("Location: admin.php?tab=" . ($_GET['tab'] ?? 'dashboard') . "&msg=" . urlencode($msg));

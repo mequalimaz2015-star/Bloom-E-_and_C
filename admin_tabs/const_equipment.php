@@ -4,21 +4,39 @@ $equipment = $pdo->query("SELECT * FROM construction_equipment ORDER BY created_
 
 <div class="card" style="border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: none; overflow: hidden;">
     <div class="card-header"
-        style="background: #fff; border-bottom: 1px solid #f1f5f9; padding: 25px; display: flex; justify-content: space-between; align-items: center;">
+        style="background: #fff; border-bottom: 1px solid #f1f5f9; padding: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
         <span class="card-title"
             style="margin: 0; display: flex; align-items: center; gap: 12px; font-weight: 700; color: #1e293b;">
             <i class="fa-solid fa-truck-pickup" style="color: #6366f1;"></i> Equipment Inventory
         </span>
-        <button class="btn btn-primary btn-sm" onclick="showEquipModal('addEquipModal')"
-            style="border-radius: 8px; padding: 8px 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; background: #6366f1; border: none;">
-            <i class="fa-solid fa-plus"></i> Add Equipment
-        </button>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <div id="equip_bulk_actions" style="display: none; align-items: center; gap: 10px;">
+                <span id="equip_selected_count" style="font-size: 13px; font-weight: 700; color: #2563eb;">0
+                    selected</span>
+                <form method="POST" id="equip_bulk_form" style="display: flex; gap: 5px;">
+                    <input type="hidden" name="equip_bulk_ids" id="equip_bulk_ids_input">
+                    <button type="submit" name="bulk_delete_const_equipment" class="btn"
+                        onclick="return confirm('Are you sure you want to delete the selected equipment?')"
+                        style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 7px 16px; font-size: 12px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(239,68,68,0.3);">
+                        <i class="fa-solid fa-trash-can"></i> Delete Selected
+                    </button>
+                </form>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="showEquipModal('addEquipModal')"
+                style="border-radius: 8px; padding: 8px 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; background: #6366f1; border: none;">
+                <i class="fa-solid fa-plus"></i> Add Equipment
+            </button>
+        </div>
     </div>
     <div style="padding: 25px;">
         <div style="overflow-x: auto;">
             <table class="data-table" style="width: 100%; border-collapse: separate; border-spacing: 0;">
                 <thead style="background: #f8fafc;">
                     <tr>
+                        <th style="padding: 15px; border-bottom: 2px solid #f1f5f9; width: 40px; text-align: center;">
+                            <input type="checkbox" id="select_all_equip" onchange="toggleSelectAllEquip(this)"
+                                style="width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb;">
+                        </th>
                         <th
                             style="padding: 15px; border-bottom: 2px solid #f1f5f9; text-align: left; font-weight: 600; color: #64748b; font-size: 13px;">
                             Equipment Info</th>
@@ -46,6 +64,11 @@ $equipment = $pdo->query("SELECT * FROM construction_equipment ORDER BY created_
                     <?php else: ?>
                         <?php foreach ($equipment as $equip): ?>
                             <tr>
+                                <td style="padding: 15px; border-bottom: 1px solid #f1f5f9; text-align: center;">
+                                    <input type="checkbox" class="equip-checkbox" value="<?= $equip['id'] ?>"
+                                        onchange="updateEquipBulkUI()"
+                                        style="width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb;">
+                                </td>
                                 <td style="padding: 15px; border-bottom: 1px solid #f1f5f9;">
                                     <div style="display: flex; align-items: center; gap: 15px;">
                                         <div
@@ -103,6 +126,29 @@ $equipment = $pdo->query("SELECT * FROM construction_equipment ORDER BY created_
         </div>
     </div>
 </div>
+
+<script>
+    function toggleSelectAllEquip(source) {
+        document.querySelectorAll('.equip-checkbox').forEach(cb => cb.checked = source.checked);
+        updateEquipBulkUI();
+    }
+    function updateEquipBulkUI() {
+        const checked = document.querySelectorAll('.equip-checkbox:checked');
+        const all = document.querySelectorAll('.equip-checkbox');
+        const bulk = document.getElementById('equip_bulk_actions');
+        const count = document.getElementById('equip_selected_count');
+        const ids = document.getElementById('equip_bulk_ids_input');
+        const selAll = document.getElementById('select_all_equip');
+        if (checked.length > 0) {
+            bulk.style.display = 'flex';
+            count.innerText = checked.length + ' selected';
+            ids.value = Array.from(checked).map(cb => cb.value).join(',');
+        } else { bulk.style.display = 'none'; }
+        if (all.length > 0 && checked.length === all.length) { selAll.checked = true; selAll.indeterminate = false; }
+        else if (checked.length > 0) { selAll.checked = false; selAll.indeterminate = true; }
+        else { selAll.checked = false; selAll.indeterminate = false; }
+    }
+</script>
 
 <!-- Modal -->
 <div id="addEquipModal" class="modal"

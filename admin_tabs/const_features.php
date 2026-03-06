@@ -3,21 +3,46 @@ $features = $pdo->query("SELECT * FROM construction_features ORDER BY id DESC")-
 ?>
 
 <div style="padding: 20px 0 60px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 12px;">
         <div>
             <h2 style="margin: 0; color: #333; font-size: 24px;">Why Choose Us - Highlights</h2>
             <p style="margin: 5px 0 0; color: #666; font-size: 14px;">Manage the 4 main advantages displayed on your
                 homepage.</p>
         </div>
-        <button onclick="openModal('featureModal')" class="btn"
-            style="background: #c0991cff; color: #fff; padding: 12px 25px; border-radius: 10px; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);">
-            <i class="fa-solid fa-plus"></i> Add Highlight Item
-        </button>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <div id="cfeatures_bulk_actions" style="display: none; align-items: center; gap: 10px;">
+                <span id="cfeatures_selected_count" style="font-size: 13px; font-weight: 700; color: #2563eb;">0
+                    selected</span>
+                <form method="POST" style="display: flex; gap: 5px;">
+                    <input type="hidden" name="cfeatures_bulk_ids" id="cfeatures_bulk_ids_input">
+                    <button type="submit" name="bulk_delete_const_features" class="btn"
+                        onclick="return confirm('Are you sure you want to delete the selected highlights?')"
+                        style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 7px 16px; font-size: 12px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(239,68,68,0.3);">
+                        <i class="fa-solid fa-trash-can"></i> Delete Selected
+                    </button>
+                </form>
+            </div>
+            <label
+                style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: #64748b; background: #f8fafc; padding: 6px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <input type="checkbox" id="select_all_cfeatures" onchange="toggleSelectAllCFeatures(this)"
+                    style="width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb;"> Select All
+            </label>
+            <button onclick="openModal('featureModal')" class="btn"
+                style="background: #c0991cff; color: #fff; padding: 12px 25px; border-radius: 10px; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);">
+                <i class="fa-solid fa-plus"></i> Add Highlight Item
+            </button>
+        </div>
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
         <?php foreach ($features as $f): ?>
             <div class="card"
-                style="border-radius: 16px; overflow: hidden; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.03); background: #fff; transition: transform 0.3s ease;">
+                style="border-radius: 16px; overflow: hidden; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.03); background: #fff; transition: transform 0.3s ease; position: relative;">
+                <div style="position: absolute; top: 10px; right: 10px; z-index: 5;">
+                    <input type="checkbox" class="cfeatures-checkbox" value="<?= $f['id'] ?>"
+                        onchange="updateCFeaturesBulkUI()"
+                        style="width: 18px; height: 18px; cursor: pointer; accent-color: #2563eb;">
+                </div>
                 <div style="padding: 25px;">
                     <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
                         <div
@@ -59,6 +84,29 @@ $features = $pdo->query("SELECT * FROM construction_features ORDER BY id DESC")-
         </div>
     <?php endif; ?>
 </div>
+
+<script>
+    function toggleSelectAllCFeatures(source) {
+        document.querySelectorAll('.cfeatures-checkbox').forEach(cb => cb.checked = source.checked);
+        updateCFeaturesBulkUI();
+    }
+    function updateCFeaturesBulkUI() {
+        const checked = document.querySelectorAll('.cfeatures-checkbox:checked');
+        const all = document.querySelectorAll('.cfeatures-checkbox');
+        const bulk = document.getElementById('cfeatures_bulk_actions');
+        const count = document.getElementById('cfeatures_selected_count');
+        const ids = document.getElementById('cfeatures_bulk_ids_input');
+        const selAll = document.getElementById('select_all_cfeatures');
+        if (checked.length > 0) {
+            bulk.style.display = 'flex';
+            count.innerText = checked.length + ' selected';
+            ids.value = Array.from(checked).map(cb => cb.value).join(',');
+        } else { bulk.style.display = 'none'; }
+        if (all.length > 0 && checked.length === all.length) { selAll.checked = true; selAll.indeterminate = false; }
+        else if (checked.length > 0) { selAll.checked = false; selAll.indeterminate = true; }
+        else { selAll.checked = false; selAll.indeterminate = false; }
+    }
+</script>
 <!-- Modal -->
 <div id="featureModal" class="modal"
     style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px);">

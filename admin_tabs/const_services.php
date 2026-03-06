@@ -3,22 +3,46 @@ $services = $pdo->query("SELECT * FROM construction_services ORDER BY id DESC")-
 ?>
 
 <div style="padding: 20px 0 60px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 12px;">
         <div>
             <h2 style="margin: 0; color: #333; font-size: 24px;">Construction Services</h2>
             <p style="margin: 5px 0 0; color: #666; font-size: 14px;">Manage specific services with descriptions and
                 imagery.</p>
         </div>
-        <button onclick="openModal('serviceModal')" class="btn"
-            style="background: #e67e22; color: #fff; padding: 12px 25px; border-radius: 10px; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);">
-            <i class="fa-solid fa-plus"></i> Add New Service
-        </button>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <div id="csvc_bulk_actions" style="display: none; align-items: center; gap: 10px;">
+                <span id="csvc_selected_count" style="font-size: 13px; font-weight: 700; color: #2563eb;">0
+                    selected</span>
+                <form method="POST" style="display: flex; gap: 5px;">
+                    <input type="hidden" name="csvc_bulk_ids" id="csvc_bulk_ids_input">
+                    <button type="submit" name="bulk_delete_const_services" class="btn"
+                        onclick="return confirm('Are you sure you want to delete the selected construction services?')"
+                        style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 7px 16px; font-size: 12px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(239,68,68,0.3);">
+                        <i class="fa-solid fa-trash-can"></i> Delete Selected
+                    </button>
+                </form>
+            </div>
+            <label
+                style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: #64748b; background: #f8fafc; padding: 6px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <input type="checkbox" id="select_all_csvc" onchange="toggleSelectAllCSvc(this)"
+                    style="width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb;"> Select All
+            </label>
+            <button onclick="openModal('serviceModal')" class="btn"
+                style="background: #e67e22; color: #fff; padding: 12px 25px; border-radius: 10px; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);">
+                <i class="fa-solid fa-plus"></i> Add New Service
+            </button>
+        </div>
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 20px;">
         <?php foreach ($services as $s): ?>
             <div class="card"
-                style="border-radius: 16px; overflow: hidden; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.03); background: #fff; transition: transform 0.3s ease;">
+                style="border-radius: 16px; overflow: hidden; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.03); background: #fff; transition: transform 0.3s ease; position: relative;">
+                <div style="position: absolute; top: 10px; right: 10px; z-index: 5;">
+                    <input type="checkbox" class="csvc-checkbox" value="<?= $s['id'] ?>" onchange="updateCSvcBulkUI()"
+                        style="width: 18px; height: 18px; cursor: pointer; accent-color: #2563eb;">
+                </div>
                 <div style="height: 200px; position: relative; overflow: hidden;">
                     <img src="<?= !empty($s['image_url']) ? htmlspecialchars($s['image_url']) : 'https://images.unsplash.com/photo-1503387762-592fbc0b45b?q=80&w=1931' ?>"
                         style="width: 100%; height: 100%; object-fit: cover;">
@@ -61,6 +85,29 @@ $services = $pdo->query("SELECT * FROM construction_services ORDER BY id DESC")-
         </div>
     <?php endif; ?>
 </div>
+
+<script>
+    function toggleSelectAllCSvc(source) {
+        document.querySelectorAll('.csvc-checkbox').forEach(cb => cb.checked = source.checked);
+        updateCSvcBulkUI();
+    }
+    function updateCSvcBulkUI() {
+        const checked = document.querySelectorAll('.csvc-checkbox:checked');
+        const all = document.querySelectorAll('.csvc-checkbox');
+        const bulk = document.getElementById('csvc_bulk_actions');
+        const count = document.getElementById('csvc_selected_count');
+        const ids = document.getElementById('csvc_bulk_ids_input');
+        const selAll = document.getElementById('select_all_csvc');
+        if (checked.length > 0) {
+            bulk.style.display = 'flex';
+            count.innerText = checked.length + ' selected';
+            ids.value = Array.from(checked).map(cb => cb.value).join(',');
+        } else { bulk.style.display = 'none'; }
+        if (all.length > 0 && checked.length === all.length) { selAll.checked = true; selAll.indeterminate = false; }
+        else if (checked.length > 0) { selAll.checked = false; selAll.indeterminate = true; }
+        else { selAll.checked = false; selAll.indeterminate = false; }
+    }
+</script>
 
 <!-- Modal -->
 <div id="serviceModal" class="modal"

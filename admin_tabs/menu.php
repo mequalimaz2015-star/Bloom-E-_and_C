@@ -1,6 +1,19 @@
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+<div
+    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 12px;">
     <h2 style="font-size: 28px; font-weight: 800; color: #1e293b;">Menu Management</h2>
-    <div style="display: flex; gap: 10px;">
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <!-- Bulk Actions -->
+        <div id="menu_bulk_actions" style="display: none; align-items: center; gap: 10px;">
+            <span id="menu_selected_count" style="font-size: 13px; font-weight: 700; color: #2563eb;">0 selected</span>
+            <form method="POST" id="menu_bulk_form" style="display: flex; gap: 5px;">
+                <input type="hidden" name="menu_bulk_ids" id="menu_bulk_ids_input">
+                <button type="submit" name="bulk_delete_menu" class="btn"
+                    onclick="return confirm('Are you sure you want to delete the selected menu items?')"
+                    style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 7px 16px; font-size: 12px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(239,68,68,0.3);">
+                    <i class="fa-solid fa-trash-can"></i> Delete Selected
+                </button>
+            </form>
+        </div>
         <!-- Hidden file input for Excel/CSV import -->
         <input type="file" id="excelFileInput" accept=".csv,.xls,.xlsx" style="display: none;"
             onchange="handleExcelFile(this)">
@@ -161,6 +174,10 @@
     <table style="border-spacing: 0 10px;">
         <thead>
             <tr style="background: none;">
+                <th style="width: 40px; text-align: center;">
+                    <input type="checkbox" id="select_all_menu" onchange="toggleSelectAllMenu(this)"
+                        style="width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb;">
+                </th>
                 <th style="padding-left: 20px;">Item</th>
                 <th>Category</th>
                 <th>Price</th>
@@ -177,6 +194,10 @@
             foreach ($menus as $m):
                 ?>
                 <tr class="menu-row">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="menu-checkbox" value="<?= $m['id'] ?>" onchange="updateMenuBulkUI()"
+                            style="width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb;">
+                    </td>
                     <td>
                         <div class="item-cell">
                             <img src="<?= !empty($m['image_url']) ? htmlspecialchars($m['image_url']) : 'https://via.placeholder.com/50' ?>"
@@ -259,6 +280,29 @@
         </tbody>
     </table>
 </div>
+
+<script>
+    function toggleSelectAllMenu(source) {
+        document.querySelectorAll('.menu-checkbox').forEach(cb => cb.checked = source.checked);
+        updateMenuBulkUI();
+    }
+    function updateMenuBulkUI() {
+        const checked = document.querySelectorAll('.menu-checkbox:checked');
+        const all = document.querySelectorAll('.menu-checkbox');
+        const bulk = document.getElementById('menu_bulk_actions');
+        const count = document.getElementById('menu_selected_count');
+        const ids = document.getElementById('menu_bulk_ids_input');
+        const selAll = document.getElementById('select_all_menu');
+        if (checked.length > 0) {
+            bulk.style.display = 'flex';
+            count.innerText = checked.length + ' selected';
+            ids.value = Array.from(checked).map(cb => cb.value).join(',');
+        } else { bulk.style.display = 'none'; }
+        if (all.length > 0 && checked.length === all.length) { selAll.checked = true; selAll.indeterminate = false; }
+        else if (checked.length > 0) { selAll.checked = false; selAll.indeterminate = true; }
+        else { selAll.checked = false; selAll.indeterminate = false; }
+    }
+</script>
 
 <!-- Edit Menu Modal -->
 <div class="modal-overlay" id="editMenuModal" style="display: none;">

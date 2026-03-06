@@ -1,4 +1,16 @@
-<div style="margin-bottom: 20px; text-align: right;">
+<div
+    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+    <div id="jobs_bulk_actions" style="display: none; align-items: center; gap: 10px;">
+        <span id="jobs_selected_count" style="font-size: 13px; font-weight: 700; color: #2563eb;">0 selected</span>
+        <form method="POST" id="jobs_bulk_form" style="display: flex; gap: 5px;">
+            <input type="hidden" name="jobs_bulk_ids" id="jobs_bulk_ids_input">
+            <button type="submit" name="bulk_delete_jobs" class="btn"
+                onclick="return confirm('Are you sure you want to delete the selected job listings?')"
+                style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 7px 16px; font-size: 12px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(239,68,68,0.3);">
+                <i class="fa-solid fa-trash-can"></i> Delete Selected
+            </button>
+        </form>
+    </div>
     <button onclick="document.getElementById('addJobModal').style.display='flex';" class="btn btn-primary">
         <i class="fa-solid fa-plus"></i> Post New Job
     </button>
@@ -45,6 +57,10 @@
     <div class="card-header"><span class="card-title">My Job Listings</span></div>
     <table>
         <tr>
+            <th style="width: 40px; text-align: center;">
+                <input type="checkbox" id="select_all_jobs" onchange="toggleSelectAllJobs(this)"
+                    style="width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb;">
+            </th>
             <th>Job Title</th>
             <th>Category</th>
             <th>Type</th>
@@ -57,6 +73,10 @@
         $jobs_list = $pdo->query("SELECT * FROM jobs ORDER BY id DESC")->fetchAll();
         foreach ($jobs_list as $job): ?>
             <tr>
+                <td style="text-align: center;">
+                    <input type="checkbox" class="jobs-checkbox" value="<?= $job['id'] ?>" onchange="updateJobsBulkUI()"
+                        style="width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb;">
+                </td>
                 <td><strong>
                         <?= htmlspecialchars($job['title']) ?>
                     </strong><br><small>
@@ -129,6 +149,29 @@
         <?php endforeach; ?>
     </table>
 </div>
+
+<script>
+    function toggleSelectAllJobs(source) {
+        document.querySelectorAll('.jobs-checkbox').forEach(cb => cb.checked = source.checked);
+        updateJobsBulkUI();
+    }
+    function updateJobsBulkUI() {
+        const checked = document.querySelectorAll('.jobs-checkbox:checked');
+        const all = document.querySelectorAll('.jobs-checkbox');
+        const bulk = document.getElementById('jobs_bulk_actions');
+        const count = document.getElementById('jobs_selected_count');
+        const ids = document.getElementById('jobs_bulk_ids_input');
+        const selAll = document.getElementById('select_all_jobs');
+        if (checked.length > 0) {
+            bulk.style.display = 'flex';
+            count.innerText = checked.length + ' selected';
+            ids.value = Array.from(checked).map(cb => cb.value).join(',');
+        } else { bulk.style.display = 'none'; }
+        if (all.length > 0 && checked.length === all.length) { selAll.checked = true; selAll.indeterminate = false; }
+        else if (checked.length > 0) { selAll.checked = false; selAll.indeterminate = true; }
+        else { selAll.checked = false; selAll.indeterminate = false; }
+    }
+</script>
 
 <!-- Edit Job Modal -->
 <div class="modal-overlay" id="editJobModal" style="display: none;">

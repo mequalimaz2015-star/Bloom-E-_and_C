@@ -4,15 +4,29 @@ $quotes = $pdo->query("SELECT * FROM construction_quotes ORDER BY created_at DES
 
 <div class="card" style="border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: none; overflow: hidden;">
     <div class="card-header"
-        style="background: #fff; border-bottom: 1px solid #f1f5f9; padding: 25px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to right, #ffffff, #f8fafc);">
+        style="background: #fff; border-bottom: 1px solid #f1f5f9; padding: 25px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to right, #ffffff, #f8fafc); flex-wrap: wrap; gap: 10px;">
         <span class="card-title"
             style="margin: 0; display: flex; align-items: center; gap: 12px; font-weight: 700; color: #1e293b;">
             <i class="fa-solid fa-file-invoice-dollar" style="color: #f59e0b;"></i> Client Quotes & Project Requests
         </span>
-        <div
-            style="font-size: 13px; color: #64748b; font-weight: 600; background: #fff; padding: 6px 15px; border-radius: 20px; border: 1px solid #e2e8f0;">
-            Total Requests:
-            <?= count($quotes) ?>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <div id="cquotes_bulk_actions" style="display: none; align-items: center; gap: 10px;">
+                <span id="cquotes_selected_count" style="font-size: 13px; font-weight: 700; color: #2563eb;">0
+                    selected</span>
+                <form method="POST" style="display: flex; gap: 5px;">
+                    <input type="hidden" name="cquotes_bulk_ids" id="cquotes_bulk_ids_input">
+                    <button type="submit" name="bulk_delete_const_quotes" class="btn"
+                        onclick="return confirm('Are you sure you want to delete the selected quote requests?')"
+                        style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 7px 16px; font-size: 12px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(239,68,68,0.3);">
+                        <i class="fa-solid fa-trash-can"></i> Delete Selected
+                    </button>
+                </form>
+            </div>
+            <div
+                style="font-size: 13px; color: #64748b; font-weight: 600; background: #fff; padding: 6px 15px; border-radius: 20px; border: 1px solid #e2e8f0;">
+                Total Requests:
+                <?= count($quotes) ?>
+            </div>
         </div>
     </div>
     <div style="padding: 25px;">
@@ -20,6 +34,10 @@ $quotes = $pdo->query("SELECT * FROM construction_quotes ORDER BY created_at DES
             <table class="data-table" style="width: 100%; border-collapse: separate; border-spacing: 0;">
                 <thead style="background: #f8fafc;">
                     <tr>
+                        <th style="padding: 15px; border-bottom: 2px solid #f1f5f9; width: 40px; text-align: center;">
+                            <input type="checkbox" id="select_all_cquotes" onchange="toggleSelectAllCQuotes(this)"
+                                style="width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb;">
+                        </th>
                         <th
                             style="padding: 15px; border-bottom: 2px solid #f1f5f9; text-align: left; font-weight: 600; color: #64748b; font-size: 13px;">
                             Client Details</th>
@@ -48,6 +66,12 @@ $quotes = $pdo->query("SELECT * FROM construction_quotes ORDER BY created_at DES
                         <?php foreach ($quotes as $q): ?>
                             <tr style="transition: 0.3s; cursor: pointer;"
                                 onclick="viewQuote(<?= htmlspecialchars(json_encode($q)) ?>)">
+                                <td style="padding: 15px; border-bottom: 1px solid #f1f5f9; text-align: center;"
+                                    onclick="event.stopPropagation()">
+                                    <input type="checkbox" class="cquotes-checkbox" value="<?= $q['id'] ?>"
+                                        onchange="updateCQuotesBulkUI()"
+                                        style="width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb;">
+                                </td>
                                 <td style="padding: 15px; border-bottom: 1px solid #f1f5f9;">
                                     <div style="font-weight: 700; color: #1e293b;">
                                         <?= htmlspecialchars($q['client_name']) ?>
@@ -114,6 +138,29 @@ $quotes = $pdo->query("SELECT * FROM construction_quotes ORDER BY created_at DES
         </div>
     </div>
 </div>
+
+<script>
+    function toggleSelectAllCQuotes(source) {
+        document.querySelectorAll('.cquotes-checkbox').forEach(cb => cb.checked = source.checked);
+        updateCQuotesBulkUI();
+    }
+    function updateCQuotesBulkUI() {
+        const checked = document.querySelectorAll('.cquotes-checkbox:checked');
+        const all = document.querySelectorAll('.cquotes-checkbox');
+        const bulk = document.getElementById('cquotes_bulk_actions');
+        const count = document.getElementById('cquotes_selected_count');
+        const ids = document.getElementById('cquotes_bulk_ids_input');
+        const selAll = document.getElementById('select_all_cquotes');
+        if (checked.length > 0) {
+            bulk.style.display = 'flex';
+            count.innerText = checked.length + ' selected';
+            ids.value = Array.from(checked).map(cb => cb.value).join(',');
+        } else { bulk.style.display = 'none'; }
+        if (all.length > 0 && checked.length === all.length) { selAll.checked = true; selAll.indeterminate = false; }
+        else if (checked.length > 0) { selAll.checked = false; selAll.indeterminate = true; }
+        else { selAll.checked = false; selAll.indeterminate = false; }
+    }
+</script>
 
 <!-- View Quote Modal -->
 <div id="viewQuoteModal" class="modal"

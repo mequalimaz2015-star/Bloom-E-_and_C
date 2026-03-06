@@ -1,8 +1,23 @@
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+<div
+    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 12px;">
     <h2 style="font-size: 28px; font-weight: 800; color: #1e293b;">Staff Directory</h2>
-    <button onclick="document.getElementById('registerEmpModal').style.display='flex';" class="btn"
-        style="background: #e11d48; color: #fff; border-radius: 10px; padding: 12px 24px; font-weight: 700; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3); transition: 0.3s;"><i
-            class="fa-solid fa-user-plus"></i> Register New Employee</button>
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <!-- Bulk Actions -->
+        <div id="staff_bulk_actions" style="display: none; align-items: center; gap: 10px;">
+            <span id="staff_selected_count" style="font-size: 13px; font-weight: 700; color: #2563eb;">0 selected</span>
+            <form method="POST" id="staff_bulk_form" style="display: flex; gap: 5px;">
+                <input type="hidden" name="staff_bulk_ids" id="staff_bulk_ids_input">
+                <button type="submit" name="bulk_delete_staff" class="btn"
+                    onclick="return confirm('Are you sure you want to delete the selected employees?')"
+                    style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 7px 16px; font-size: 12px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(239,68,68,0.3);">
+                    <i class="fa-solid fa-trash-can"></i> Delete Selected
+                </button>
+            </form>
+        </div>
+        <button onclick="document.getElementById('registerEmpModal').style.display='flex';" class="btn"
+            style="background: #e11d48; color: #fff; border-radius: 10px; padding: 12px 24px; font-weight: 700; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3); transition: 0.3s;"><i
+                class="fa-solid fa-user-plus"></i> Register New Employee</button>
+    </div>
 </div>
 
 <div class="modal-overlay" id="registerEmpModal" style="display: none;">
@@ -159,6 +174,10 @@
     <div style="overflow-x: auto;">
         <table>
             <tr>
+                <th style="width: 40px; text-align: center;">
+                    <input type="checkbox" id="select_all_staff" onchange="toggleSelectAllStaff(this)"
+                        style="width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb;">
+                </th>
                 <th>Name</th>
                 <th>Photo</th>
                 <th>Role</th>
@@ -173,6 +192,10 @@
                 $emp_photo = !empty($s['photo']) ? $s['photo'] : 'https://ui-avatars.com/api/?name=' . urlencode($s['name']) . '&background=dfb180&color=fff&size=100';
                 ?>
                 <tr>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="staff-checkbox" value="<?= $s['id'] ?>" onchange="updateStaffBulkUI()"
+                            style="width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb;">
+                    </td>
                     <td><strong>
                             <?= htmlspecialchars($s['title'] . ' ' . $s['name']) ?>
                         </strong></td>
@@ -246,6 +269,29 @@
         </table>
     </div>
 </div>
+
+<script>
+    function toggleSelectAllStaff(source) {
+        document.querySelectorAll('.staff-checkbox').forEach(cb => cb.checked = source.checked);
+        updateStaffBulkUI();
+    }
+    function updateStaffBulkUI() {
+        const checked = document.querySelectorAll('.staff-checkbox:checked');
+        const all = document.querySelectorAll('.staff-checkbox');
+        const bulk = document.getElementById('staff_bulk_actions');
+        const count = document.getElementById('staff_selected_count');
+        const ids = document.getElementById('staff_bulk_ids_input');
+        const selAll = document.getElementById('select_all_staff');
+        if (checked.length > 0) {
+            bulk.style.display = 'flex';
+            count.innerText = checked.length + ' selected';
+            ids.value = Array.from(checked).map(cb => cb.value).join(',');
+        } else { bulk.style.display = 'none'; }
+        if (all.length > 0 && checked.length === all.length) { selAll.checked = true; selAll.indeterminate = false; }
+        else if (checked.length > 0) { selAll.checked = false; selAll.indeterminate = true; }
+        else { selAll.checked = false; selAll.indeterminate = false; }
+    }
+</script>
 
 <!-- Edit Employee Modal -->
 <div class="modal-overlay" id="editEmpModal" style="display: none;">
