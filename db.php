@@ -623,6 +623,19 @@ try {
     $pdo->exec("UPDATE construction_testimonials SET message = 'The attention to detail in our renovation project was amazing. They turned our vision into reality while maintaining strict safety standards.' WHERE client_name='Lydia Gashaw'");
     $pdo->exec("UPDATE construction_testimonials SET message = 'Professionalism and integrity are the core of Bloom. They handled our lab extension with the utmost care and precision.' WHERE client_name='Dr. Mequannent G.'");
 
+    // Force cleanup: delete all but 3 specific job listings
+    $pdo->exec("DELETE FROM jobs WHERE title NOT IN ('Executive Chef', 'Restaurant Manager', 'Senior Civil Engineer')");
+
+    // Seed careers (Job Listings)
+    $pdo->exec("INSERT IGNORE INTO jobs (title, category, type, location, description, closing_date, status) VALUES 
+        ('Executive Chef', 'Kitchen', 'Full-time', 'Addis Ababa', 'We are looking for a creative and experienced Executive Chef to lead our kitchen team, design menus, and maintain high standards of culinary excellence.', '2026-04-30', 'Active'),
+        ('Restaurant Manager', 'Management', 'Full-time', 'Addis Ababa', 'Seeking a dynamic Restaurant Manager to oversee daily operations, ensure exceptional guest service, and manage staff to achieve business goals.', '2026-04-15', 'Active'),
+        ('Senior Civil Engineer', 'Construction', 'Full-time', 'Project Site', 'Responsible for overseeing large-scale infrastructure projects, ensuring technical accuracy, and managing onsite engineering teams for Bloom Construction.', '2026-05-20', 'Active')");
+
+    $pdo->exec("UPDATE jobs SET category = 'Kitchen', type = 'Full-time', location = 'Addis Ababa' WHERE title='Executive Chef'");
+    $pdo->exec("UPDATE jobs SET category = 'Management', type = 'Full-time', location = 'Addis Ababa' WHERE title='Restaurant Manager'");
+    $pdo->exec("UPDATE jobs SET category = 'Construction', type = 'Full-time', location = 'Project Site' WHERE title='Senior Civil Engineer'");
+
 } catch (PDOException $e) {
     die("Database Setup Error: " . $e->getMessage());
 }
