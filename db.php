@@ -527,6 +527,9 @@ try {
     }
 
 
+    // Force cleanup: delete all but the 3 specific services
+    $pdo->exec("DELETE FROM construction_services WHERE title NOT IN ('Construction Management', 'Renovation', 'Interior Design')");
+
     // Seed construction_services (Using user's local images)
     $pdo->exec("INSERT IGNORE INTO construction_services (title, description, image_url, button_text, button_url) VALUES 
         ('Construction Management', 'Full lifecycle management of your construction project, ensuring site safety, resource efficiency, and regulatory compliance from start to finish.', 'Construction/Images/card1.jpg', 'Learn More', '#'), 
@@ -537,6 +540,9 @@ try {
     $pdo->exec("UPDATE construction_services SET image_url = 'Construction/Images/card2.jpg' WHERE title='Renovation'");
     $pdo->exec("UPDATE construction_services SET image_url = 'Construction/Images/card3.jpg' WHERE title='Interior Design'");
 
+    // Force cleanup: delete all but the 3 specific projects
+    $pdo->exec("DELETE FROM construction_projects WHERE title NOT IN ('Skyline Tower', 'Oceanview Residences', 'City Center Mall')");
+
     // Seed construction_projects
     $pdo->exec("INSERT IGNORE INTO construction_projects (title, description, status, image_url) VALUES 
         ('Skyline Tower', 'A modern 40-story commercial skyscraper featuring sustainable materials and state-of-the-art energy systems.', 'Ongoing', 'Construction/Images/gallery1.jpg'),
@@ -546,6 +552,19 @@ try {
     $pdo->exec("UPDATE construction_projects SET image_url = 'Construction/Images/gallery1.jpg' WHERE title='Skyline Tower'");
     $pdo->exec("UPDATE construction_projects SET image_url = 'Construction/Images/gallery2.jpg' WHERE title='Oceanview Residences'");
     $pdo->exec("UPDATE construction_projects SET image_url = 'Construction/Images/gallery3.jpg' WHERE title='City Center Mall'");
+
+    // Force cleanup: delete all but 3 menu items
+    $pdo->exec("DELETE FROM menu_items WHERE name NOT IN ('Doro Wat', 'Kitfo Traditional', 'Injera Special Wrap')");
+
+    // Seed menu items
+    $pdo->exec("INSERT IGNORE INTO menu_items (name, category, price, description, image_url) VALUES 
+        ('Doro Wat', 'Main Dish', 450.00, 'Spicy chicken stew slow-cooked with berbere, onions, and garlic, served with a hard-boiled egg.', 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=800'),
+        ('Kitfo Traditional', 'Main Dish', 550.00, 'Minced raw beef marinated in mitmita (spicy chili powder) and niter kibbeh (clarified butter).', 'https://images.unsplash.com/photo-1541014741259-df549fa3bb68?q=80&w=800'),
+        ('Injera Special Wrap', 'Fast Food', 320.00, 'Authentic sourdough flatbread wrapped with various fresh vegetables and lean proteins.', 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?q=80&w=800')");
+
+    $pdo->exec("UPDATE menu_items SET image_url = 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=800' WHERE name='Doro Wat'");
+    $pdo->exec("UPDATE menu_items SET image_url = 'https://images.unsplash.com/photo-1541014741259-df549fa3bb68?q=80&w=800' WHERE name='Kitfo Traditional'");
+    $pdo->exec("UPDATE menu_items SET image_url = 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?q=80&w=800' WHERE name='Injera Special Wrap'");
 
     // Seed default admin if empty
     $check_users = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
@@ -591,14 +610,18 @@ try {
     $pdo->exec("UPDATE construction_equipment SET image_url = 'https://images.unsplash.com/photo-1541888946425-d81bb19480c5?q=80&w=800' WHERE serial_number='EQ-CR-042'");
     $pdo->exec("UPDATE construction_equipment SET image_url = 'https://images.unsplash.com/photo-1533160600052-a5676735237c?q=80&w=800' WHERE serial_number='EQ-MX-099'");
 
-    // Seed construction_testimonials if empty
-    $check_testim = $pdo->query("SELECT COUNT(*) FROM construction_testimonials")->fetchColumn();
-    if ($check_testim == 0) {
-        $pdo->exec("INSERT INTO construction_testimonials (client_name, client_role, message, rating, status, image_url) VALUES 
-            ('Samuel Teketo', 'Project Manager, UrbanDev', 'Bloom Construction delivered our high-rise project ahead of schedule with exceptional quality. Their engineering team is second to none.', 5, 'Active', 'https://i.pravatar.cc/150?u=sam'),
-            ('Lydia Gashaw', 'CEO, Rift Valley Estates', 'The attention to detail in our renovation project was amazing. They turned our vision into reality while maintaining strict safety standards.', 5, 'Active', 'https://i.pravatar.cc/150?u=lydia'),
-            ('Dr. Mequannent G.', 'University Coordinator', 'Professionalism and integrity are the core of Bloom. They handled our lab extension with the utmost care and precision.', 5, 'Active', 'https://i.pravatar.cc/150?u=meq')");
-    }
+    // Force cleanup: delete all but 3 testimonials
+    $pdo->exec("DELETE FROM construction_testimonials WHERE client_name NOT IN ('Samuel Teketo', 'Lydia Gashaw', 'Dr. Mequannent G.')");
+
+    // Seed construction_testimonials
+    $pdo->exec("INSERT IGNORE INTO construction_testimonials (client_name, client_role, message, rating, status, image_url) VALUES 
+        ('Samuel Teketo', 'Project Manager, UrbanDev', 'Bloom Construction delivered our high-rise project ahead of schedule with exceptional quality. Their engineering team is second to none.', 5, 'Active', 'https://i.pravatar.cc/150?u=sam'),
+        ('Lydia Gashaw', 'CEO, Rift Valley Estates', 'The attention to detail in our renovation project was amazing. They turned our vision into reality while maintaining strict safety standards.', 5, 'Active', 'https://i.pravatar.cc/150?u=lydia'),
+        ('Dr. Mequannent G.', 'University Coordinator', 'Professionalism and integrity are the core of Bloom. They handled our lab extension with the utmost care and precision.', 5, 'Active', 'https://i.pravatar.cc/150?u=meq')");
+
+    $pdo->exec("UPDATE construction_testimonials SET message = 'Bloom Construction delivered our high-rise project ahead of schedule with exceptional quality. Their engineering team is second to none.' WHERE client_name='Samuel Teketo'");
+    $pdo->exec("UPDATE construction_testimonials SET message = 'The attention to detail in our renovation project was amazing. They turned our vision into reality while maintaining strict safety standards.' WHERE client_name='Lydia Gashaw'");
+    $pdo->exec("UPDATE construction_testimonials SET message = 'Professionalism and integrity are the core of Bloom. They handled our lab extension with the utmost care and precision.' WHERE client_name='Dr. Mequannent G.'");
 
 } catch (PDOException $e) {
     die("Database Setup Error: " . $e->getMessage());
