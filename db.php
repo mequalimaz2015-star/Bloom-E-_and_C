@@ -1,7 +1,6 @@
 <?php
 // Support both local XAMPP and cloud hosting (Render/Railway)
 // 1. Get Environment Variables with robust detection
-// 1. Get Environment Variables with robust detection
 $host = getenv('BLOOM_DB_HOST');
 $dbname = getenv('BLOOM_DB_NAME') ?: 'bloom_africa';
 $username = getenv('BLOOM_DB_USER') ?: 'root';
@@ -116,6 +115,7 @@ try {
     CREATE TABLE IF NOT EXISTS employees (
         id INT AUTO_INCREMENT PRIMARY KEY,
         id_number VARCHAR(50) UNIQUE,
+        title VARCHAR(20),
         name VARCHAR(255) NOT NULL,
         first_name VARCHAR(100),
         middle_name VARCHAR(100),
@@ -288,6 +288,7 @@ try {
         email VARCHAR(255) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL,
         role ENUM('Admin', 'Manager', 'Supervisor', 'Waiter') DEFAULT 'Admin',
+        profile_pic VARCHAR(255),
         permissions TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
@@ -470,18 +471,52 @@ try {
             'hero3_image' => "VARCHAR(255)"
         ],
         'chat_sessions' => ['department' => "VARCHAR(50) DEFAULT 'Restaurant' AFTER customer_phone"],
-        'chat_messages' => ['is_read' => "BOOLEAN DEFAULT 0 AFTER location_lng"]
+        'chat_messages' => ['is_read' => "BOOLEAN DEFAULT 0 AFTER location_lng"],
+        'employees' => [
+            'id_number' => "VARCHAR(50) UNIQUE AFTER id",
+            'title' => "VARCHAR(20) AFTER id_number",
+            'first_name' => "VARCHAR(100) AFTER name",
+            'middle_name' => "VARCHAR(100) AFTER first_name",
+            'last_name' => "VARCHAR(100) AFTER middle_name",
+            'salary_type' => "ENUM('Monthly', 'Daily', 'Hourly') DEFAULT 'Monthly' AFTER role",
+            'salary' => "DECIMAL(10, 2) AFTER gender",
+            'hire_date' => "DATE AFTER join_date",
+            'bio' => "TEXT AFTER status",
+            'photo' => "VARCHAR(255) AFTER bio"
+        ],
+        'users' => [
+            'profile_pic' => "VARCHAR(255) AFTER role",
+            'permissions' => "TEXT AFTER profile_pic"
+        ],
+        'gallery' => [
+            'title' => "VARCHAR(255) AFTER image_url",
+            'description' => "TEXT AFTER title"
+        ],
+        'services' => [
+            'icon' => "VARCHAR(100) AFTER description",
+            'video_url' => "VARCHAR(255) AFTER icon",
+            'category' => "ENUM('Food Delivery', 'Catering Service', 'Wedding Events', 'Birthday Parties', 'Corporate Events', 'Others') DEFAULT 'Others' AFTER video_url",
+            'status' => "ENUM('Active', 'Inactive') DEFAULT 'Active' AFTER category"
+        ]
     ];
 
     foreach ($sync_tasks as $table => $columns) {
         try {
-            $existing_cols = $pdo->query("DESCRIBE `$table`")->fetchAll(PDO::FETCH_COLUMN);
+            $stmt = $pdo->query("DESCRIBE `$table`");
+            $existing_cols = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            $existing_cols = array_map('strtolower', $existing_cols);
+
             foreach ($columns as $col => $definition) {
-                if (!in_array($col, $existing_cols)) {
-                    $pdo->exec("ALTER TABLE `$table` ADD COLUMN `$col` $definition");
+                if (!in_array(strtolower($col), $existing_cols)) {
+                    try {
+                        $pdo->exec("ALTER TABLE `$table` ADD COLUMN `$col` $definition");
+                    } catch (Exception $e2) {
+                        $clean_def = preg_replace('/AFTER \w+/i', '', $definition);
+                        $pdo->exec("ALTER TABLE `$table` ADD COLUMN `$col` $clean_def");
+                    }
                 }
             }
-        } catch (Exception $e) { /* Table might not exist yet, setup_queries will create it */
+        } catch (Exception $e) { /* Table might not exist yet */
         }
     }
 
