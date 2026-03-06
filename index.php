@@ -360,20 +360,17 @@
 </head>
 
 <body>
-
     <div class="circles-bg">
         <div class="circle circle-1"></div>
         <div class="circle circle-2"></div>
         <div class="circle circle-3"></div>
     </div>
-
     <div class="center-brand">
         <div class="logo-box">
             <h1>BLOOM AFRICA</h1>
             <span>GROUP OF COMPANIES</span>
         </div>
     </div>
-
     <div class="split-container">
         <!-- Restaurant Side -->
         <div class="split-half restaurant-side" onclick="window.location.href='restaurant_home.php'">

@@ -1,32 +1,25 @@
-# Bloom Africa - Production Blueprint v2.1
 services:
-  # 1. Database (Private Service)
   - type: pserv
-    name: bloom-db-pserv
+    name: bloom-db
     env: docker
     dockerContext: .
     dockerfilePath: Dockerfile.mysql
-    plan: free
-    region: oregon 
     envVars:
       - key: MYSQL_ROOT_PASSWORD
         value: bloom_root_pass
       - key: MYSQL_DATABASE
         value: bloom_africa
 
-  # 2. Application (Public Web Service)
   - type: web
-    name: bloom-web-app
+    name: bloom-web
     env: docker
     dockerContext: .
     dockerfilePath: Dockerfile
-    plan: free
-    region: oregon
     envVars:
       - key: BLOOM_DB_HOST
         fromService:
           type: pserv
-          name: bloom-db-pserv
+          name: bloom-db
           property: host
       - key: BLOOM_DB_NAME
         value: bloom_africa
@@ -34,5 +27,3 @@ services:
         value: root
       - key: BLOOM_DB_PASS
         value: bloom_root_pass
-      - key: BLOOM_DB_PORT
-        value: "3306"
