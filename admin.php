@@ -465,13 +465,13 @@ $perf_data_json = json_encode($perf_percent);
             <?php if (hasPermission('menu') || hasPermission('reservations') || hasPermission('gallery')): ?>
                 <div class="nav-dropdown <?= in_array($active_tab, ['menu', 'reservations', 'gallery']) ? 'open' : '' ?>">
                     <div class="nav-dropdown-toggle" onclick="this.parentElement.classList.toggle('open')">
-                        <span style="display: flex; align-items: center; gap: 15px;">
+                        <span style="display: flex; align-items: center; gap: 12px;">
                             <i class="fa-solid fa-utensils"></i> Restaurant Mgmt
                             <?php if ($pending_res_count > 0): ?>
                                 <span class="nav-badge"><?= $pending_res_count ?></span>
                             <?php endif; ?>
                         </span>
-                        <i class="fa-solid fa-chevron-down"></i>
+                        <i class="fa-solid fa-chevron-down toggle-icon"></i>
                     </div>
                     <div class="submenu">
                         <?php if (hasPermission('menu')): ?>
@@ -495,34 +495,29 @@ $perf_data_json = json_encode($perf_percent);
             <?php endif; ?>
 
             <!-- Construction Management Dropdown -->
-            <?php if (hasPermission('const_projects') || hasPermission('const_equipment') || hasPermission('const_quotes')): ?>
-                <div
-                    class="nav-dropdown <?= in_array($active_tab, ['const_projects', 'const_equipment', 'const_quotes']) ? 'open' : '' ?>">
+            <?php if (hasPermission('const_projects') || hasPermission('const_equipment') || hasPermission('const_quotes') || hasPermission('const_services') || hasPermission('const_features') || hasPermission('const_info')): ?>
+                <div class="nav-dropdown <?= in_array($active_tab, ['const_projects', 'const_equipment', 'const_quotes', 'const_services', 'const_features', 'const_info']) ? 'open' : '' ?>">
                     <div class="nav-dropdown-toggle" onclick="this.parentElement.classList.toggle('open')">
-                        <span style="display: flex; align-items: center; gap: 15px;">
+                        <span style="display: flex; align-items: center; gap: 12px;">
                             <i class="fa-solid fa-hard-hat"></i> Construction Mgmt
                         </span>
-                        <i class="fa-solid fa-chevron-down"></i>
+                        <i class="fa-solid fa-chevron-down toggle-icon"></i>
                     </div>
                     <div class="submenu">
                         <?php if (hasPermission('const_projects')): ?>
-                            <a href="?tab=const_projects"
-                                class="nav-item <?= $active_tab == 'const_projects' ? 'active' : '' ?>"><i
+                            <a href="?tab=const_projects" class="nav-item <?= $active_tab == 'const_projects' ? 'active' : '' ?>"><i
                                     class="fa-solid fa-building"></i> Projects</a>
                         <?php endif; ?>
                         <?php if (hasPermission('const_services')): ?>
-                            <a href="?tab=const_services"
-                                class="nav-item <?= $active_tab == 'const_services' ? 'active' : '' ?>"><i
+                            <a href="?tab=const_services" class="nav-item <?= $active_tab == 'const_services' ? 'active' : '' ?>"><i
                                     class="fa-solid fa-screwdriver-wrench"></i> Our Services</a>
                         <?php endif; ?>
                         <?php if (hasPermission('const_features')): ?>
-                            <a href="?tab=const_features"
-                                class="nav-item <?= $active_tab == 'const_features' ? 'active' : '' ?>"><i
+                            <a href="?tab=const_features" class="nav-item <?= $active_tab == 'const_features' ? 'active' : '' ?>"><i
                                     class="fa-solid fa-lightbulb"></i> Why Choose Us</a>
                         <?php endif; ?>
                         <?php if (hasPermission('const_equipment')): ?>
-                            <a href="?tab=const_equipment"
-                                class="nav-item <?= $active_tab == 'const_equipment' ? 'active' : '' ?>"><i
+                            <a href="?tab=const_equipment" class="nav-item <?= $active_tab == 'const_equipment' ? 'active' : '' ?>"><i
                                     class="fa-solid fa-truck-pickup"></i> Equipment</a>
                         <?php endif; ?>
                         <?php if (hasPermission('const_quotes')): ?>
@@ -541,13 +536,13 @@ $perf_data_json = json_encode($perf_percent);
             <?php if (hasPermission('staff') || hasPermission('attendance') || hasPermission('payroll')): ?>
                 <div class="nav-dropdown <?= in_array($active_tab, ['staff', 'attendance', 'payroll']) ? 'open' : '' ?>">
                     <div class="nav-dropdown-toggle" onclick="this.parentElement.classList.toggle('open')">
-                        <span style="display: flex; align-items: center; gap: 15px;">
+                        <span style="display: flex; align-items: center; gap: 12px;">
                             <i class="fa-solid fa-users-gear"></i> HR & Payroll
                             <?php if ($pending_salary_count > 0): ?>
                                 <span class="nav-badge"><?= $pending_salary_count ?></span>
                             <?php endif; ?>
                         </span>
-                        <i class="fa-solid fa-chevron-down"></i>
+                        <i class="fa-solid fa-chevron-down toggle-icon"></i>
                     </div>
                     <div class="submenu">
                         <?php if (hasPermission('staff')): ?>
@@ -574,13 +569,13 @@ $perf_data_json = json_encode($perf_percent);
             <?php if (hasPermission('jobs') || hasPermission('applications')): ?>
                 <div class="nav-dropdown <?= in_array($active_tab, ['jobs', 'applications']) ? 'open' : '' ?>">
                     <div class="nav-dropdown-toggle" onclick="this.parentElement.classList.toggle('open')">
-                        <span style="display: flex; align-items: center; gap: 15px;">
+                        <span style="display: flex; align-items: center; gap: 12px;">
                             <i class="fa-solid fa-briefcase"></i> Recruitment
                             <?php if ($pending_app_count > 0): ?>
                                 <span class="nav-badge"><?= $pending_app_count ?></span>
                             <?php endif; ?>
                         </span>
-                        <i class="fa-solid fa-chevron-down"></i>
+                        <i class="fa-solid fa-chevron-down toggle-icon"></i>
                     </div>
                     <div class="submenu">
                         <?php if (hasPermission('jobs')): ?>

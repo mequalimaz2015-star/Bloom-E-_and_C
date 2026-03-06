@@ -1,27 +1,16 @@
 <?php
 // Support both local XAMPP and cloud hosting (Render/Railway)
-// 1. Get Environment Variables with robust detection and fallbacks
-$raw_host = getenv('BLOOM_DB_HOST') ?: getenv('DB_HOST') ?: getenv('MYSQLHOST') ?: getenv('DATABASE_HOST');
+// 1. Get Environment Variables with robust detection
+$host = getenv('BLOOM_DB_HOST');
+$dbname = getenv('BLOOM_DB_NAME') ?: 'bloom_africa';
+$username = getenv('BLOOM_DB_USER') ?: 'root';
+$password = getenv('BLOOM_DB_PASS'); // Can be empty
+$port = getenv('BLOOM_DB_PORT') ?: '3306';
 
-// 2. Render-Specific Fix: Ignore auto-injected Postgres hosts (starting with dpg-)
-if (strpos($raw_host, 'dpg-') !== false) {
-    $host = 'mysql'; // Force fallback to our private MySQL service name
-} else {
-    $host = $raw_host;
-}
-
-$dbname = getenv('BLOOM_DB_NAME') ?: getenv('DB_NAME') ?: getenv('MYSQLDATABASE') ?: 'bloom_africa';
-$username = getenv('BLOOM_DB_USER') ?: getenv('DB_USER') ?: getenv('MYSQLUSER') ?: 'root';
-$password = getenv('BLOOM_DB_PASS') ?: getenv('DB_PASS') ?: getenv('MYSQLPASSWORD') ?: '';
-$port = getenv('BLOOM_DB_PORT') ?: getenv('DB_PORT') ?: getenv('MYSQLPORT') ?: '3306';
-
-// 3. Environment Logic
-if (empty($host) || $host === 'localhost') {
-    if (getenv('RENDER')) {
-        $host = 'mysql';
-    } else {
-        $host = '127.0.0.1';
-    }
+// 2. Environment Failsafes
+if (!$host) {
+    // If on Render but BLOOM_DB_HOST is missing, use the service name 'mysql'
+    $host = getenv('RENDER') ? 'mysql' : '127.0.0.1';
 }
 
 // Ensure we NEVER use 'localhost' (which triggers socket files on Linux)
@@ -29,81 +18,42 @@ if ($host === 'localhost') {
     $host = '127.0.0.1';
 }
 
-// 3. User-Friendly Connection Strategy
+// 3. Failsafe: Handle injected Render PostgreSQL hosts (dpg-...)
+if (strpos($host, 'dpg-') !== false && strpos($host, '.onrender.com') === false) {
+    $host = 'mysql';
+}
+
+// 4. Connection Loop with Retries
+$max_retries = 5;
+$retry_delay = 5; // seconds
 $pdo = null;
-$conn_error = "";
-$possible_hosts = array_unique(array_filter([$host, 'mysql', 'mysql.internal', 'mariadb', '127.0.0.1']));
 
-foreach ($possible_hosts as $try_host) {
-    for ($i = 1; $i <= 2; $i++) {
+for ($i = 0; $i < $max_retries; $i++) {
+    try {
+        // Attempt 1: Connect directly to the database
+        $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
+        $pdo = new PDO($dsn, $username, $password ?: '');
+        break; // Success!
+    } catch (PDOException $e) {
+        // Attempt 2: Connect to host only and create DB (if it doesn't exist)
         try {
-            $dsn = "mysql:host=$try_host;port=$port;dbname=$dbname;charset=utf8mb4";
-            $pdo = new PDO($dsn, $username, $password ?: '', [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_TIMEOUT => 2,
-            ]);
-            if ($pdo)
-                break 2;
-        } catch (PDOException $e) {
-            $conn_error = $e->getMessage();
-
-            // If connection refused, we found the right host! 
-            // Stop trying other hosts and just wait for this one to wake up.
-            if (strpos($conn_error, 'refused') !== false) {
-                $host = $try_host; // Stick to this host
-                break 2;
+            $pdo = new PDO("mysql:host=$host;port=$port;charset=utf8mb4", $username, $password ?: '');
+            $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+            $pdo->exec("USE `$dbname`");
+            break; // Success!
+        } catch (PDOException $e2) {
+            if ($i === $max_retries - 1) {
+                die("Critical: Database connection failed after $max_retries attempts. Target Host: $host:$port. Error: " . $e2->getMessage());
             }
-
-            if (strpos($conn_error, 'getaddrinfo') !== false || strpos($conn_error, 'not known') !== false) {
-                break;
-            }
-
-            if ($i < 2) {
-                sleep(1);
-                continue;
-            }
-            break;
+            sleep($retry_delay);
         }
     }
 }
 
+// 5. Final Connection Check
 if (!$pdo) {
-    session_start();
-    $_SESSION['db_attempts'] = ($_SESSION['db_attempts'] ?? 0) + 1;
-    $attempt = $_SESSION['db_attempts'];
-
-    echo "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'>";
-    echo "<title>Bloom Africa | Waking Up</title>";
-    echo "<style>
-        body { background: #fdfdfd; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-        .box { padding: 50px 30px; background: white; border-radius: 20px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.05); max-width: 450px; width: 90%; }
-        .icon { font-size: 60px; margin-bottom: 25px; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1)); animation: pulse 2s infinite ease-in-out; }
-        h2 { color: #1a202c; margin-bottom: 12px; font-weight: 600; }
-        p { color: #718096; line-height: 1.6; font-size: 15px; }
-        .loader-container { margin: 30px auto; width: 100%; height: 6px; background: #f1f5f9; border-radius: 10px; overflow: hidden; position: relative; }
-        .loader-bar { position: absolute; height: 100%; width: 40%; background: linear-gradient(90deg, #c0991c, #d4af37); border-radius: 10px; animation: sweep 2.5s infinite linear; }
-        .status { color: #a0aec0; font-size: 12px; margin-top: 30px; border-top: 1px dashed #edf2f7; padding-top: 20px; }
-        @keyframes sweep { from { left: -40%; } to { left: 100%; } }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-    </style></head><body>";
-    echo "<div class='box'>";
-    if ($attempt < 8) {
-        echo "<div class='icon'>✨</div><h2>Almost Ready</h2>";
-    } else {
-        echo "<div class='icon'>☕</div><h2>Finalizing Setup...</h2>";
-    }
-    echo "<p>Your secure database is performing its final internal checks. This usually takes 60-90 seconds.</p>";
-    if ($attempt > 3)
-        echo "<p style='color: #d4af37; font-weight: 500; font-size: 14px;'>The server is found and responding. We're just waiting for the green light.</p>";
-    echo "<div class='loader-container'><div class='loader-bar'></div></div>";
-    echo "<p class='status'>Auto-checking connection every 7s (Attempt #$attempt)...</p>";
-    echo "<details style='margin-top: 15px; color: #cbd5e0; font-size: 10px;'><summary style='cursor:pointer'>Technical Log</summary><pre style='text-align: left; background: #f8fafc; padding: 10px; border-radius: 5px; overflow-x: auto;'>Host: $host\nError: $conn_error</pre></details></div>";
-    echo "<script>setTimeout(() => { window.location.reload(); }, 7000);</script>";
-    echo "</body></html>";
-    die();
+    die("Critical: Could not establish a database connection.");
 }
-unset($_SESSION['db_attempts']); // Success, clear counter
-
 
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -438,6 +388,24 @@ try {
 
     $pdo->exec($setup_queries);
 
+    // 6.5 Schema Updates (Ensure newer columns exist)
+    try {
+        $pdo->exec("ALTER TABLE construction_equipment ADD COLUMN serial_number VARCHAR(100) AFTER name");
+    } catch (Exception $e) {
+    }
+    try {
+        $pdo->exec("ALTER TABLE construction_projects ADD COLUMN start_date DATE AFTER image_url");
+    } catch (Exception $e) {
+    }
+    try {
+        $pdo->exec("ALTER TABLE construction_projects ADD COLUMN completion_date DATE AFTER start_date");
+    } catch (Exception $e) {
+    }
+    try {
+        $pdo->exec("ALTER TABLE construction_info ADD COLUMN hero_video VARCHAR(255) DEFAULT NULL");
+    } catch (Exception $e) {
+    }
+
     // 7. Data Seeding
     // Seed company_info if it's empty
     $check_company = $pdo->query("SELECT COUNT(*) FROM company_info")->fetchColumn();
@@ -463,10 +431,10 @@ try {
     // Seed construction_projects if empty
     $check_const_projects = $pdo->query("SELECT COUNT(*) FROM construction_projects")->fetchColumn();
     if ($check_const_projects == 0) {
-        $pdo->exec("INSERT INTO construction_projects (title, description, status, image_url, category) VALUES 
-            ('Skyline Tower', 'A modern 40-story commercial skyscraper featuring sustainable materials and state-of-the-art energy systems.', 'Active', 'Construction/Images/gallery1.jpg', 'Commercial'),
-            ('Oceanview Residences', 'Luxury residential complex with panoramic ocean views, infinity pools, and high-end finishes throughout.', 'Active', 'Construction/Images/gallery2.jpg', 'Residential'),
-            ('City Center Mall', 'Massive retail and entertainment complex in the heart of the city, bringing over 200 premium brands together.', 'Active', 'Construction/Images/gallery3.jpg', 'Commercial')");
+        $pdo->exec("INSERT INTO construction_projects (name, description, status, image_url) VALUES 
+            ('Skyline Tower', 'A modern 40-story commercial skyscraper featuring sustainable materials and state-of-the-art energy systems.', 'Ongoing', 'Construction/Images/gallery1.jpg'),
+            ('Oceanview Residences', 'Luxury residential complex with panoramic ocean views, infinity pools, and high-end finishes throughout.', 'Ongoing', 'Construction/Images/gallery2.jpg'),
+            ('City Center Mall', 'Massive retail and entertainment complex in the heart of the city, bringing over 200 premium brands together.', 'Completed', 'Construction/Images/gallery3.jpg')");
     }
 
     // Seed default admin if empty
@@ -495,6 +463,24 @@ try {
         foreach ($tables_to_seed as $t) {
             $stmt_seed->execute($t);
         }
+    }
+
+    // Seed construction_equipment if empty
+    $check_equip = $pdo->query("SELECT COUNT(*) FROM construction_equipment")->fetchColumn();
+    if ($check_equip == 0) {
+        $pdo->exec("INSERT INTO construction_equipment (name, serial_number, description, status, image_url) VALUES 
+            ('Heavy Duty Excavator', 'EQ-EX-001', 'High-performance hydraulic excavator for major earthmoving and trenching operations.', 'Available', 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800'),
+            ('Tower Crane - 50M', 'EQ-CR-042', 'Reliable vertical transport for high-rise construction projects with precision control systems.', 'In Use', 'https://images.unsplash.com/photo-1541888946425-d81bb19480c5?q=80&w=800'),
+            ('Industrial Cement Mixer', 'EQ-MX-099', 'Efficient concrete mixing and delivery for structural foundations and large-scale flooring.', 'Available', 'https://images.unsplash.com/photo-1533160600052-a5676735237c?q=80&w=800')");
+    }
+
+    // Seed construction_testimonials if empty
+    $check_testim = $pdo->query("SELECT COUNT(*) FROM construction_testimonials")->fetchColumn();
+    if ($check_testim == 0) {
+        $pdo->exec("INSERT INTO construction_testimonials (client_name, client_role, message, rating, status, image_url) VALUES 
+            ('Samuel Teketo', 'Project Manager, UrbanDev', 'Bloom Construction delivered our high-rise project ahead of schedule with exceptional quality. Their engineering team is second to none.', 5, 'Active', 'https://i.pravatar.cc/150?u=sam'),
+            ('Lydia Gashaw', 'CEO, Rift Valley Estates', 'The attention to detail in our renovation project was amazing. They turned our vision into reality while maintaining strict safety standards.', 5, 'Active', 'https://i.pravatar.cc/150?u=lydia'),
+            ('Dr. Mequannent G.', 'University Coordinator', 'Professionalism and integrity are the core of Bloom. They handled our lab extension with the utmost care and precision.', 5, 'Active', 'https://i.pravatar.cc/150?u=meq')");
     }
 
 } catch (PDOException $e) {

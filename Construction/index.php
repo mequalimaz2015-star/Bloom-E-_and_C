@@ -16,6 +16,9 @@ $services = $pdo->query("SELECT * FROM construction_services ORDER BY id ASC LIM
 // Fetch Testimonials
 $testimonials = $pdo->query("SELECT * FROM construction_testimonials WHERE status='Active' ORDER BY id DESC LIMIT 6")->fetchAll();
 
+// Fetch Equipment
+$equipment = $pdo->query("SELECT * FROM construction_equipment ORDER BY id DESC")->fetchAll();
+
 // Handle Quote Submission
 $form_msg = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
@@ -54,6 +57,120 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
     <title>
         <?= htmlspecialchars($c['company_name'] ?? 'Bloom Construction') ?> | Engineering Excellence
     </title>
+    <style>
+        /* Equipment Section Styles */
+        #sec-equipment {
+            background-color: #fff;
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        #sec-equipment h1 {
+            font-size: 2.5rem;
+            color: #1a1c27;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 50px;
+            letter-spacing: 2px;
+        }
+
+        .equipment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 400px));
+            gap: 40px;
+            justify-content: center;
+        }
+
+        .equipment-card {
+            background: #f8fafc;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            transition: 0.4s ease;
+            border: 1px solid #e2e8f0;
+            width: 100%;
+        }
+
+        .equipment-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-color: #f39c12;
+        }
+
+        .equip-img-box {
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .equip-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.6s;
+        }
+
+        .equipment-card:hover .equip-img-box img {
+            transform: scale(1.1);
+        }
+
+        .equip-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .status-available {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-in-use {
+            background: #fef9c3;
+            color: #a16207;
+        }
+
+        .status-maintenance {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .equip-info {
+            padding: 20px;
+            text-align: left;
+        }
+
+        .equip-info h3 {
+            font-size: 1.25rem;
+            color: #1e293b;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .equip-sn {
+            display: block;
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 12px;
+            font-family: monospace;
+        }
+
+        .equip-info p {
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.5;
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
 </head>
 
 <body>
@@ -329,21 +446,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
             </div>
         </article>
     </section>
-    <section id="sec-1">
-        <div class="container">
-            <article>
-                <h1>Welcome to our company</h1>
-                <h2>Building your vision with precision.</h2>
-                <p>
+    <section id="sec-1" style="background-color: #fdf7f0; padding: 100px 0; overflow: hidden;">
+        <div class="container" style="display: flex; align-items: center; gap: 80px; flex-wrap: wrap;">
+            <article style="flex: 1.2; min-width: 350px; text-align: left; padding: 0;">
+                <h1
+                    style="font-size: 2.8rem; color: #c8832a; font-weight: 800; text-transform: uppercase; font-family: 'Playfair Display', serif; margin-bottom: 20px; line-height: 1.2;">
+                    Welcome to our company</h1>
+                <h2 style="font-size: 1.5rem; font-weight: 600; color: #1a1a2e; margin-bottom: 25px;">Building your
+                    vision with precision.</h2>
+                <div style="width: 60px; height: 4px; background: #c8832a; margin-bottom: 30px; border-radius: 2px;">
+                </div>
+                <p
+                    style="font-size: 1.1rem; color: #4a4a68; text-align: justify; margin-bottom: 40px; line-height: 1.8;">
                     <?= nl2br(htmlspecialchars($c['about_text'] ?? "At " . ($c['company_name'] ?? 'Bloom Construction') . ", we bring years of expertise to the Ethiopian construction landscape. We specialize in high-quality architectural design, renovation, and complete construction management. \n\nOur team is dedicated to delivering excellence, ensuring that every project we undertake meets the highest standards of safety and aesthetic appeal.")) ?>
                 </p>
-                <a href="<?= $c['portfolio_url'] ?? '#' ?>">Our Portfolio</a>
+                <a href="<?= $c['portfolio_url'] ?? '#' ?>"
+                    style="color: #fff; background: #c8832a; text-transform: uppercase; text-decoration: none; padding: 15px 40px; border-radius: 50px; display: inline-block; font-weight: 700; transition: all 0.3s ease; letter-spacing: 1.5px; box-shadow: 0 10px 20px rgba(200, 131, 42, 0.2);">Our
+                    Portfolio</a>
             </article>
-            <aside style="display: flex; justify-content: center; align-items: center;">
+            <aside
+                style="flex: 1; min-width: 350px; display: flex; justify-content: center; align-items: center; position: relative;">
+                <div
+                    style="position: absolute; width: 110%; height: 110%; background: radial-gradient(circle, rgba(200, 131, 42, 0.08) 0%, rgba(200, 131, 42, 0) 70%); z-index: 0;">
+                </div>
                 <img src="<?= !empty($c['hero_image']) ? '../' . $c['hero_image'] : 'Images/img1.png' ?>"
                     alt="company image"
-                    style="width: 100%; max-width: 450px; aspect-ratio: 1/1; object-fit: cover; border-radius: 50%; border: 10px solid #ffffff; box-shadow: 0 15px 35px rgba(0,0,0,0.15); transition: transform 0.3s ease;"
-                    onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    style="width: 100%; max-width: 480px; aspect-ratio: 1/1; object-fit: cover; border-radius: 50%; border: 12px solid #ffffff; box-shadow: 0 25px 50px rgba(0,0,0,0.15); transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1; position: relative;"
+                    onmouseover="this.style.transform='scale(1.03) translateY(-10px)'; this.style.boxShadow='0 35px 70px rgba(0,0,0,0.2)';"
+                    onmouseout="this.style.transform='scale(1) translateY(0)'; this.style.boxShadow='0 25px 50px rgba(0,0,0,0.15)';"
+                    class="wow animated zoomIn">
             </aside>
         </div>
     </section>
@@ -524,6 +655,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
             </div>
         </div>
     </section>
+
+    <!-- Equipment Showcase Section -->
+    <?php if (!empty($equipment)): ?>
+        <section id="sec-equipment">
+            <div class="container">
+                <h1 class="wow animated fadeInUp">Machinery & Equipment</h1>
+                <div class="equipment-grid">
+                    <?php foreach ($equipment as $e):
+                        $status_class = 'status-' . strtolower(str_replace(' ', '-', $e['status']));
+                        ?>
+                        <div class="equipment-card wow animated fadeInUp">
+                            <div class="equip-img-box">
+                                <?php
+                                $img_src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800'; // High-quality default
+                                if (!empty($e['image_url'])) {
+                                    if (strpos($e['image_url'], 'http') === 0) {
+                                        $img_src = $e['image_url'];
+                                    } else {
+                                        $img_src = '../' . $e['image_url'];
+                                    }
+                                }
+                                ?>
+                                <img src="<?= htmlspecialchars($img_src) ?>" alt="<?= htmlspecialchars($e['name']) ?>"
+                                    onerror="this.src='https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800'">
+                                <div class="equip-status <?= $status_class ?>">
+                                    <?= htmlspecialchars($e['status']) ?>
+                                </div>
+                            </div>
+                            <div class="equip-info">
+                                <h3><?= htmlspecialchars($e['name']) ?></h3>
+                                <?php if (!empty($e['serial_number'])): ?>
+                                    <span class="equip-sn">ID: <?= htmlspecialchars($e['serial_number']) ?></span>
+                                <?php endif; ?>
+                                <p><?= htmlspecialchars($e['description']) ?></p>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </section>
+    <?php endif; ?>
+
     <section id="sec-5">
         <div class="container">
             <h1><?= htmlspecialchars($c['reviews_title'] ?? 'CUSTOMER HIGHLIGHTS') ?></h1>

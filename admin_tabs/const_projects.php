@@ -80,11 +80,11 @@ $projects = $pdo->query("SELECT * FROM construction_projects ORDER BY created_at
                                 </td>
                                 <td style="padding: 20px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-size: 13px;">
                                     <div><i class="fa-solid fa-calendar-day" style="width: 20px;"></i> Start:
-                                        <?= $proj['start_date'] ?: 'N/A' ?>
+                                        <?= !empty($proj['start_date']) ? $proj['start_date'] : 'N/A' ?>
                                     </div>
                                     <div style="margin-top: 4px;"><i class="fa-solid fa-flag-checkered"
                                             style="width: 20px;"></i> End:
-                                        <?= $proj['completion_date'] ?: 'N/A' ?>
+                                        <?= !empty($proj['completion_date']) ? $proj['completion_date'] : 'N/A' ?>
                                     </div>
                                 </td>
                                 <td style="padding: 20px; border-bottom: 1px solid #f1f5f9; text-align: right;">

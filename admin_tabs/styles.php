@@ -115,6 +115,7 @@
     body {
         display: flex;
         height: 100vh;
+        overflow: hidden;
         background: var(--bg);
         color: var(--text);
     }
@@ -122,13 +123,35 @@
     .sidebar {
         width: 260px;
         min-width: 260px;
+        height: 100vh;
         background: var(--sidebar);
         color: #fff;
         display: flex;
         flex-direction: column;
-        padding: 30px 0;
-        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+        padding: 30px 0 20px;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
         z-index: 100;
+        position: sticky;
+        top: 0;
+        flex-shrink: 0;
+    }
+
+    /* Custom scrollbar for sidebar */
+    .sidebar::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.3);
     }
 
     .brand {
@@ -158,21 +181,45 @@
 
     .nav-items {
         flex: 1;
-        padding: 0 15px;
+        padding: 0 15px 15px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    /* Scrollbar for nav items */
+    .nav-items::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    .nav-items::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .nav-items::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 3px;
+    }
+
+    .nav-items::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.25);
     }
 
     .nav-item {
         padding: 12px 18px;
         display: flex;
         align-items: center;
-        gap: 15px;
-        color: rgba(255, 255, 255, 0.8);
+        gap: 12px;
+        color: rgba(255, 255, 255, 0.82);
         text-decoration: none;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-weight: 600;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         border-radius: 12px;
-        font-size: 15px;
+        font-size: 14.5px;
+        opacity: 1 !important;
+        visibility: visible !important;
+        position: relative;
+        z-index: 1;
     }
 
     .nav-item i {
@@ -184,14 +231,14 @@
     .nav-item:hover {
         background: rgba(255, 255, 255, 0.1);
         color: #fff;
-        transform: translateX(5px);
+        transform: translateX(4px);
     }
 
     .nav-item.active {
         background: var(--accent);
         color: var(--blue);
-        transform: translateX(8px);
-        box-shadow: 0 4px 15px rgba(255, 238, 88, 0.4);
+        transform: translateX(6px);
+        box-shadow: 0 4px 15px rgba(255, 238, 88, 0.35);
     }
 
     .nav-badge {
@@ -223,7 +270,9 @@
 
     /* Sidebar Dropdown Styles */
     .nav-dropdown {
-        margin-bottom: 8px;
+        margin-bottom: 6px;
+        opacity: 1 !important;
+        visibility: visible !important;
     }
 
     .nav-dropdown-toggle {
@@ -232,13 +281,15 @@
         align-items: center;
         justify-content: space-between;
         padding: 12px 18px;
-        color: rgba(255, 255, 255, 0.8);
+        color: rgba(255, 255, 255, 0.85);
         font-weight: 700;
         border-radius: 12px;
-        transition: 0.3s;
-        font-size: 15px;
+        transition: background 0.3s, color 0.3s;
+        font-size: 14.5px;
         background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        opacity: 1 !important;
+        visibility: visible !important;
     }
 
     .nav-dropdown-toggle:hover {
@@ -246,27 +297,29 @@
         color: #fff;
     }
 
-    .nav-dropdown-toggle i:last-child {
-        font-size: 12px;
-        transition: 0.3s;
+    .nav-dropdown-toggle .toggle-icon {
+        font-size: 11px;
+        transition: transform 0.3s ease;
+        flex-shrink: 0;
     }
 
-    .nav-dropdown.open .nav-dropdown-toggle i:last-child {
+    .nav-dropdown.open .nav-dropdown-toggle .toggle-icon {
         transform: rotate(180deg);
     }
 
     .nav-dropdown.open .nav-dropdown-toggle {
         background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.12);
         color: #fff;
     }
 
     .submenu {
         display: none;
-        padding-left: 15px;
-        margin-top: 5px;
-        border-left: 2px solid rgba(255, 255, 255, 0.1);
-        margin-left: 10px;
+        padding-left: 12px;
+        margin-top: 4px;
+        border-left: 2px solid rgba(255, 255, 255, 0.12);
+        margin-left: 12px;
+        overflow: visible;
     }
 
     .nav-dropdown.open .submenu {
@@ -274,14 +327,16 @@
     }
 
     .submenu .nav-item {
-        font-size: 14px;
-        padding: 10px 15px;
-        margin-bottom: 4px;
+        font-size: 13.5px;
+        padding: 9px 14px;
+        margin-bottom: 3px;
         font-weight: 500;
+        opacity: 1 !important;
+        visibility: visible !important;
     }
 
     .submenu .nav-item.active {
-        transform: translateX(5px);
+        transform: translateX(4px);
     }
 
     .main-content {
@@ -966,13 +1021,17 @@
         body {
             flex-direction: column;
             height: auto;
+            overflow: auto;
         }
 
         .sidebar {
             width: 100% !important;
             min-width: 100% !important;
             height: auto !important;
+            max-height: none !important;
+            position: relative !important;
             padding: 10px 0 !important;
+            overflow: visible !important;
         }
 
         .brand {
@@ -995,18 +1054,38 @@
             flex-wrap: wrap;
             justify-content: center;
             gap: 8px;
-            padding: 0 10px;
+            padding: 0 10px 10px;
+            overflow: visible !important;
+            max-height: none !important;
+        }
+
+        .nav-dropdown {
+            width: auto;
+        }
+
+        .submenu {
+            position: absolute;
+            background: var(--sidebar);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            z-index: 500;
+            min-width: 180px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            margin-left: 0;
+            border-left: none;
         }
 
         .nav-item {
             padding: 8px 12px;
             font-size: 13px;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .main-content {
             padding: 15px;
             width: 100%;
+            overflow-y: auto;
         }
     }
 

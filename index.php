@@ -18,7 +18,8 @@
             --restaurant-accent: #dfb180;
             --font-main: 'Outfit', sans-serif;
             --font-heading: 'Playfair Display', serif;
-        --bg-deep: #050a0f; /* Attractive deep blue instead of black */
+            --bg-deep: #050a0f;
+            /* Attractive deep blue instead of black */
         }
 
         * {
@@ -57,14 +58,46 @@
             animation: floatCircle 15s infinite ease-in-out;
         }
 
-        .circle-1 { width: 400px; height: 400px; top: -100px; left: 10%; animation-delay: 0s; }
-        .circle-2 { width: 300px; height: 300px; bottom: 10%; right: 20%; background: radial-gradient(circle, rgba(243, 156, 18, 0.1) 0%, rgba(243, 156, 18, 0) 70%); animation-delay: -5s; }
-        .circle-3 { width: 500px; height: 500px; top: 30%; left: 40%; background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 70%); animation-delay: -10s; }
+        .circle-1 {
+            width: 400px;
+            height: 400px;
+            top: -100px;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .circle-2 {
+            width: 300px;
+            height: 300px;
+            bottom: 10%;
+            right: 20%;
+            background: radial-gradient(circle, rgba(243, 156, 18, 0.1) 0%, rgba(243, 156, 18, 0) 70%);
+            animation-delay: -5s;
+        }
+
+        .circle-3 {
+            width: 500px;
+            height: 500px;
+            top: 30%;
+            left: 40%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
+            animation-delay: -10s;
+        }
 
         @keyframes floatCircle {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, 50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, 50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
         }
 
         .split-container {
@@ -116,13 +149,13 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, rgba(5,10,15,0.3) 0%, rgba(5,10,15,0.7) 100%);
+            background: linear-gradient(180deg, rgba(5, 10, 15, 0.3) 0%, rgba(5, 10, 15, 0.7) 100%);
             z-index: 2;
             transition: opacity 0.6s ease;
         }
 
         .split-half:hover .overlay {
-            background: linear-gradient(180deg, rgba(5,10,15,0.1) 0%, rgba(5,10,15,0.5) 100%);
+            background: linear-gradient(180deg, rgba(5, 10, 15, 0.1) 0%, rgba(5, 10, 15, 0.5) 100%);
         }
 
         .content {
@@ -140,8 +173,15 @@
             transition: 0.5s;
         }
 
-        .restaurant-side .content i { color: var(--restaurant-accent); text-shadow: 0 0 30px rgba(223, 177, 128, 0.4); }
-        .construction-side .content i { color: var(--construction-accent); text-shadow: 0 0 30px rgba(243, 156, 18, 0.4); }
+        .restaurant-side .content i {
+            color: var(--restaurant-accent);
+            text-shadow: 0 0 30px rgba(223, 177, 128, 0.4);
+        }
+
+        .construction-side .content i {
+            color: var(--construction-accent);
+            text-shadow: 0 0 30px rgba(243, 156, 18, 0.4);
+        }
 
         .split-half:hover .content i {
             transform: translateY(-10px) rotate(5deg) scale(1.1);
@@ -158,7 +198,7 @@
 
         .content p {
             font-size: 1.2rem;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
             opacity: 0;
             transform: translateY(30px);
             transition: all 0.6s ease;
@@ -177,7 +217,8 @@
         .btn-enter {
             display: inline-block;
             padding: 16px 45px;
-            border-radius: 50px; /* Circular feel for buttons too */
+            border-radius: 50px;
+            /* Circular feel for buttons too */
             text-decoration: none;
             font-weight: 800;
             font-size: 1rem;
@@ -195,11 +236,27 @@
             transition-delay: 0.4s;
         }
 
-        .restaurant-side .btn-enter { color: var(--restaurant-accent); border-color: var(--restaurant-accent); }
-        .restaurant-side .btn-enter:hover { background: var(--restaurant-accent); color: #000; box-shadow: 0 0 30px rgba(223, 177, 128, 0.5); }
+        .restaurant-side .btn-enter {
+            color: var(--restaurant-accent);
+            border-color: var(--restaurant-accent);
+        }
 
-        .construction-side .btn-enter { color: var(--construction-accent); border-color: var(--construction-accent); }
-        .construction-side .btn-enter:hover { background: var(--construction-accent); color: #000; box-shadow: 0 0 30px rgba(243, 156, 18, 0.5); }
+        .restaurant-side .btn-enter:hover {
+            background: var(--restaurant-accent);
+            color: #000;
+            box-shadow: 0 0 30px rgba(223, 177, 128, 0.5);
+        }
+
+        .construction-side .btn-enter {
+            color: var(--construction-accent);
+            border-color: var(--construction-accent);
+        }
+
+        .construction-side .btn-enter:hover {
+            background: var(--construction-accent);
+            color: #000;
+            box-shadow: 0 0 30px rgba(243, 156, 18, 0.5);
+        }
 
         /* Center Branding */
         .center-brand {
@@ -213,13 +270,14 @@
         }
 
         .logo-box {
-            background: rgba(5,10,15,0.6);
+            background: rgba(5, 10, 15, 0.6);
             padding: 25px 50px;
-            border-radius: 60px; /* Circular box */
-            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 60px;
+            /* Circular box */
+            border: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
             position: relative;
-            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
         }
 
         .logo-box::before {
@@ -268,12 +326,32 @@
         }
 
         @media(max-width: 991px) {
-            .split-container { flex-direction: column; }
-            .logo-box h1 { font-size: 1.6rem; letter-spacing: 4px; }
-            .content p { display: none; }
-            .btn-enter { opacity: 1; transform: translateY(0); }
-            .center-brand { width: 90%; }
-            .logo-box { padding: 15px; }
+            .split-container {
+                flex-direction: column;
+            }
+
+            .logo-box h1 {
+                font-size: 1.6rem;
+                letter-spacing: 4px;
+            }
+
+            .content p {
+                display: none;
+            }
+
+            .btn-enter {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .center-brand {
+                width: 90%;
+            }
+
+            .logo-box {
+                padding: 15px;
+            }
+
             .divider {
                 display: none;
             }

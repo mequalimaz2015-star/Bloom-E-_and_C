@@ -2919,7 +2919,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
             fetch('chat_handler.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ register: true, name, email, phone , department: 'Restaurant' })
+                body: JSON.stringify({ register: true, name, email, phone, department: 'Restaurant' })
             })
                 .then(res => res.json())
                 .then(data => {
@@ -3025,16 +3025,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
             <i class="fa-solid fa-robot"></i>
         </div>
         <?php if (!empty($company['telegram'])): ?>
-                <a href="<?= htmlspecialchars($company['telegram']) ?>" class="telegram-float" target="_blank"
-                    rel="noopener noreferrer" data-tooltip="Chat on Telegram">
-                    <i class="fa-brands fa-telegram"></i>
-                </a>
+            <a href="<?= htmlspecialchars($company['telegram']) ?>" class="telegram-float" target="_blank"
+                rel="noopener noreferrer" data-tooltip="Chat on Telegram">
+                <i class="fa-brands fa-telegram"></i>
+            </a>
         <?php endif; ?>
         <?php if (!empty($company['whatsapp'])): ?>
-                <a href="<?= htmlspecialchars($company['whatsapp']) ?>" class="whatsapp-float" target="_blank"
-                    rel="noopener noreferrer" data-tooltip="Order on WhatsApp">
-                    <i class="fa-brands fa-whatsapp"></i>
-                </a>
+            <a href="<?= htmlspecialchars($company['whatsapp']) ?>" class="whatsapp-float" target="_blank"
+                rel="noopener noreferrer" data-tooltip="Order on WhatsApp">
+                <i class="fa-brands fa-whatsapp"></i>
+            </a>
         <?php endif; ?>
     </div>
 

@@ -1,15 +1,1 @@
-FROM mariadb:10.6
-
-# Turbo-optimized for Render Free Tier (512MB)
-# This configuration minimizes memory and speeds up internal initialization
-RUN echo '[mysqld]\n\
-    skip-name-resolve\n\
-    innodb_buffer_pool_size=16M\n\
-    innodb_log_buffer_size=512K\n\
-    innodb_flush_log_at_trx_commit=2\n\
-    innodb_doublewrite=0\n\
-    performance_schema=OFF\n\
-    bind-address=0.0.0.0\n\
-    max_connections=10\n\
-    key_buffer_size=4M\n\
-    query_cache_size=0\n' > /etc/mysql/conf.d/render_limits.cnf
+FROM mysql:8.0
