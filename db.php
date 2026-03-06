@@ -77,6 +77,23 @@ try {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
+    CREATE TABLE IF NOT EXISTS favorites (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        menu_item_id INT NOT NULL,
+        customer_email VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS recycle_bin (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        table_name VARCHAR(100) NOT NULL,
+        record_id INT NOT NULL,
+        record_data JSON NOT NULL,
+        deleted_by VARCHAR(255),
+        deletion_reason TEXT,
+        deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE TABLE IF NOT EXISTS tables (
         id INT AUTO_INCREMENT PRIMARY KEY,
         table_number INT NOT NULL UNIQUE,
@@ -444,6 +461,13 @@ try {
         $pdo->exec("ALTER TABLE construction_projects ADD COLUMN completion_date DATE AFTER start_date");
     } catch (Exception $e) {
     }
+
+    // Add likes column to menu_items if missing
+    try {
+        $pdo->exec("ALTER TABLE menu_items ADD COLUMN likes INT DEFAULT 0 AFTER price");
+    } catch (Exception $e) {
+    }
+
 
 
     // 7. Data Seeding
