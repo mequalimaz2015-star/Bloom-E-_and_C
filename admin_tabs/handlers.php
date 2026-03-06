@@ -159,13 +159,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             logActivity($pdo, "Registered new employee: $full_name ($id_number)");
             $msg = "Employee '$full_name' registered with ID: $id_number";
-
-
-            if ($e->getCode() == 23000) {
-                echo "<script>alert('Error: Data overlap detected (duplicate email or ID).'); window.location.href='admin.php?tab=staff';</script>";
-                exit;
-            } else
-                throw $e;
+        } catch (PDOException $e) {
+            error_log("Employee registration error: " . $e->getMessage());
+            $msg = "Error registering employee: " . $e->getMessage();
         }
     } elseif (isset($_POST['update_employee_status'])) {
         $pdo->prepare("UPDATE employees SET status=? WHERE id=?")->execute([$_POST['status'], $_POST['id']]);
