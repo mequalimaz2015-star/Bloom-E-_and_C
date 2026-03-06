@@ -1,7 +1,10 @@
+# 100% FREE TIER ONLY - No Card Required
 services:
-  - type: pserv
+  # 1. Database (Changed from pserv to web to keep it free)
+  - type: web
     name: bloom-db
     env: docker
+    plan: free
     dockerContext: .
     dockerfilePath: Dockerfile.mysql
     envVars:
@@ -10,15 +13,15 @@ services:
       - key: MYSQL_DATABASE
         value: bloom_africa
 
+  # 2. Application (Free Web Service)
   - type: web
     name: bloom-web
     env: docker
-    dockerContext: .
-    dockerfilePath: Dockerfile
+    plan: free
     envVars:
       - key: BLOOM_DB_HOST
         fromService:
-          type: pserv
+          type: web
           name: bloom-db
           property: host
       - key: BLOOM_DB_NAME
