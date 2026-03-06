@@ -38,7 +38,7 @@ services:
     plan: free
     region: oregon
     dockerContext: .
-    dockerfile: Dockerfile.mysql
+    dockerfilePath: Dockerfile.mysql
     envVars:
       - key: MYSQL_ROOT_PASSWORD
         generateValue: true
