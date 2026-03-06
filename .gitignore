@@ -1,5 +1,5 @@
 # XAMPP / PHP / Development
-/uploads/
+# /uploads/ (Allowing uploads to be versioned for Render build context)
 /vendor/
 *.log
 .DS_Store

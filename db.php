@@ -414,10 +414,11 @@ try {
     // Seed construction_info if it's empty
     $check_const = $pdo->query("SELECT COUNT(*) FROM construction_info")->fetchColumn();
     if ($check_const == 0) {
-        $pdo->exec("INSERT INTO construction_info (company_name, email, phone, address, why_choose_us_msg, services_desc) VALUES ('Bloom Construction', 'info@bloomconstruction.et', '+251 911 222 333', 'Addis Ababa, Ethiopia', 'Quality and Excellence in every build.', 'Leading construction services in Ethiopia.')");
+        $pdo->exec("INSERT INTO construction_info (company_name, email, phone, address, why_choose_us_msg, services_desc, review_text, review_image) VALUES 
+            ('Bloom Construction', 'info@bloomconstruction.et', '+251 911 222 333', 'Addis Ababa, Ethiopia', 'Quality and Excellence in every build.', 'Leading construction services in Ethiopia.', 'The attention to detail in our projects is what defines us. Experience perfection.', 'uploads/const/review_1772692350.png')");
     }
 
-    // Seed construction_services if empty
+    // Seed construction_services if empty (Using user's local images)
     $check_const_services = $pdo->query("SELECT COUNT(*) FROM construction_services")->fetchColumn();
     if ($check_const_services == 0) {
         $pdo->exec("INSERT INTO construction_services (title, description, image_url, button_text, button_url) VALUES 
