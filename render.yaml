@@ -1,6 +1,6 @@
-# Render Blueprint for Bloom Africa
+# Bloom Africa - Production Blueprint v2.1
 services:
-  # MySQL Private Service (Database)
+  # 1. Database (Private Service)
   - type: pserv
     name: bloom-db-pserv
     env: docker
@@ -14,7 +14,7 @@ services:
       - key: MYSQL_DATABASE
         value: bloom_africa
 
-  # PHP Web Service (Application)
+  # 2. Application (Public Web Service)
   - type: web
     name: bloom-web-app
     env: docker
@@ -22,7 +22,6 @@ services:
     dockerfilePath: Dockerfile
     plan: free
     region: oregon
-    healthCheckPath: /
     envVars:
       - key: BLOOM_DB_HOST
         fromService:
