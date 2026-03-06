@@ -390,7 +390,6 @@
                 <a href="restaurant_home.php" class="btn-enter" onclick="event.stopPropagation();">Enter Dining</a>
             </div>
         </div>
-
         <!-- Construction Side -->
         <div class="split-half construction-side" onclick="window.location.href='Construction/index.php'">
             <video autoplay muted loop playsinline class="video-bg">

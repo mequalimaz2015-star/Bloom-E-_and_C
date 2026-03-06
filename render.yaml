@@ -32,7 +32,7 @@ services:
     #   sizeGB: 1
 
   # Private MySQL Service (Background only)
-  - type: pvt
+  - type: pserv
     name: bloom-mysql
     env: docker
     plan: free
