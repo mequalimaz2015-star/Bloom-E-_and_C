@@ -7,22 +7,23 @@ RUN apt-get update && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Config MySQL for low memory (Super Important for Render Free Tier)
-RUN echo "[mysqld]\n\
+RUN printf "[mysqld]\n\
     skip-name-resolve\n\
     innodb_buffer_pool_size = 32M\n\
     max_connections = 10\n\
-    performance_schema = OFF\n" > /etc/mysql/mariadb.conf.d/low-memory.cnf
+    performance_schema = OFF\n\
+    bind-address = 127.0.0.1\n" > /etc/mysql/mariadb.conf.d/low-memory.cnf
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
 # Setup Startup Script
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-# Set the working directory
 WORKDIR /var/www/html
 COPY . /var/www/html/
+
+# Setup entrypoint
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Ensure proper permissions
 RUN chown -R www-data:www-data /var/www/html/
@@ -31,4 +32,4 @@ RUN chown -R www-data:www-data /var/www/html/
 EXPOSE 80
 
 # Start everything
-CMD ["/entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

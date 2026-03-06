@@ -2,10 +2,10 @@
 services:
   # One Service, Infinite Power (PHP + MariaDB combined)
   - type: web
-    name: bloom-africa
+    name: bloom-africa-app
     env: docker
     plan: free
-    region: oregon 
+    region: oregon
     healthCheckPath: /
     envVars:
       - key: BLOOM_DB_HOST

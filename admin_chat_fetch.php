@@ -17,7 +17,7 @@ if (!$sid) {
 }
 
 // Fetch new messages
-$stmt = $pdo->prepare("SELECT id, sender, message, created_at FROM chat_messages WHERE session_id = ? AND id > ? ORDER BY created_at ASC");
+$stmt = $pdo->prepare("SELECT id, sender, message, image_path, location_lat, location_lng, created_at FROM chat_messages WHERE session_id = ? AND id > ? ORDER BY created_at ASC");
 $stmt->execute([$sid, $last_id]);
 $new_messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

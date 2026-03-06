@@ -281,6 +281,9 @@ try {
         session_id VARCHAR(255) NOT NULL,
         sender ENUM('User', 'Bot', 'Admin') NOT NULL,
         message TEXT NOT NULL,
+        image_path VARCHAR(255) DEFAULT NULL,
+        location_lat DECIMAL(10, 8) DEFAULT NULL,
+        location_lng DECIMAL(11, 8) DEFAULT NULL,
         is_read BOOLEAN DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );

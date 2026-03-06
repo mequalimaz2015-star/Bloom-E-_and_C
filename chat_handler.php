@@ -10,7 +10,8 @@ $session_id = $_SESSION['chat_session'];
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = json_decode(file_get_contents('php://input'), true);
+    // Handle both JSON and FormData
+    $data = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
     // Check if it's a registration request
     if (isset($data['register'])) {
@@ -43,12 +44,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $user_msg = trim($data['message'] ?? '');
-    if (empty($user_msg))
+    $image_path = null;
+    $lat = $data['lat'] ?? null;
+    $lng = $data['lng'] ?? null;
+
+    // Handle image upload
+    if (isset($_FILES['chat_image']) && $_FILES['chat_image']['error'] === 0) {
+        $upload_dir = 'uploads/chat/';
+        if (!is_dir($upload_dir))
+            mkdir($upload_dir, 0777, true);
+
+        $ext = pathinfo($_FILES['chat_image']['name'], PATHINFO_EXTENSION);
+        $filename = 'chat_' . time() . '_' . rand(100, 999) . '.' . $ext;
+        if (move_uploaded_file($_FILES['chat_image']['tmp_name'], $upload_dir . $filename)) {
+            $image_path = $upload_dir . $filename;
+        }
+    }
+
+    if (empty($user_msg) && !$image_path && !$lat)
         exit;
 
     // Save user message
-    $stmt = $pdo->prepare("INSERT INTO chat_messages (session_id, sender, message) VALUES (?, 'User', ?)");
-    $stmt->execute([$session_id, $user_msg]);
+    $stmt = $pdo->prepare("INSERT INTO chat_messages (session_id, sender, message, image_path, location_lat, location_lng) VALUES (?, 'User', ?, ?, ?, ?)");
+    $stmt->execute([$session_id, $user_msg, $image_path, $lat, $lng]);
 
     $department = 'Restaurant';
     $sess_stmt = $pdo->prepare("SELECT department FROM chat_sessions WHERE session_id = ?");
@@ -70,7 +88,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->query("SELECT name FROM construction_projects WHERE status='Completed' LIMIT 5");
             $items = $stmt->fetchAll(PDO::FETCH_COLUMN);
             $bot_reply = "Here are some of our completed projects:\n" . implode("\n", array_map(function ($i) {
-                return "• $i"; }, $items));
+                return "• $i";
+            }, $items));
             if (empty($items))
                 $bot_reply = "We are constantly working on new projects! Check back soon.";
             $buttons = ['◀️ Main Menu', '👤 Talk to Human'];
@@ -78,7 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->query("SELECT title FROM construction_services LIMIT 5");
             $items = $stmt->fetchAll(PDO::FETCH_COLUMN);
             $bot_reply = "Our construction services include:\n" . implode("\n", array_map(function ($i) {
-                return "• $i"; }, $items));
+                return "• $i";
+            }, $items));
             if (empty($items))
                 $bot_reply = "We provide comprehensive construction services.";
             $buttons = ['◀️ Main Menu', '👤 Talk to Human'];
@@ -195,7 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt->execute([$session_id]);
     $session = $stmt->fetch();
 
-    $stmt = $pdo->prepare("SELECT sender, message, created_at FROM chat_messages WHERE session_id = ? ORDER BY created_at ASC");
+    $stmt = $pdo->prepare("SELECT sender, message, image_path, location_lat, location_lng, created_at FROM chat_messages WHERE session_id = ? ORDER BY created_at ASC");
     $stmt->execute([$session_id]);
     $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

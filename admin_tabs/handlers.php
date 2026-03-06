@@ -1191,10 +1191,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $msg = "Quote status updated and reply saved!";
     } elseif (isset($_POST['send_chat_reply'])) {
         $sid = $_POST['session_id'];
-        $reply = trim($_POST['reply']);
-        if ($sid && $reply) {
-            $stmt = $pdo->prepare("INSERT INTO chat_messages (session_id, sender, message, is_read) VALUES (?, 'Admin', ?, 1)");
-            $stmt->execute([$sid, $reply]);
+        $reply = trim($_POST['reply'] ?? '');
+        $lat = $_POST['lat'] ?? null;
+        $lng = $_POST['lng'] ?? null;
+        $image_path = null;
+
+        if (isset($_FILES['chat_image']) && $_FILES['chat_image']['error'] === 0) {
+            $upload_dir = __DIR__ . "/../uploads/chat/";
+            if (!is_dir($upload_dir))
+                mkdir($upload_dir, 0777, true);
+            $ext = pathinfo($_FILES['chat_image']['name'], PATHINFO_EXTENSION);
+            $filename = 'admin_chat_' . time() . '_' . rand(100, 999) . '.' . $ext;
+            if (move_uploaded_file($_FILES['chat_image']['tmp_name'], $upload_dir . $filename)) {
+                $image_path = "uploads/chat/" . $filename;
+            }
+        }
+
+        if ($sid && ($reply || $image_path || $lat)) {
+            $stmt = $pdo->prepare("INSERT INTO chat_messages (session_id, sender, message, image_path, location_lat, location_lng, is_read) VALUES (?, 'Admin', ?, ?, ?, ?, 1)");
+            $stmt->execute([$sid, $reply, $image_path, $lat, $lng]);
             logActivity($pdo, "Replied to chat session: $sid");
             $msg = "Reply sent successfully!";
         }

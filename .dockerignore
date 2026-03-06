@@ -1,0 +1,10 @@
+.git
+.github
+.vscode
+.gemini
+tmp
+*.md
+Dockerfile.mysql
+migrate_*.php
+check_*.php
+debug_*.php
