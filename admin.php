@@ -489,6 +489,10 @@ $perf_data_json = json_encode($perf_percent);
                             <a href="?tab=gallery" class="nav-item <?= $active_tab == 'gallery' ? 'active' : '' ?>"><i
                                     class="fa-solid fa-images"></i> Gallery</a>
                         <?php endif; ?>
+                        <?php if (hasPermission('team')): ?>
+                            <a href="?tab=team" class="nav-item <?= $active_tab == 'team' ? 'active' : '' ?>"><i
+                                    class="fa-solid fa-user-tie"></i> Featured Team</a>
+                        <?php endif; ?>
                     </div>
                 </div>
             <?php endif; ?>

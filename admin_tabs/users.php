@@ -3,8 +3,8 @@ $users = $pdo->query("SELECT * FROM users ORDER BY id ASC")->fetchAll();
 
 // Detailed Role Templates (Recommended defaults)
 $role_defaults = [
-    'Admin' => ['menu', 'reservations', 'gallery', 'staff', 'attendance', 'payroll', 'jobs', 'applications', 'services', 'company', 'chatbot', 'communication'],
-    'Manager' => ['menu', 'reservations', 'gallery', 'staff', 'attendance', 'payroll', 'services', 'communication'],
+    'Admin' => ['menu', 'reservations', 'gallery', 'team', 'staff', 'attendance', 'payroll', 'jobs', 'applications', 'services', 'company', 'chatbot', 'communication'],
+    'Manager' => ['menu', 'reservations', 'gallery', 'team', 'staff', 'attendance', 'payroll', 'services', 'communication'],
     'Supervisor' => ['menu', 'reservations', 'attendance', 'services', 'chatbot'],
     'Waiter' => ['menu', 'services']
 ];
@@ -14,6 +14,7 @@ $permission_groups = [
         'menu' => ['label' => 'Menu Mgmt', 'icon' => 'fa-list-check'],
         'reservations' => ['label' => 'Reservations', 'icon' => 'fa-calendar-check'],
         'gallery' => ['label' => 'Gallery', 'icon' => 'fa-images'],
+        'team' => ['label' => 'Team Mgmt', 'icon' => 'fa-user-tie'],
     ],
     'Human Resources' => [
         'staff' => ['label' => 'Staff Directory', 'icon' => 'fa-users'],
