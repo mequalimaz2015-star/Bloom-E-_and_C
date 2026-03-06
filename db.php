@@ -440,23 +440,7 @@ try {
             'completion_date' => "DATE AFTER start_date"
         ],
         'construction_equipment' => ['serial_number' => "VARCHAR(100) UNIQUE AFTER name"],
-        'construction_info' => [
-            'hero_title' => "VARCHAR(255)",
-            'hero_subtitle' => "TEXT",
-            'hero_description' => "TEXT",
-            'hero_image' => "VARCHAR(255)",
-            'hero_video' => "VARCHAR(255)",
-            'why_choose_us_title' => "VARCHAR(255)",
-            'why_choose_us_subtitle' => "TEXT",
-            'services_title' => "VARCHAR(255)",
-            'services_subtitle' => "TEXT",
-            'projects_title' => "VARCHAR(255)",
-            'projects_subtitle' => "TEXT",
-            'reviews_title' => "VARCHAR(255)",
-            'reviews_subtitle' => "TEXT",
-            'quote_title' => "VARCHAR(255)",
-            'quote_subtitle' => "TEXT"
-        ],
+
         'company_info' => [
             'hero_button_text' => "VARCHAR(100)",
             'hero_video' => "VARCHAR(255)",
@@ -535,28 +519,29 @@ try {
     // Seed company_info if it's empty
     $check_company = $pdo->query("SELECT COUNT(*) FROM company_info")->fetchColumn();
     if ($check_company == 0) {
-        $pdo->exec("INSERT INTO company_info (company_name, email, phone, address, about_text, dev_name, dev_email, dev_phone) VALUES ('Bloom Africa Restaurant', 'info@bloomafrica.com', '+251 900 123 456', 'Addis Ababa, Ethiopia', 'Experience authentic African cuisine.', 'Mequannent Gashaw', 'meqalimaz2015@gmail.com', '+251 918 592 028')");
+        $pdo->exec("INSERT INTO company_info (id, company_name, email, phone, address, about_text, dev_name, dev_email, dev_phone) VALUES (1, 'Bloom Africa Restaurant', 'info@bloomafrica.com', '+251 900 123 456', 'Addis Ababa, Ethiopia', 'Experience authentic African cuisine.', 'Mequannent Gashaw', 'meqalimaz2015@gmail.com', '+251 918 592 028')");
     }
 
     // Seed construction_info if it's empty
+    $check_const = $pdo->query("SELECT COUNT(*) FROM construction_info")->fetchColumn();
+    if ($check_const == 0) {
+        $pdo->exec("INSERT INTO construction_info (id, company_name, hero_title, hero_subtitle, hero_image, email, phone, address, why_choose_us_msg, services_desc, review_text, review_image) VALUES 
+            (1, 'Bloom Construction', 'WELCOME TO OUR COMPANY', 'Building your vision with precision.', 'uploads/const/hero_1772692960.jpg', 'info@bloomconstruction.et', '+251 911 222 333', 'Addis Ababa, Ethiopia', 'Quality and Excellence in every build.', 'Leading construction services in Ethiopia.', 'The team delivered our project ahead of schedule with exceptional attention to detail.', 'uploads/const/review_1772692350.png')");
+    }
 
+    // Ensure uploads directory exists for chatbot images
     if (!file_exists('uploads/chat')) {
         @mkdir('uploads/chat', 0777, true);
     }
 
-
     // Check if we need to seed the base structure (if services are missing)
     $check_seed = $pdo->query("SELECT COUNT(*) FROM construction_services")->fetchColumn();
     if ($check_seed < 3) {
-        // Seed construction_services (Using user's local images)
+        // Seed construction_services (Using INSERT IGNORE to prevent duplicates)
         $pdo->exec("INSERT IGNORE INTO construction_services (title, description, image_url, button_text, button_url) VALUES 
             ('Construction Management', 'Full lifecycle management of your construction project, ensuring site safety, resource efficiency, and regulatory compliance from start to finish.', 'Construction/Images/card1.jpg', 'Learn More', '#'), 
             ('Renovation', 'Modernizing existing structures with the latest materials and designs, breathing new life into your residential or commercial space.', 'Construction/Images/card2.jpg', 'Learn More', '#'), 
             ('Interior Design', 'Creating functional and aesthetically pleasing interior spaces tailored to your personal style and operational needs.', 'Construction/Images/card3.jpg', 'Learn More', '#')");
-
-        $pdo->exec("UPDATE construction_services SET image_url = 'Construction/Images/card1.jpg' WHERE title='Construction Management'");
-        $pdo->exec("UPDATE construction_services SET image_url = 'Construction/Images/card2.jpg' WHERE title='Renovation'");
-        $pdo->exec("UPDATE construction_services SET image_url = 'Construction/Images/card3.jpg' WHERE title='Interior Design'");
 
         // Seed construction_projects
         $pdo->exec("INSERT IGNORE INTO construction_projects (title, description, status, image_url) VALUES 
@@ -564,19 +549,11 @@ try {
             ('Oceanview Residences', 'Luxury residential complex with panoramic ocean views, infinity pools, and high-end finishes throughout.', 'Ongoing', 'Construction/Images/gallery2.jpg'),
             ('City Center Mall', 'Massive retail and entertainment complex in the heart of the city, bringing over 200 premium brands together.', 'Completed', 'Construction/Images/gallery3.jpg')");
 
-        $pdo->exec("UPDATE construction_projects SET image_url = 'Construction/Images/gallery1.jpg' WHERE title='Skyline Tower'");
-        $pdo->exec("UPDATE construction_projects SET image_url = 'Construction/Images/gallery2.jpg' WHERE title='Oceanview Residences'");
-        $pdo->exec("UPDATE construction_projects SET image_url = 'Construction/Images/gallery3.jpg' WHERE title='City Center Mall'");
-
         // Seed menu items
         $pdo->exec("INSERT IGNORE INTO menu_items (name, category, price, description, image_url) VALUES 
             ('Doro Wat', 'Main Dish', 450.00, 'Spicy chicken stew slow-cooked with berbere, onions, and garlic, served with a hard-boiled egg.', 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=800'),
             ('Kitfo Traditional', 'Main Dish', 550.00, 'Minced raw beef marinated in mitmita (spicy chili powder) and niter kibbeh (clarified butter).', 'https://images.unsplash.com/photo-1541014741259-df549fa3bb68?q=80&w=800'),
             ('Injera Special Wrap', 'Fast Food', 320.00, 'Authentic sourdough flatbread wrapped with various fresh vegetables and lean proteins.', 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?q=80&w=800')");
-
-        $pdo->exec("UPDATE menu_items SET image_url = 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=800' WHERE name='Doro Wat'");
-        $pdo->exec("UPDATE menu_items SET image_url = 'https://images.unsplash.com/photo-1541014741259-df549fa3bb68?q=80&w=800' WHERE name='Kitfo Traditional'");
-        $pdo->exec("UPDATE menu_items SET image_url = 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?q=80&w=800' WHERE name='Injera Special Wrap'");
 
         // Seed default admin if empty
         $check_users = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
@@ -595,25 +572,17 @@ try {
             }
         }
 
-        // Seed construction_equipment and force update images
+        // Seed construction_equipment
         $pdo->exec("INSERT IGNORE INTO construction_equipment (name, serial_number, description, status, image_url) VALUES 
             ('Heavy Duty Excavator', 'EQ-EX-001', 'High-performance hydraulic excavator for major earthmoving and trenching operations.', 'Available', 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800'),
             ('Tower Crane - 50M', 'EQ-CR-042', 'Reliable vertical transport for high-rise construction projects with precision control systems.', 'In Use', 'https://images.unsplash.com/photo-1541888946425-d81bb19480c5?q=80&w=800'),
             ('Industrial Cement Mixer', 'EQ-MX-099', 'Efficient concrete mixing and delivery for structural foundations and large-scale flooring.', 'Available', 'https://images.unsplash.com/photo-1533160600052-a5676735237c?q=80&w=800')");
-
-        $pdo->exec("UPDATE construction_equipment SET image_url = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800' WHERE serial_number='EQ-EX-001'");
-        $pdo->exec("UPDATE construction_equipment SET image_url = 'https://images.unsplash.com/photo-1541888946425-d81bb19480c5?q=80&w=800' WHERE serial_number='EQ-CR-042'");
-        $pdo->exec("UPDATE construction_equipment SET image_url = 'https://images.unsplash.com/photo-1533160600052-a5676735237c?q=80&w=800' WHERE serial_number='EQ-MX-099'");
 
         // Seed construction_testimonials
         $pdo->exec("INSERT IGNORE INTO construction_testimonials (client_name, client_role, message, rating, status, image_url) VALUES 
             ('Samuel Teketo', 'Project Manager, UrbanDev', 'Bloom Construction delivered our high-rise project ahead of schedule with exceptional quality. Their engineering team is second to none.', 5, 'Active', 'https://i.pravatar.cc/150?u=sam'),
             ('Lydia Gashaw', 'CEO, Rift Valley Estates', 'The attention to detail in our renovation project was amazing. They turned our vision into reality while maintaining strict safety standards.', 5, 'Active', 'https://i.pravatar.cc/150?u=lydia'),
             ('Dr. Mequannent G.', 'University Coordinator', 'Professionalism and integrity are the core of Bloom. They handled our lab extension with the utmost care and precision.', 5, 'Active', 'https://i.pravatar.cc/150?u=meq')");
-
-        $pdo->exec("UPDATE construction_testimonials SET message = 'Bloom Construction delivered our high-rise project ahead of schedule with exceptional quality. Their engineering team is second to none.' WHERE client_name='Samuel Teketo'");
-        $pdo->exec("UPDATE construction_testimonials SET message = 'The attention to detail in our renovation project was amazing. They turned our vision into reality while maintaining strict safety standards.' WHERE client_name='Lydia Gashaw'");
-        $pdo->exec("UPDATE construction_testimonials SET message = 'Professionalism and integrity are the core of Bloom. They handled our lab extension with the utmost care and precision.' WHERE client_name='Dr. Mequannent G.'");
 
         // Seed careers (Job Listings)
         $pdo->exec("INSERT IGNORE INTO jobs (title, category, type, location, description, closing_date, status) VALUES 
