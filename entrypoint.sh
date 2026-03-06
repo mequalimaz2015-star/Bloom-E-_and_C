@@ -43,13 +43,16 @@ DB_USER=${BLOOM_DB_USER:-root}
 DB_PASS=${BLOOM_DB_PASS:-bloom_root_pass}
 
 echo "Setting up database: $DB_NAME"
-mysql -e "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\`;"
+# Use -u root without password for initial setup (typical for fresh Debian/Ubuntu installs)
+mysql -u root -e "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\`;"
 
-# Configure root user for local TCP access (127.0.0.1) as used in db.php
-mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$DB_PASS';"
-mysql -e "CREATE USER IF NOT EXISTS '$DB_USER'@'127.0.0.1' IDENTIFIED BY '$DB_PASS';"
-mysql -e "GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USER'@'127.0.0.1';"
-mysql -e "FLUSH PRIVILEGES;"
+# Configure root user and external user
+# Note: In some MariaDB versions on Debian, root uses unix_socket by default.
+mysql -u root -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$DB_PASS');" || true
+mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' IDENTIFIED BY '$DB_PASS' WITH GRANT OPTION;" || true
+mysql -u root -e "CREATE USER IF NOT EXISTS '$DB_USER'@'127.0.0.1' IDENTIFIED BY '$DB_PASS';" || true
+mysql -u root -e "GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USER'@'127.0.0.1';" || true
+mysql -u root -e "FLUSH PRIVILEGES;"
 
 echo "Database successfully initialized."
 
