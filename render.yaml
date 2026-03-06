@@ -2,11 +2,9 @@ services:
   # Web Service for the PHP Application
   - type: web
     name: bloom-restaurant
-    env: php
-    plan: free # Can be changed to 'starter' if a Disk is needed
-    region: oregon # Best to keep same region as DB
-    buildCommand: "echo 'No build command needed'"
-    startCommand: "apache2-foreground" # Default for Render PHP
+    env: docker
+    plan: free 
+    region: oregon 
     envVars:
       - key: BLOOM_DB_HOST
         fromService:
