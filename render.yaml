@@ -1,10 +1,10 @@
 services:
-  # Web Service for the PHP Application
+  # 1. Web Service (The PHP Application)
   - type: web
     name: bloom-restaurant
     env: docker
-    plan: free 
-    region: oregon 
+    plan: free
+    region: oregon
     envVars:
       - key: BLOOM_DB_HOST
         fromService:
@@ -19,21 +19,14 @@ services:
         value: bloom_root_pass
       - key: BLOOM_DB_PORT
         value: "3306"
-    # Uncomment the disk section if you upgrade to a paid 'starter' plan
-    # to maintain persistent image uploads
-    # disk:
-    #   name: uploads
-    #   mountPath: /var/www/html/uploads
-    #   sizeGB: 1
 
-  # Private MySQL Service (Background only)
+  # 2. Private MySQL Service (Using standard image for better stability)
   - type: pserv
     name: bloom-mysql
-    env: docker
+    env: image
+    image: mysql:8.0
     plan: free
     region: oregon
-    dockerContext: .
-    dockerfilePath: Dockerfile.mysql
     envVars:
       - key: MYSQL_ROOT_PASSWORD
         value: bloom_root_pass
