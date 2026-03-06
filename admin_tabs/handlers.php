@@ -19,8 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($record) {
             $json_data = json_encode($record);
-            $ins = $pdo->prepare("INSERT INTO recycle_bin (table_name, record_data, deleted_by, deletion_reason) VALUES (?, ?, ?, ?)");
-            $ins->execute([$table, $json_data, $admin, $reason]);
+            $ins = $pdo->prepare("INSERT INTO recycle_bin (table_name, record_id, record_data, deleted_by, deletion_reason) VALUES (?, ?, ?, ?, ?)");
+            $ins->execute([$table, $id, $json_data, $admin, $reason]);
 
             // Now delete from original
             $pdo->prepare("DELETE FROM `$table` WHERE id = ?")->execute([$id]);

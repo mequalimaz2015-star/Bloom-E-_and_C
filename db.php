@@ -187,6 +187,7 @@ try {
     CREATE TABLE IF NOT EXISTS activity_logs (
         id INT AUTO_INCREMENT PRIMARY KEY,
         action VARCHAR(255) NOT NULL,
+        admin_name VARCHAR(255),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -465,6 +466,11 @@ try {
     // Add likes column to menu_items if missing
     try {
         $pdo->exec("ALTER TABLE menu_items ADD COLUMN likes INT DEFAULT 0 AFTER price");
+    } catch (Exception $e) {
+    }
+
+    try {
+        $pdo->exec("ALTER TABLE activity_logs ADD COLUMN admin_name VARCHAR(255) AFTER action");
     } catch (Exception $e) {
     }
 
