@@ -1,10 +1,25 @@
+name: bloom-africa-deployment
 services:
-  # 1. Web Service (The PHP Application)
+  # MySQL Private Service - Define first so Web can reference it
+  - type: pserv
+    name: bloom-mysql
+    env: image
+    image: mysql:5.7
+    plan: free
+    region: oregon
+    envVars:
+      - key: MYSQL_ROOT_PASSWORD
+        value: bloom_root_pass
+      - key: MYSQL_DATABASE
+        value: bloom_africa
+
+  # PHP Web Service
   - type: web
-    name: bloom-restaurant
+    name: bloom-app
     env: docker
     plan: free
     region: oregon
+    healthCheckPath: /
     envVars:
       - key: BLOOM_DB_HOST
         fromService:
@@ -19,16 +34,3 @@ services:
         value: bloom_root_pass
       - key: BLOOM_DB_PORT
         value: "3306"
-
-  # 2. Private MySQL Service (Using standard image for better stability)
-  - type: pserv
-    name: bloom-mysql
-    env: image
-    image: mysql:8.0
-    plan: free
-    region: oregon
-    envVars:
-      - key: MYSQL_ROOT_PASSWORD
-        value: bloom_root_pass
-      - key: MYSQL_DATABASE
-        value: bloom_africa
