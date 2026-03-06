@@ -413,21 +413,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
             </div>
         </article>
     </section>
-    <section id="sec-1">
-        <div class="container">
-            <article>
-                <h1>Welcome to our company</h1>
-                <h2>Building your vision with precision.</h2>
-                <p>
+    <section id="sec-1" style="background-color: #fdf7f0; padding: 100px 0; overflow: hidden;">
+        <div class="container" style="display: flex; align-items: center; gap: 80px; flex-wrap: wrap;">
+            <article style="flex: 1.2; min-width: 350px; text-align: left; padding: 0;">
+                <h1
+                    style="font-size: 2.8rem; color: #c8832a; font-weight: 800; text-transform: uppercase; font-family: 'Playfair Display', serif; margin-bottom: 20px; line-height: 1.2;">
+                    Welcome to our company</h1>
+                <h2 style="font-size: 1.5rem; font-weight: 600; color: #1a1a2e; margin-bottom: 25px;">Building your
+                    vision with precision.</h2>
+                <div style="width: 60px; height: 4px; background: #c8832a; margin-bottom: 30px; border-radius: 2px;">
+                </div>
+                <p
+                    style="font-size: 1.1rem; color: #4a4a68; text-align: justify; margin-bottom: 40px; line-height: 1.8;">
                     <?= nl2br(htmlspecialchars($c['about_text'] ?? "At " . ($c['company_name'] ?? 'Bloom Construction') . ", we bring years of expertise to the Ethiopian construction landscape. We specialize in high-quality architectural design, renovation, and complete construction management. \n\nOur team is dedicated to delivering excellence, ensuring that every project we undertake meets the highest standards of safety and aesthetic appeal.")) ?>
                 </p>
-                <a href="<?= $c['portfolio_url'] ?? '#' ?>">Our Portfolio</a>
+                <a href="<?= $c['portfolio_url'] ?? '#' ?>"
+                    style="color: #fff; background: #c8832a; text-transform: uppercase; text-decoration: none; padding: 15px 40px; border-radius: 50px; display: inline-block; font-weight: 700; transition: all 0.3s ease; letter-spacing: 1.5px; box-shadow: 0 10px 20px rgba(200, 131, 42, 0.2);">Our
+                    Portfolio</a>
             </article>
-            <aside style="display: flex; justify-content: center; align-items: center;">
+            <aside
+                style="flex: 1; min-width: 350px; display: flex; justify-content: center; align-items: center; position: relative;">
+                <div
+                    style="position: absolute; width: 110%; height: 110%; background: radial-gradient(circle, rgba(200, 131, 42, 0.08) 0%, rgba(200, 131, 42, 0) 70%); z-index: 0;">
+                </div>
                 <img src="<?= !empty($c['hero_image']) ? '../' . $c['hero_image'] : 'Images/img1.png' ?>"
                     alt="company image"
-                    style="width: 100%; max-width: 450px; aspect-ratio: 1/1; object-fit: cover; border-radius: 50%; border: 10px solid #ffffff; box-shadow: 0 15px 35px rgba(0,0,0,0.15); transition: transform 0.3s ease;"
-                    onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    style="width: 100%; max-width: 480px; aspect-ratio: 1/1; object-fit: cover; border-radius: 50%; border: 12px solid #ffffff; box-shadow: 0 25px 50px rgba(0,0,0,0.15); transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1; position: relative;"
+                    onmouseover="this.style.transform='scale(1.03) translateY(-10px)'; this.style.boxShadow='0 35px 70px rgba(0,0,0,0.2)';"
+                    onmouseout="this.style.transform='scale(1) translateY(0)'; this.style.boxShadow='0 25px 50px rgba(0,0,0,0.15)';"
+                    class="wow animated zoomIn">
             </aside>
         </div>
     </section>
