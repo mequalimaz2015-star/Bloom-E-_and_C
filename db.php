@@ -438,7 +438,7 @@ try {
             'start_date' => "DATE AFTER image_url",
             'completion_date' => "DATE AFTER start_date"
         ],
-        'construction_equipment' => ['serial_number' => "VARCHAR(100) AFTER name"],
+        'construction_equipment' => ['serial_number' => "VARCHAR(100) UNIQUE AFTER name"],
         'construction_info' => [
             'hero_title' => "VARCHAR(255)",
             'hero_subtitle' => "TEXT",
@@ -575,7 +575,12 @@ try {
         }
     }
 
-    // Seed construction_equipment if empty
+    // Force cleanup: delete all but the 3 specific equipment items
+    $pdo->exec("DELETE FROM construction_equipment WHERE serial_number NOT IN ('EQ-EX-001', 'EQ-CR-042', 'EQ-MX-099')");
+
+    // Remove duplicates if any (in case UNIQUE constraint wasn't yet applied)
+    $pdo->exec("DELETE c1 FROM construction_equipment c1 INNER JOIN construction_equipment c2 WHERE c1.id > c2.id AND c1.serial_number = c2.serial_number");
+
     // Seed construction_equipment and force update images
     $pdo->exec("INSERT IGNORE INTO construction_equipment (name, serial_number, description, status, image_url) VALUES 
         ('Heavy Duty Excavator', 'EQ-EX-001', 'High-performance hydraulic excavator for major earthmoving and trenching operations.', 'Available', 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800'),
