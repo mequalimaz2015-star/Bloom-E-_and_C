@@ -838,8 +838,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
                 <h1>Latest Projects</h1>
                 <?php foreach ($projects as $p): ?>
                     <a href="#"><span>
-                            <?= date('d', strtotime($p['created_at'])) ?><br>
-                            <?= strtoupper(date('M', strtotime($p['created_at']))) ?>
+                            <?= date('d', strtotime($p['created_at'] ?? 'now')) ?><br>
+                            <?= strtoupper(date('M', strtotime($p['created_at'] ?? 'now'))) ?>
                         </span>
                         <?= htmlspecialchars($p['title'] ?? 'Project') ?>
                     </a>
@@ -861,12 +861,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
         </div>
     </section>
     <section id="sec-7">
-        <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
-            <p>Copyright @
-                <?= date('Y') ?> | Designed by <span>Bloom Africa Team</span>
-            </p>
-            <a href="../admin.php" style="color:rgba(255,255,255,0.3); font-size:11px; text-decoration:none;">Admin
-                Login</a>
+        <div class="container"
+            style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 20px 0;">
+            <p style="margin:0; font-size: 14px; opacity: 0.7;">Copyright @ <?= date('Y') ?> | Designed by <span
+                    style="color: #f39c12; font-weight: 600;">Bloom Africa Team</span></p>
+            <a href="../admin.php"
+                style="display:inline-flex; align-items:center; gap:10px; color:rgba(255,255,255,0.5); font-size:12px; text-decoration:none; padding:10px 24px; border:1px solid rgba(255,255,255,0.1); border-radius:50px; transition:all 0.4s ease; background:rgba(255,255,255,0.03); letter-spacing: 1px; font-weight: 700;"
+                onmouseover="this.style.background='rgba(243, 156, 18, 0.1)'; this.style.borderColor='rgba(243, 156, 18, 0.5)'; this.style.color='#f39c12'; this.style.boxShadow='0 0 20px rgba(243, 156, 18, 0.2)';"
+                onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='rgba(255,255,255,0.5)'; this.style.boxShadow='none';">
+                <i class="fa-solid fa-gauge-high" style="font-size:13px;"></i> ADMIN PORTAL
+            </a>
         </div>
     </section>
     <style>

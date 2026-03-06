@@ -334,7 +334,7 @@ try {
     );
     CREATE TABLE IF NOT EXISTS construction_projects (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
+        title VARCHAR(255) NOT NULL,
         description TEXT,
         status ENUM('Planning', 'Ongoing', 'Completed', 'On Hold') DEFAULT 'Planning',
         image_url VARCHAR(255),
@@ -426,6 +426,12 @@ try {
         }
     }
 
+    // Sync construction_projects column name (name -> title)
+    try {
+        $pdo->exec("ALTER TABLE construction_projects CHANGE COLUMN `name` `title` VARCHAR(255) NOT NULL");
+    } catch (Exception $e) {
+    }
+
     try {
         $pdo->exec("ALTER TABLE construction_equipment ADD COLUMN serial_number VARCHAR(100) AFTER name");
     } catch (Exception $e) {
@@ -453,8 +459,8 @@ try {
         $pdo->exec("INSERT INTO construction_info (company_name, hero_title, hero_image, email, phone, address, why_choose_us_msg, services_desc, review_text, review_image) VALUES 
             ('Bloom Construction', 'WELCOME TO OUR COMPANY', 'uploads/const/hero_1772692960.jpg', 'info@bloomconstruction.et', '+251 911 222 333', 'Addis Ababa, Ethiopia', 'Quality and Excellence in every build.', 'Leading construction services in Ethiopia.', 'The team delivered our project ahead of schedule with exceptional attention to detail. Highly recommend for any major construction work in Addis.', 'uploads/const/review_1772692350.png')");
     } else {
-        // Force update user's specific image if placeholder is detected (Initial sync fix)
-        $pdo->exec("UPDATE construction_info SET hero_image = 'uploads/const/hero_1772692960.jpg' WHERE id = 1 AND (hero_image IS NULL OR hero_image = '')");
+        // Force update user's specific image to ensure it matches local (Overriding a bad previous seed/initial state)
+        $pdo->exec("UPDATE construction_info SET hero_image = 'uploads/const/hero_1772692960.jpg', hero_title = 'WELCOME TO OUR COMPANY' WHERE id = 1");
     }
 
     // Seed construction_services if empty (Using user's local images)
@@ -469,7 +475,7 @@ try {
     // Seed construction_projects if empty
     $check_const_projects = $pdo->query("SELECT COUNT(*) FROM construction_projects")->fetchColumn();
     if ($check_const_projects == 0) {
-        $pdo->exec("INSERT INTO construction_projects (name, description, status, image_url) VALUES 
+        $pdo->exec("INSERT INTO construction_projects (title, description, status, image_url) VALUES 
             ('Skyline Tower', 'A modern 40-story commercial skyscraper featuring sustainable materials and state-of-the-art energy systems.', 'Ongoing', 'Construction/Images/gallery1.jpg'),
             ('Oceanview Residences', 'Luxury residential complex with panoramic ocean views, infinity pools, and high-end finishes throughout.', 'Ongoing', 'Construction/Images/gallery2.jpg'),
             ('City Center Mall', 'Massive retail and entertainment complex in the heart of the city, bringing over 200 premium brands together.', 'Completed', 'Construction/Images/gallery3.jpg')");

@@ -747,7 +747,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         logActivity($pdo, "Updated construction portal info");
         $msg = "Construction portal info updated successfully!";
     } elseif (isset($_POST['save_const_project'])) {
-        $name = $_POST['name'];
+        $title = $_POST['title'] ?? $_POST['name'];
         $desc = $_POST['description'];
         $status = $_POST['status'];
         $start = $_POST['start_date'];
@@ -764,13 +764,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($id) {
-            $stmt = $pdo->prepare("UPDATE construction_projects SET name=?, description=?, status=?, start_date=?, completion_date=?, image_url=? WHERE id=?");
-            $stmt->execute([$name, $desc, $status, $start, $completion, $image_url, $id]);
-            logActivity($pdo, "Updated construction project: " . $name);
+            $stmt = $pdo->prepare("UPDATE construction_projects SET title=?, description=?, status=?, start_date=?, completion_date=?, image_url=? WHERE id=?");
+            $stmt->execute([$title, $desc, $status, $start, $completion, $image_url, $id]);
+            logActivity($pdo, "Updated construction project: " . $title);
         } else {
-            $stmt = $pdo->prepare("INSERT INTO construction_projects (name, description, status, start_date, completion_date, image_url) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$name, $desc, $status, $start, $completion, $image_url]);
-            logActivity($pdo, "Added new construction project: " . $name);
+            $stmt = $pdo->prepare("INSERT INTO construction_projects (title, description, status, start_date, completion_date, image_url) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$title, $desc, $status, $start, $completion, $image_url]);
+            logActivity($pdo, "Added new construction project: " . $title);
         }
         $msg = "Project saved successfully!";
     } elseif (isset($_POST['delete_const_project'])) {

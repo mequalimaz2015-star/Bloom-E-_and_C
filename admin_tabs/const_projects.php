@@ -55,7 +55,7 @@ $projects = $pdo->query("SELECT * FROM construction_projects ORDER BY created_at
                                         </div>
                                         <div>
                                             <div style="font-weight: 700; color: #1e293b;">
-                                                <?= htmlspecialchars($proj['name']) ?>
+                                                <?= htmlspecialchars($proj['title'] ?? $proj['name'] ?? 'Untitled') ?>
                                             </div>
                                             <div style="font-size: 12px; color: #64748b;">
                                                 <?= htmlspecialchars(substr($proj['description'] ?? '', 0, 50)) ?>...
@@ -127,68 +127,67 @@ $projects = $pdo->query("SELECT * FROM construction_projects ORDER BY created_at
             <input type="hidden" name="id" id="projId">
             <input type="hidden" name="existing_image" id="projExistingImage">
 
-            <div style="margin-bottom: 20px;">
-                <label
-                    style="display:block; font-size:12px; font-weight:700; color:#64748b; margin-bottom:8px; text-transform:uppercase;">Project
-                    Name</label>
-                <input type="text" name="name" id="projName" required
-                    style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:12px; outline:none; transition:0.3s;">
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                <div>
-                    <label
-                        style="display:block; font-size:12px; font-weight:700; color:#64748b; margin-bottom:8px; text-transform:uppercase;">Status</label>
-                    <select name="status" id="projStatus"
-                        style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:12px;">
-                        <option value="Planning">Planning</option>
-                        <option value="Ongoing">Ongoing</option>
-                        <option value="Completed">Completed</option>
-                        <option value="On Hold">On Hold</option>
-                    </select>
-                </div>
-                <div>
-                    <label
-                        style="display:block; font-size:12px; font-weight:700; color:#64748b; margin-bottom:8px; text-transform:uppercase;">Project
-                        Photo</label>
-                    <input type="file" name="project_photo" accept="image/*" style="font-size: 11px;">
-                </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                <div>
-                    <label
-                        style="display:block; font-size:12px; font-weight:700; color:#64748b; margin-bottom:8px; text-transform:uppercase;">Start
-                        Date</label>
-                    <input type="date" name="start_date" id="projStart"
-                        style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:12px;">
-                </div>
-                <div>
-                    <label
-                        style="display:block; font-size:12px; font-weight:700; color:#64748b; margin-bottom:8px; text-transform:uppercase;">Commpletion
-                        Date (Est.)</label>
-                    <input type="date" name="completion_date" id="projEnd"
-                        style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:12px;">
-                </div>
-            </div>
-
-            <div style="margin-bottom: 30px;">
-                <label
-                    style="display:block; font-size:12px; font-weight:700; color:#64748b; margin-bottom:8px; text-transform:uppercase;">Project
-                    Description</label>
-                <textarea name="description" id="projDesc" rows="4"
-                    style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:12px; resize:none; outline:none;"></textarea>
-            </div>
-
-            <div style="display:flex; gap:15px; justify-content:flex-end;">
-                <button type="button" onclick="closeModal('addProjectModal')"
-                    style="padding:12px 25px; border-radius:12px; border:1px solid #e2e8f0; background:#fff; color:#64748b; font-weight:600; cursor:pointer;">Cancel</button>
-                <button type="submit"
-                    style="padding:12px 35px; border-radius:12px; border:none; background:#10b981; color:#fff; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(16,185,129,0.39);">Save
-                    Project</button>
-            </div>
-        </form>
+            <label
+                style="display:block; font-size:12px; font-weight:700; color:#64748b; margin-bottom:8px; text-transform:uppercase;">Project
+                Title</label>
+            <input type="text" name="title" id="projTitle" required
+                style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:12px; outline:none; transition:0.3s;">
     </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+        <div>
+            <label
+                style="display:block; font-size:12px; font-weight:700; color:#64748b; margin-bottom:8px; text-transform:uppercase;">Status</label>
+            <select name="status" id="projStatus"
+                style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:12px;">
+                <option value="Planning">Planning</option>
+                <option value="Ongoing">Ongoing</option>
+                <option value="Completed">Completed</option>
+                <option value="On Hold">On Hold</option>
+            </select>
+        </div>
+        <div>
+            <label
+                style="display:block; font-size:12px; font-weight:700; color:#64748b; margin-bottom:8px; text-transform:uppercase;">Project
+                Photo</label>
+            <input type="file" name="project_photo" accept="image/*" style="font-size: 11px;">
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+        <div>
+            <label
+                style="display:block; font-size:12px; font-weight:700; color:#64748b; margin-bottom:8px; text-transform:uppercase;">Start
+                Date</label>
+            <input type="date" name="start_date" id="projStart"
+                style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:12px;">
+        </div>
+        <div>
+            <label
+                style="display:block; font-size:12px; font-weight:700; color:#64748b; margin-bottom:8px; text-transform:uppercase;">Commpletion
+                Date (Est.)</label>
+            <input type="date" name="completion_date" id="projEnd"
+                style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:12px;">
+        </div>
+    </div>
+
+    <div style="margin-bottom: 30px;">
+        <label
+            style="display:block; font-size:12px; font-weight:700; color:#64748b; margin-bottom:8px; text-transform:uppercase;">Project
+            Description</label>
+        <textarea name="description" id="projDesc" rows="4"
+            style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:12px; resize:none; outline:none;"></textarea>
+    </div>
+
+    <div style="display:flex; gap:15px; justify-content:flex-end;">
+        <button type="button" onclick="closeModal('addProjectModal')"
+            style="padding:12px 25px; border-radius:12px; border:1px solid #e2e8f0; background:#fff; color:#64748b; font-weight:600; cursor:pointer;">Cancel</button>
+        <button type="submit"
+            style="padding:12px 35px; border-radius:12px; border:none; background:#10b981; color:#fff; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(16,185,129,0.39);">Save
+            Project</button>
+    </div>
+    </form>
+</div>
 </div>
 
 <script>
@@ -196,7 +195,7 @@ $projects = $pdo->query("SELECT * FROM construction_projects ORDER BY created_at
         document.getElementById(id).style.display = 'block';
         document.getElementById('modalTitle').innerText = 'Add New Project';
         document.getElementById('projId').value = '';
-        document.getElementById('projName').value = '';
+        document.getElementById('projTitle').value = '';
         document.getElementById('projDesc').value = '';
         document.getElementById('projStatus').value = 'Planning';
         document.getElementById('projStart').value = '';
@@ -212,7 +211,7 @@ $projects = $pdo->query("SELECT * FROM construction_projects ORDER BY created_at
         document.getElementById('addProjectModal').style.display = 'block';
         document.getElementById('modalTitle').innerText = 'Edit Project';
         document.getElementById('projId').value = proj.id;
-        document.getElementById('projName').value = proj.name;
+        document.getElementById('projTitle').value = proj.title || proj.name;
         document.getElementById('projDesc').value = proj.description;
         document.getElementById('projStatus').value = proj.status;
         document.getElementById('projStart').value = proj.start_date;
