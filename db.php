@@ -299,6 +299,21 @@ try {
     CREATE TABLE IF NOT EXISTS construction_info (
         id INT AUTO_INCREMENT PRIMARY KEY,
         company_name VARCHAR(255),
+        hero_title VARCHAR(255),
+        hero_subtitle TEXT,
+        hero_description TEXT,
+        hero_image VARCHAR(255),
+        hero_video VARCHAR(255),
+        why_choose_us_title VARCHAR(255),
+        why_choose_us_subtitle TEXT,
+        services_title VARCHAR(255),
+        services_subtitle TEXT,
+        projects_title VARCHAR(255),
+        projects_subtitle TEXT,
+        reviews_title VARCHAR(255),
+        reviews_subtitle TEXT,
+        quote_title VARCHAR(255),
+        quote_subtitle TEXT,
         email VARCHAR(255),
         phone VARCHAR(50),
         address VARCHAR(255),
@@ -387,6 +402,30 @@ try {
     $pdo->exec($setup_queries);
 
     // 6.5 Schema Updates (Ensure newer columns exist)
+    $update_cols = [
+        'hero_title' => "VARCHAR(255)",
+        'hero_subtitle' => "TEXT",
+        'hero_description' => "TEXT",
+        'hero_image' => "VARCHAR(255)",
+        'hero_video' => "VARCHAR(255)",
+        'why_choose_us_title' => "VARCHAR(255)",
+        'why_choose_us_subtitle' => "TEXT",
+        'services_title' => "VARCHAR(255)",
+        'services_subtitle' => "TEXT",
+        'projects_title' => "VARCHAR(255)",
+        'projects_subtitle' => "TEXT",
+        'reviews_title' => "VARCHAR(255)",
+        'reviews_subtitle' => "TEXT",
+        'quote_title' => "VARCHAR(255)",
+        'quote_subtitle' => "TEXT"
+    ];
+    foreach ($update_cols as $col => $type) {
+        try {
+            $pdo->exec("ALTER TABLE construction_info ADD COLUMN `$col` $type");
+        } catch (Exception $e) {
+        }
+    }
+
     try {
         $pdo->exec("ALTER TABLE construction_equipment ADD COLUMN serial_number VARCHAR(100) AFTER name");
     } catch (Exception $e) {
@@ -399,10 +438,7 @@ try {
         $pdo->exec("ALTER TABLE construction_projects ADD COLUMN completion_date DATE AFTER start_date");
     } catch (Exception $e) {
     }
-    try {
-        $pdo->exec("ALTER TABLE construction_info ADD COLUMN hero_video VARCHAR(255) DEFAULT NULL");
-    } catch (Exception $e) {
-    }
+
 
     // 7. Data Seeding
     // Seed company_info if it's empty
@@ -414,8 +450,11 @@ try {
     // Seed construction_info if it's empty
     $check_const = $pdo->query("SELECT COUNT(*) FROM construction_info")->fetchColumn();
     if ($check_const == 0) {
-        $pdo->exec("INSERT INTO construction_info (company_name, email, phone, address, why_choose_us_msg, services_desc, review_text, review_image) VALUES 
-            ('Bloom Construction', 'info@bloomconstruction.et', '+251 911 222 333', 'Addis Ababa, Ethiopia', 'Quality and Excellence in every build.', 'Leading construction services in Ethiopia.', 'The attention to detail in our projects is what defines us. Experience perfection.', 'uploads/const/review_1772692350.png')");
+        $pdo->exec("INSERT INTO construction_info (company_name, hero_title, hero_image, email, phone, address, why_choose_us_msg, services_desc, review_text, review_image) VALUES 
+            ('Bloom Construction', 'WELCOME TO OUR COMPANY', 'uploads/const/hero_1772692960.jpg', 'info@bloomconstruction.et', '+251 911 222 333', 'Addis Ababa, Ethiopia', 'Quality and Excellence in every build.', 'Leading construction services in Ethiopia.', 'The team delivered our project ahead of schedule with exceptional attention to detail. Highly recommend for any major construction work in Addis.', 'uploads/const/review_1772692350.png')");
+    } else {
+        // Force update user's specific image if placeholder is detected (Initial sync fix)
+        $pdo->exec("UPDATE construction_info SET hero_image = 'uploads/const/hero_1772692960.jpg' WHERE id = 1 AND (hero_image IS NULL OR hero_image = '')");
     }
 
     // Seed construction_services if empty (Using user's local images)
