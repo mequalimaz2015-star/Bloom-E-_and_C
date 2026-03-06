@@ -527,142 +527,110 @@ try {
     }
 
 
-    // Force cleanup: delete all but the 3 specific services
-    $pdo->exec("DELETE FROM construction_services WHERE title NOT IN ('Construction Management', 'Renovation', 'Interior Design')");
+    // Check if we need to seed the base structure (if services are missing)
+    $check_seed = $pdo->query("SELECT COUNT(*) FROM construction_services")->fetchColumn();
+    if ($check_seed < 3) {
+        // Seed construction_services (Using user's local images)
+        $pdo->exec("INSERT IGNORE INTO construction_services (title, description, image_url, button_text, button_url) VALUES 
+            ('Construction Management', 'Full lifecycle management of your construction project, ensuring site safety, resource efficiency, and regulatory compliance from start to finish.', 'Construction/Images/card1.jpg', 'Learn More', '#'), 
+            ('Renovation', 'Modernizing existing structures with the latest materials and designs, breathing new life into your residential or commercial space.', 'Construction/Images/card2.jpg', 'Learn More', '#'), 
+            ('Interior Design', 'Creating functional and aesthetically pleasing interior spaces tailored to your personal style and operational needs.', 'Construction/Images/card3.jpg', 'Learn More', '#')");
 
-    // Seed construction_services (Using user's local images)
-    $pdo->exec("INSERT IGNORE INTO construction_services (title, description, image_url, button_text, button_url) VALUES 
-        ('Construction Management', 'Full lifecycle management of your construction project, ensuring site safety, resource efficiency, and regulatory compliance from start to finish.', 'Construction/Images/card1.jpg', 'Learn More', '#'), 
-        ('Renovation', 'Modernizing existing structures with the latest materials and designs, breathing new life into your residential or commercial space.', 'Construction/Images/card2.jpg', 'Learn More', '#'), 
-        ('Interior Design', 'Creating functional and aesthetically pleasing interior spaces tailored to your personal style and operational needs.', 'Construction/Images/card3.jpg', 'Learn More', '#')");
+        $pdo->exec("UPDATE construction_services SET image_url = 'Construction/Images/card1.jpg' WHERE title='Construction Management'");
+        $pdo->exec("UPDATE construction_services SET image_url = 'Construction/Images/card2.jpg' WHERE title='Renovation'");
+        $pdo->exec("UPDATE construction_services SET image_url = 'Construction/Images/card3.jpg' WHERE title='Interior Design'");
 
-    $pdo->exec("UPDATE construction_services SET image_url = 'Construction/Images/card1.jpg' WHERE title='Construction Management'");
-    $pdo->exec("UPDATE construction_services SET image_url = 'Construction/Images/card2.jpg' WHERE title='Renovation'");
-    $pdo->exec("UPDATE construction_services SET image_url = 'Construction/Images/card3.jpg' WHERE title='Interior Design'");
+        // Seed construction_projects
+        $pdo->exec("INSERT IGNORE INTO construction_projects (title, description, status, image_url) VALUES 
+            ('Skyline Tower', 'A modern 40-story commercial skyscraper featuring sustainable materials and state-of-the-art energy systems.', 'Ongoing', 'Construction/Images/gallery1.jpg'),
+            ('Oceanview Residences', 'Luxury residential complex with panoramic ocean views, infinity pools, and high-end finishes throughout.', 'Ongoing', 'Construction/Images/gallery2.jpg'),
+            ('City Center Mall', 'Massive retail and entertainment complex in the heart of the city, bringing over 200 premium brands together.', 'Completed', 'Construction/Images/gallery3.jpg')");
 
-    // Force cleanup: delete all but the 3 specific projects
-    $pdo->exec("DELETE FROM construction_projects WHERE title NOT IN ('Skyline Tower', 'Oceanview Residences', 'City Center Mall')");
+        $pdo->exec("UPDATE construction_projects SET image_url = 'Construction/Images/gallery1.jpg' WHERE title='Skyline Tower'");
+        $pdo->exec("UPDATE construction_projects SET image_url = 'Construction/Images/gallery2.jpg' WHERE title='Oceanview Residences'");
+        $pdo->exec("UPDATE construction_projects SET image_url = 'Construction/Images/gallery3.jpg' WHERE title='City Center Mall'");
 
-    // Seed construction_projects
-    $pdo->exec("INSERT IGNORE INTO construction_projects (title, description, status, image_url) VALUES 
-        ('Skyline Tower', 'A modern 40-story commercial skyscraper featuring sustainable materials and state-of-the-art energy systems.', 'Ongoing', 'Construction/Images/gallery1.jpg'),
-        ('Oceanview Residences', 'Luxury residential complex with panoramic ocean views, infinity pools, and high-end finishes throughout.', 'Ongoing', 'Construction/Images/gallery2.jpg'),
-        ('City Center Mall', 'Massive retail and entertainment complex in the heart of the city, bringing over 200 premium brands together.', 'Completed', 'Construction/Images/gallery3.jpg')");
+        // Seed menu items
+        $pdo->exec("INSERT IGNORE INTO menu_items (name, category, price, description, image_url) VALUES 
+            ('Doro Wat', 'Main Dish', 450.00, 'Spicy chicken stew slow-cooked with berbere, onions, and garlic, served with a hard-boiled egg.', 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=800'),
+            ('Kitfo Traditional', 'Main Dish', 550.00, 'Minced raw beef marinated in mitmita (spicy chili powder) and niter kibbeh (clarified butter).', 'https://images.unsplash.com/photo-1541014741259-df549fa3bb68?q=80&w=800'),
+            ('Injera Special Wrap', 'Fast Food', 320.00, 'Authentic sourdough flatbread wrapped with various fresh vegetables and lean proteins.', 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?q=80&w=800')");
 
-    $pdo->exec("UPDATE construction_projects SET image_url = 'Construction/Images/gallery1.jpg' WHERE title='Skyline Tower'");
-    $pdo->exec("UPDATE construction_projects SET image_url = 'Construction/Images/gallery2.jpg' WHERE title='Oceanview Residences'");
-    $pdo->exec("UPDATE construction_projects SET image_url = 'Construction/Images/gallery3.jpg' WHERE title='City Center Mall'");
+        $pdo->exec("UPDATE menu_items SET image_url = 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=800' WHERE name='Doro Wat'");
+        $pdo->exec("UPDATE menu_items SET image_url = 'https://images.unsplash.com/photo-1541014741259-df549fa3bb68?q=80&w=800' WHERE name='Kitfo Traditional'");
+        $pdo->exec("UPDATE menu_items SET image_url = 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?q=80&w=800' WHERE name='Injera Special Wrap'");
 
-    // Force cleanup: delete all but 3 menu items
-    $pdo->exec("DELETE FROM menu_items WHERE name NOT IN ('Doro Wat', 'Kitfo Traditional', 'Injera Special Wrap')");
-
-    // Seed menu items
-    $pdo->exec("INSERT IGNORE INTO menu_items (name, category, price, description, image_url) VALUES 
-        ('Doro Wat', 'Main Dish', 450.00, 'Spicy chicken stew slow-cooked with berbere, onions, and garlic, served with a hard-boiled egg.', 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=800'),
-        ('Kitfo Traditional', 'Main Dish', 550.00, 'Minced raw beef marinated in mitmita (spicy chili powder) and niter kibbeh (clarified butter).', 'https://images.unsplash.com/photo-1541014741259-df549fa3bb68?q=80&w=800'),
-        ('Injera Special Wrap', 'Fast Food', 320.00, 'Authentic sourdough flatbread wrapped with various fresh vegetables and lean proteins.', 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?q=80&w=800')");
-
-    $pdo->exec("UPDATE menu_items SET image_url = 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=800' WHERE name='Doro Wat'");
-    $pdo->exec("UPDATE menu_items SET image_url = 'https://images.unsplash.com/photo-1541014741259-df549fa3bb68?q=80&w=800' WHERE name='Kitfo Traditional'");
-    $pdo->exec("UPDATE menu_items SET image_url = 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?q=80&w=800' WHERE name='Injera Special Wrap'");
-
-    // Seed default admin if empty
-    $check_users = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
-    if ($check_users == 0) {
-        $admin_pass = password_hash('admin123', PASSWORD_DEFAULT);
-        $pdo->exec("INSERT INTO users (full_name, email, password, role) VALUES ('System Admin', 'admin@bloomafrica.com', '$admin_pass', 'Admin')");
-    }
-
-    // Seed tables if empty
-    $check_tables = $pdo->query("SELECT COUNT(*) FROM tables")->fetchColumn();
-    if ($check_tables == 0) {
-        $tables_to_seed = [
-            [1, 2],
-            [2, 2],
-            [3, 2],
-            [4, 2],
-            [5, 4],
-            [6, 4],
-            [7, 4],
-            [8, 6],
-            [9, 8],
-            [10, 12]
-        ];
-        $stmt_seed = $pdo->prepare("INSERT INTO tables (table_number, capacity) VALUES (?, ?)");
-        foreach ($tables_to_seed as $t) {
-            $stmt_seed->execute($t);
+        // Seed default admin if empty
+        $check_users = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+        if ($check_users == 0) {
+            $admin_pass = password_hash('admin123', PASSWORD_DEFAULT);
+            $pdo->exec("INSERT INTO users (full_name, email, password, role) VALUES ('System Admin', 'admin@bloomafrica.com', '$admin_pass', 'Admin')");
         }
+
+        // Seed tables if empty
+        $check_tables = $pdo->query("SELECT COUNT(*) FROM tables")->fetchColumn();
+        if ($check_tables == 0) {
+            $tables_to_seed = [[1, 2], [2, 2], [3, 2], [4, 2], [5, 4], [6, 4], [7, 4], [8, 6], [9, 8], [10, 12]];
+            $stmt_seed = $pdo->prepare("INSERT INTO tables (table_number, capacity) VALUES (?, ?)");
+            foreach ($tables_to_seed as $t) {
+                $stmt_seed->execute($t);
+            }
+        }
+
+        // Seed construction_equipment and force update images
+        $pdo->exec("INSERT IGNORE INTO construction_equipment (name, serial_number, description, status, image_url) VALUES 
+            ('Heavy Duty Excavator', 'EQ-EX-001', 'High-performance hydraulic excavator for major earthmoving and trenching operations.', 'Available', 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800'),
+            ('Tower Crane - 50M', 'EQ-CR-042', 'Reliable vertical transport for high-rise construction projects with precision control systems.', 'In Use', 'https://images.unsplash.com/photo-1541888946425-d81bb19480c5?q=80&w=800'),
+            ('Industrial Cement Mixer', 'EQ-MX-099', 'Efficient concrete mixing and delivery for structural foundations and large-scale flooring.', 'Available', 'https://images.unsplash.com/photo-1533160600052-a5676735237c?q=80&w=800')");
+
+        $pdo->exec("UPDATE construction_equipment SET image_url = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800' WHERE serial_number='EQ-EX-001'");
+        $pdo->exec("UPDATE construction_equipment SET image_url = 'https://images.unsplash.com/photo-1541888946425-d81bb19480c5?q=80&w=800' WHERE serial_number='EQ-CR-042'");
+        $pdo->exec("UPDATE construction_equipment SET image_url = 'https://images.unsplash.com/photo-1533160600052-a5676735237c?q=80&w=800' WHERE serial_number='EQ-MX-099'");
+
+        // Seed construction_testimonials
+        $pdo->exec("INSERT IGNORE INTO construction_testimonials (client_name, client_role, message, rating, status, image_url) VALUES 
+            ('Samuel Teketo', 'Project Manager, UrbanDev', 'Bloom Construction delivered our high-rise project ahead of schedule with exceptional quality. Their engineering team is second to none.', 5, 'Active', 'https://i.pravatar.cc/150?u=sam'),
+            ('Lydia Gashaw', 'CEO, Rift Valley Estates', 'The attention to detail in our renovation project was amazing. They turned our vision into reality while maintaining strict safety standards.', 5, 'Active', 'https://i.pravatar.cc/150?u=lydia'),
+            ('Dr. Mequannent G.', 'University Coordinator', 'Professionalism and integrity are the core of Bloom. They handled our lab extension with the utmost care and precision.', 5, 'Active', 'https://i.pravatar.cc/150?u=meq')");
+
+        $pdo->exec("UPDATE construction_testimonials SET message = 'Bloom Construction delivered our high-rise project ahead of schedule with exceptional quality. Their engineering team is second to none.' WHERE client_name='Samuel Teketo'");
+        $pdo->exec("UPDATE construction_testimonials SET message = 'The attention to detail in our renovation project was amazing. They turned our vision into reality while maintaining strict safety standards.' WHERE client_name='Lydia Gashaw'");
+        $pdo->exec("UPDATE construction_testimonials SET message = 'Professionalism and integrity are the core of Bloom. They handled our lab extension with the utmost care and precision.' WHERE client_name='Dr. Mequannent G.'");
+
+        // Seed careers (Job Listings)
+        $pdo->exec("INSERT IGNORE INTO jobs (title, category, type, location, description, closing_date, status) VALUES 
+            ('Executive Chef', 'Kitchen', 'Full-time', 'Addis Ababa', 'We are looking for a creative and experienced Executive Chef to lead our kitchen team, design menus, and maintain high standards of culinary excellence.', '2026-04-30', 'Active'),
+            ('Restaurant Manager', 'Management', 'Full-time', 'Addis Ababa', 'Seeking a dynamic Restaurant Manager to oversee daily operations, ensure exceptional guest service, and manage staff to achieve business goals.', '2026-04-15', 'Active'),
+            ('Senior Civil Engineer', 'Construction', 'Full-time', 'Project Site', 'Responsible for overseeing large-scale infrastructure projects, ensuring technical accuracy, and managing onsite engineering teams for Bloom Construction.', '2026-05-20', 'Active')");
+
+        $pdo->exec("UPDATE jobs SET category = 'Kitchen', type = 'Full-time', location = 'Addis Ababa' WHERE title='Executive Chef'");
+        $pdo->exec("UPDATE jobs SET category = 'Management', type = 'Full-time', location = 'Addis Ababa' WHERE title='Restaurant Manager'");
+        $pdo->exec("UPDATE jobs SET category = 'Construction', type = 'Full-time', location = 'Project Site' WHERE title='Senior Civil Engineer'");
+
+        // --- NEW: Force Exactly 3 for Restaurant Services ---
+        $pdo->exec("INSERT IGNORE INTO services (title, description, image_url, category, icon) VALUES 
+            ('Catering Service', 'Professional catering for your events, offering a diverse menu from African to European cuisines.', 'https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=800', 'Catering Service', 'fa-utensils'),
+            ('Food Delivery', 'Hot and fresh meals from our kitchen straight to your doorstep within 30 minutes.', 'https://images.unsplash.com/photo-1526367790999-015078648402?q=80&w=800', 'Food Delivery', 'fa-truck'),
+            ('Wedding Events', 'Creating magical wedding experiences with exquisite décor, world-class dining, and impeccable service.', 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=800', 'Wedding Events', 'fa-heart')");
+
+        // --- NEW: Force Exactly 3 for Team Members ---
+        $pdo->exec("INSERT IGNORE INTO team_members (name, role, image_url) VALUES 
+            ('Mequannent Gashaw', 'Executive Chef', 'https://images.unsplash.com/photo-1583394838336-acd977730f90?q=80&w=800'),
+            ('Samuel Teketo', 'Operations Manager', 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=800'),
+            ('Lydia Gashaw', 'Guest Experience Lead', 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=800')");
+
+        // --- NEW: Force Exactly 3 for Gallery ---
+        $pdo->exec("INSERT IGNORE INTO gallery (title, category, image_url, description) VALUES 
+            ('Elegant Dining', 'Ambience', 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=800', 'Experience our premium seating arrangement.'),
+            ('Culinary Art', 'Food', 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=800', 'Dishes prepared with passion and skill.'),
+            ('Modern Ambience', 'Interior', 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800', 'Contemporary design for a cozy feel.')");
+
+        // --- NEW: Force Exactly 3 for Construction Highlight Features ---
+        $pdo->exec("INSERT IGNORE INTO construction_features (title, description, icon_class) VALUES 
+            ('Expert Engineering', 'Top-tier structural engineering solutions for any scale.', 'fa-hard-hat'),
+            ('Modern Technology', 'Using the latest BIM and drone inspection tools.', 'fa-microchip'),
+            ('Sustainable Building', 'Eco-friendly materials and energy-efficient designs.', 'fa-leaf')");
     }
-
-    // Force cleanup: delete all but the 3 specific equipment items
-    $pdo->exec("DELETE FROM construction_equipment WHERE serial_number NOT IN ('EQ-EX-001', 'EQ-CR-042', 'EQ-MX-099')");
-
-    // Remove duplicates if any (in case UNIQUE constraint wasn't yet applied)
-    $pdo->exec("DELETE c1 FROM construction_equipment c1 INNER JOIN construction_equipment c2 WHERE c1.id > c2.id AND c1.serial_number = c2.serial_number");
-
-    // Seed construction_equipment and force update images
-    $pdo->exec("INSERT IGNORE INTO construction_equipment (name, serial_number, description, status, image_url) VALUES 
-        ('Heavy Duty Excavator', 'EQ-EX-001', 'High-performance hydraulic excavator for major earthmoving and trenching operations.', 'Available', 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800'),
-        ('Tower Crane - 50M', 'EQ-CR-042', 'Reliable vertical transport for high-rise construction projects with precision control systems.', 'In Use', 'https://images.unsplash.com/photo-1541888946425-d81bb19480c5?q=80&w=800'),
-        ('Industrial Cement Mixer', 'EQ-MX-099', 'Efficient concrete mixing and delivery for structural foundations and large-scale flooring.', 'Available', 'https://images.unsplash.com/photo-1533160600052-a5676735237c?q=80&w=800')");
-
-    $pdo->exec("UPDATE construction_equipment SET image_url = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800' WHERE serial_number='EQ-EX-001'");
-    $pdo->exec("UPDATE construction_equipment SET image_url = 'https://images.unsplash.com/photo-1541888946425-d81bb19480c5?q=80&w=800' WHERE serial_number='EQ-CR-042'");
-    $pdo->exec("UPDATE construction_equipment SET image_url = 'https://images.unsplash.com/photo-1533160600052-a5676735237c?q=80&w=800' WHERE serial_number='EQ-MX-099'");
-
-    // Force cleanup: delete all but 3 testimonials
-    $pdo->exec("DELETE FROM construction_testimonials WHERE client_name NOT IN ('Samuel Teketo', 'Lydia Gashaw', 'Dr. Mequannent G.')");
-
-    // Seed construction_testimonials
-    $pdo->exec("INSERT IGNORE INTO construction_testimonials (client_name, client_role, message, rating, status, image_url) VALUES 
-        ('Samuel Teketo', 'Project Manager, UrbanDev', 'Bloom Construction delivered our high-rise project ahead of schedule with exceptional quality. Their engineering team is second to none.', 5, 'Active', 'https://i.pravatar.cc/150?u=sam'),
-        ('Lydia Gashaw', 'CEO, Rift Valley Estates', 'The attention to detail in our renovation project was amazing. They turned our vision into reality while maintaining strict safety standards.', 5, 'Active', 'https://i.pravatar.cc/150?u=lydia'),
-        ('Dr. Mequannent G.', 'University Coordinator', 'Professionalism and integrity are the core of Bloom. They handled our lab extension with the utmost care and precision.', 5, 'Active', 'https://i.pravatar.cc/150?u=meq')");
-
-    $pdo->exec("UPDATE construction_testimonials SET message = 'Bloom Construction delivered our high-rise project ahead of schedule with exceptional quality. Their engineering team is second to none.' WHERE client_name='Samuel Teketo'");
-    $pdo->exec("UPDATE construction_testimonials SET message = 'The attention to detail in our renovation project was amazing. They turned our vision into reality while maintaining strict safety standards.' WHERE client_name='Lydia Gashaw'");
-    $pdo->exec("UPDATE construction_testimonials SET message = 'Professionalism and integrity are the core of Bloom. They handled our lab extension with the utmost care and precision.' WHERE client_name='Dr. Mequannent G.'");
-
-    // Force cleanup: delete all but 3 specific job listings
-    $pdo->exec("DELETE FROM jobs WHERE title NOT IN ('Executive Chef', 'Restaurant Manager', 'Senior Civil Engineer')");
-
-    // Seed careers (Job Listings)
-    $pdo->exec("INSERT IGNORE INTO jobs (title, category, type, location, description, closing_date, status) VALUES 
-        ('Executive Chef', 'Kitchen', 'Full-time', 'Addis Ababa', 'We are looking for a creative and experienced Executive Chef to lead our kitchen team, design menus, and maintain high standards of culinary excellence.', '2026-04-30', 'Active'),
-        ('Restaurant Manager', 'Management', 'Full-time', 'Addis Ababa', 'Seeking a dynamic Restaurant Manager to oversee daily operations, ensure exceptional guest service, and manage staff to achieve business goals.', '2026-04-15', 'Active'),
-        ('Senior Civil Engineer', 'Construction', 'Full-time', 'Project Site', 'Responsible for overseeing large-scale infrastructure projects, ensuring technical accuracy, and managing onsite engineering teams for Bloom Construction.', '2026-05-20', 'Active')");
-
-    $pdo->exec("UPDATE jobs SET category = 'Kitchen', type = 'Full-time', location = 'Addis Ababa' WHERE title='Executive Chef'");
-    $pdo->exec("UPDATE jobs SET category = 'Management', type = 'Full-time', location = 'Addis Ababa' WHERE title='Restaurant Manager'");
-    $pdo->exec("UPDATE jobs SET category = 'Construction', type = 'Full-time', location = 'Project Site' WHERE title='Senior Civil Engineer'");
-
-    // --- NEW: Force Exactly 3 for Restaurant Services ---
-    $pdo->exec("DELETE FROM services WHERE title NOT IN ('Catering Service', 'Food Delivery', 'Wedding Events')");
-    $pdo->exec("INSERT IGNORE INTO services (title, description, image_url, category, icon) VALUES 
-        ('Catering Service', 'Professional catering for your events, offering a diverse menu from African to European cuisines.', 'https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=800', 'Catering Service', 'fa-utensils'),
-        ('Food Delivery', 'Hot and fresh meals from our kitchen straight to your doorstep within 30 minutes.', 'https://images.unsplash.com/photo-1526367790999-015078648402?q=80&w=800', 'Food Delivery', 'fa-truck'),
-        ('Wedding Events', 'Creating magical wedding experiences with exquisite décor, world-class dining, and impeccable service.', 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=800', 'Wedding Events', 'fa-heart')");
-
-    // --- NEW: Force Exactly 3 for Team Members ---
-    $pdo->exec("DELETE FROM team_members WHERE name NOT IN ('Mequannent Gashaw', 'Samuel Teketo', 'Lydia Gashaw')");
-    $pdo->exec("INSERT IGNORE INTO team_members (name, role, image_url) VALUES 
-        ('Mequannent Gashaw', 'Executive Chef', 'https://images.unsplash.com/photo-1583394838336-acd977730f90?q=80&w=800'),
-        ('Samuel Teketo', 'Operations Manager', 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=800'),
-        ('Lydia Gashaw', 'Guest Experience Lead', 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=800')");
-
-    // --- NEW: Force Exactly 3 for Gallery ---
-    $pdo->exec("DELETE FROM gallery WHERE title NOT IN ('Elegant Dining', 'Culinary Art', 'Modern Ambience')");
-    $pdo->exec("INSERT IGNORE INTO gallery (title, category, image_url, description) VALUES 
-        ('Elegant Dining', 'Ambience', 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=800', 'Experience our premium seating arrangement.'),
-        ('Culinary Art', 'Food', 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=800', 'Dishes prepared with passion and skill.'),
-        ('Modern Ambience', 'Interior', 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800', 'Contemporary design for a cozy feel.')");
-
-    // --- NEW: Force Exactly 3 for Construction Highlight Features ---
-    $pdo->exec("DELETE FROM construction_features WHERE title NOT IN ('Expert Engineering', 'Modern Technology', 'Sustainable Building')");
-    $pdo->exec("INSERT IGNORE INTO construction_features (title, description, icon_class) VALUES 
-        ('Expert Engineering', 'Top-tier structural engineering solutions for any scale.', 'fa-hard-hat'),
-        ('Modern Technology', 'Using the latest BIM and drone inspection tools.', 'fa-microchip'),
-        ('Sustainable Building', 'Eco-friendly materials and energy-efficient designs.', 'fa-leaf')");
 
 } catch (PDOException $e) {
     die("Database Setup Error: " . $e->getMessage());

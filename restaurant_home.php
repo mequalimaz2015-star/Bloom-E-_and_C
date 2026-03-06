@@ -2179,7 +2179,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
         <div class="job-grid">
             <?php
             // Fetch only active jobs that haven't reached their closing date/time
-            $active_jobs = $pdo->query("SELECT * FROM jobs WHERE status = 'Active' AND (closing_date IS NULL OR closing_date >= NOW()) ORDER BY id DESC")->fetchAll();
+            $active_jobs = $pdo->query("SELECT * FROM jobs WHERE status = 'Active' AND (closing_date IS NULL OR closing_date >= NOW()) ORDER BY id DESC LIMIT 3")->fetchAll();
             if (count($active_jobs) > 0):
                 foreach ($active_jobs as $job):
                     $time_left = strtotime($job['closing_date']) - time();
