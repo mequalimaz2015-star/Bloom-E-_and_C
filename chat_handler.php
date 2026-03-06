@@ -226,12 +226,22 @@ offers:";
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    // Incremental poll: only return messages newer than last_id
+    if (isset($_GET['poll']) && isset($_GET['last_id'])) {
+        $last_id = (int) $_GET['last_id'];
+        $stmt = $pdo->prepare("SELECT id, sender, message, image_path, location_lat, location_lng, created_at FROM chat_messages WHERE session_id = ? AND id > ? ORDER BY created_at ASC");
+        $stmt->execute([$session_id, $last_id]);
+        $new_messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode(['success' => true, 'new_messages' => $new_messages]);
+        exit;
+    }
+
+    // Full history load
     $stmt = $pdo->prepare("SELECT * FROM chat_sessions WHERE session_id = ?");
     $stmt->execute([$session_id]);
     $session = $stmt->fetch();
 
-    $stmt = $pdo->prepare("SELECT id, sender, message, image_path, location_lat, location_lng, created_at FROM chat_messages
-WHERE session_id = ? ORDER BY created_at ASC");
+    $stmt = $pdo->prepare("SELECT id, sender, message, image_path, location_lat, location_lng, created_at FROM chat_messages WHERE session_id = ? ORDER BY created_at ASC");
     $stmt->execute([$session_id]);
     $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

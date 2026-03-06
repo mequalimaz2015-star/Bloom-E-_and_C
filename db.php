@@ -636,6 +636,34 @@ try {
     $pdo->exec("UPDATE jobs SET category = 'Management', type = 'Full-time', location = 'Addis Ababa' WHERE title='Restaurant Manager'");
     $pdo->exec("UPDATE jobs SET category = 'Construction', type = 'Full-time', location = 'Project Site' WHERE title='Senior Civil Engineer'");
 
+    // --- NEW: Force Exactly 3 for Restaurant Services ---
+    $pdo->exec("DELETE FROM services WHERE title NOT IN ('Catering Service', 'Food Delivery', 'Wedding Events')");
+    $pdo->exec("INSERT IGNORE INTO services (title, description, image_url, category, icon) VALUES 
+        ('Catering Service', 'Professional catering for your events, offering a diverse menu from African to European cuisines.', 'https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=800', 'Catering Service', 'fa-utensils'),
+        ('Food Delivery', 'Hot and fresh meals from our kitchen straight to your doorstep within 30 minutes.', 'https://images.unsplash.com/photo-1526367790999-015078648402?q=80&w=800', 'Food Delivery', 'fa-truck'),
+        ('Wedding Events', 'Creating magical wedding experiences with exquisite décor, world-class dining, and impeccable service.', 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=800', 'Wedding Events', 'fa-heart')");
+
+    // --- NEW: Force Exactly 3 for Team Members ---
+    $pdo->exec("DELETE FROM team_members WHERE name NOT IN ('Mequannent Gashaw', 'Samuel Teketo', 'Lydia Gashaw')");
+    $pdo->exec("INSERT IGNORE INTO team_members (name, role, image_url) VALUES 
+        ('Mequannent Gashaw', 'Executive Chef', 'https://images.unsplash.com/photo-1583394838336-acd977730f90?q=80&w=800'),
+        ('Samuel Teketo', 'Operations Manager', 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=800'),
+        ('Lydia Gashaw', 'Guest Experience Lead', 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=800')");
+
+    // --- NEW: Force Exactly 3 for Gallery ---
+    $pdo->exec("DELETE FROM gallery WHERE title NOT IN ('Elegant Dining', 'Culinary Art', 'Modern Ambience')");
+    $pdo->exec("INSERT IGNORE INTO gallery (title, category, image_url, description) VALUES 
+        ('Elegant Dining', 'Ambience', 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=800', 'Experience our premium seating arrangement.'),
+        ('Culinary Art', 'Food', 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?q=80&w=800', 'Dishes prepared with passion and skill.'),
+        ('Modern Ambience', 'Interior', 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800', 'Contemporary design for a cozy feel.')");
+
+    // --- NEW: Force Exactly 3 for Construction Highlight Features ---
+    $pdo->exec("DELETE FROM construction_features WHERE title NOT IN ('Expert Engineering', 'Modern Technology', 'Sustainable Building')");
+    $pdo->exec("INSERT IGNORE INTO construction_features (title, description, icon_class) VALUES 
+        ('Expert Engineering', 'Top-tier structural engineering solutions for any scale.', 'fa-hard-hat'),
+        ('Modern Technology', 'Using the latest BIM and drone inspection tools.', 'fa-microchip'),
+        ('Sustainable Building', 'Eco-friendly materials and energy-efficient designs.', 'fa-leaf')");
+
 } catch (PDOException $e) {
     die("Database Setup Error: " . $e->getMessage());
 }

@@ -1125,6 +1125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
     </div>
     <script>
         let chatPollInterval = null;
+        let lastSeenMsgId = 0;
         function registerChat() {
             const name = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim();
@@ -1158,17 +1159,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
 
             if (win.style.display === 'flex') {
                 checkChatReg();
-                chatPollInterval = setInterval(loadChatHistory, 3000);
+                if (chatPollInterval) clearInterval(chatPollInterval);
+                chatPollInterval = setInterval(pollNewMessages, 3000);
             } else {
                 clearInterval(chatPollInterval);
+                chatPollInterval = null;
             }
         }
 
         function checkChatReg() {
-            fetch('../chat_handler.php?check_reg=1')
+            fetch('../chat_handler.php')
                 .then(res => res.json())
                 .then(data => {
-                    if (data.registered && data.customer.department === 'Construction') {
+                    if (data.registered) {
                         showChatInterface();
                         loadChatHistory();
                     } else {
@@ -1237,9 +1240,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
                 .then(res => res.json())
                 .then(data => {
                     if (data.messages && data.registered) {
-                        data.messages.forEach(m => appendMessage(m.sender, m.message, [], m.id));
+                        data.messages.forEach(m => {
+                            appendMessage(m.sender, m.message, [], m.id);
+                            if (m.id > lastSeenMsgId) lastSeenMsgId = parseInt(m.id);
+                        });
                     }
                 });
+        }
+
+        function pollNewMessages() {
+            fetch('../chat_handler.php?poll=1&last_id=' + lastSeenMsgId)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.new_messages && data.new_messages.length > 0) {
+                        data.new_messages.forEach(m => {
+                            appendMessage(m.sender, m.message, [], m.id);
+                            if (m.id > lastSeenMsgId) lastSeenMsgId = parseInt(m.id);
+                        });
+                    }
+                })
+                .catch(() => { });
         }
     </script>
     <div class="float-btn-group" id="socialFloatGroup">

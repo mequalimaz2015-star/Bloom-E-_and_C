@@ -2912,6 +2912,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
     </div>
     <script>
         let chatPollInterval = null;
+        let lastSeenMsgId = 0;
         function registerChat() {
             const name = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim();
@@ -2945,17 +2946,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
 
             if (win.style.display === 'flex') {
                 checkChatReg();
-                chatPollInterval = setInterval(loadChatHistory, 3000);
+                if (chatPollInterval) clearInterval(chatPollInterval);
+                chatPollInterval = setInterval(pollNewMessages, 3000);
             } else {
                 clearInterval(chatPollInterval);
+                chatPollInterval = null;
             }
         }
 
         function checkChatReg() {
-            fetch('chat_handler.php?check_reg=1') // Added query param to differentiate from message history fetch
+            fetch('chat_handler.php')
                 .then(res => res.json())
                 .then(data => {
-                    if (data.registered && data.customer.department === 'Restaurant') {
+                    if (data.registered) {
                         showChatInterface();
                         loadChatHistory();
                     } else {
@@ -3019,13 +3022,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
             container.scrollTop = container.scrollHeight;
         }
         function loadChatHistory() {
+            // Initial full load
             fetch('chat_handler.php')
                 .then(res => res.json())
                 .then(data => {
                     if (data.messages && data.registered) {
-                        data.messages.forEach(m => appendMessage(m.sender, m.message, [], m.id));
+                        data.messages.forEach(m => {
+                            appendMessage(m.sender, m.message, [], m.id);
+                            if (m.id > lastSeenMsgId) lastSeenMsgId = parseInt(m.id);
+                        });
                     }
                 });
+        }
+
+        function pollNewMessages() {
+            // Only fetch messages newer than the last one we've seen
+            fetch('chat_handler.php?poll=1&last_id=' + lastSeenMsgId)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.new_messages && data.new_messages.length > 0) {
+                        data.new_messages.forEach(m => {
+                            appendMessage(m.sender, m.message, [], m.id);
+                            if (m.id > lastSeenMsgId) lastSeenMsgId = parseInt(m.id);
+                        });
+                    }
+                })
+                .catch(() => { }); // Silently fail on network error
         }
     </script>
     <div class="float-btn-group" id="socialFloatGroup">
@@ -3033,16 +3055,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
             <i class="fa-solid fa-robot"></i>
         </div>
         <?php if (!empty($company['telegram'])): ?>
-                    <a href="<?= htmlspecialchars($company['telegram']) ?>" class="telegram-float" target="_blank"
-                        rel="noopener noreferrer" data-tooltip="Chat on Telegram">
-                        <i class="fa-brands fa-telegram"></i>
-                    </a>
+            <a href="<?= htmlspecialchars($company['telegram']) ?>" class="telegram-float" target="_blank"
+                rel="noopener noreferrer" data-tooltip="Chat on Telegram">
+                <i class="fa-brands fa-telegram"></i>
+            </a>
         <?php endif; ?>
         <?php if (!empty($company['whatsapp'])): ?>
-                    <a href="<?= htmlspecialchars($company['whatsapp']) ?>" class="whatsapp-float" target="_blank"
-                        rel="noopener noreferrer" data-tooltip="Order on WhatsApp">
-                        <i class="fa-brands fa-whatsapp"></i>
-                    </a>
+            <a href="<?= htmlspecialchars($company['whatsapp']) ?>" class="whatsapp-float" target="_blank"
+                rel="noopener noreferrer" data-tooltip="Order on WhatsApp">
+                <i class="fa-brands fa-whatsapp"></i>
+            </a>
         <?php endif; ?>
     </div>
 
