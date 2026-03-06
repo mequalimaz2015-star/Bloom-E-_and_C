@@ -1116,28 +1116,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->prepare("DELETE FROM team_members WHERE id=?")->execute([$id]);
         logActivity($pdo, "Removed team member ID: " . $id);
         $msg = "Team member removed from the list.";
-    } elseif (isset($_POST['add_gallery'])) {
-        $title = $_POST['title'];
-        $category = $_POST['category'];
-        $desc = $_POST['description'];
-        $image_url = "";
-
-        if (isset($_FILES['gallery_photo']) && $_FILES['gallery_photo']['error'] == 0) {
-            $new_path = "uploads/gallery/gal_" . time() . "_" . rand(100, 999) . "." . pathinfo($_FILES['gallery_photo']['name'], PATHINFO_EXTENSION);
-            if (!is_dir(__DIR__ . "/../uploads/gallery/"))
-                mkdir(__DIR__ . "/../uploads/gallery/", 0777, true);
-            if (move_uploaded_file($_FILES['gallery_photo']['tmp_name'], __DIR__ . "/../" . $new_path))
-                $image_url = $new_path;
-        }
-
-        if ($image_url) {
-            $stmt = $pdo->prepare("INSERT INTO gallery (image_url, category, title, description) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$image_url, $category, $title, $desc]);
-            logActivity($pdo, "Added new gallery image: " . $title);
-            $msg = "Image successfully added to the gallery!";
-        } else {
-            $msg = "Error: Failed to upload gallery image.";
-        }
     } elseif (isset($_POST['update_user_permissions'])) {
         $user_id = $_POST['user_id'];
         $role = $_POST['role'];

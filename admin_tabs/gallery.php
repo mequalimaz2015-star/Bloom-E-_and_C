@@ -33,7 +33,7 @@ $gallery_count = count($gallery);
                 style="width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb;"> Select All
         </label>
         <!-- Import from Directory Button -->
-        <a href="../import_gallery.php" target="_blank" class="btn"
+        <a href="import_gallery.php" target="_blank" class="btn"
             style="background: #7c3aed; color: #fff; border-radius: 10px; padding: 10px 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; text-decoration: none;"
             title="Auto-import all images from uploads/gallery folder into the database">
             <i class="fa-solid fa-folder-open"></i> Import from Directory
@@ -60,8 +60,8 @@ $gallery_count = count($gallery);
             </div>
             <!-- Image -->
             <div style="position: relative; height: 190px; overflow: hidden;">
-                <img src="../<?= htmlspecialchars($img['image_url']) ?>"
-                    style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+                <img src="<?= htmlspecialchars($img['image_url']) ?>" style="width: 100%; height: 100%; object-fit: cover;"
+                    loading="lazy">
                 <!-- Category Badge -->
                 <span
                     style="position: absolute; top: 10px; left: 10px; background: rgba(67,97,238,0.9); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.5px; text-transform: uppercase;">
