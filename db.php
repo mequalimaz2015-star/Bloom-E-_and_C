@@ -573,13 +573,15 @@ try {
     }
 
     // Seed construction_equipment if empty
-    $check_equip = $pdo->query("SELECT COUNT(*) FROM construction_equipment")->fetchColumn();
-    if ($check_equip == 0) {
-        $pdo->exec("INSERT INTO construction_equipment (name, serial_number, description, status, image_url) VALUES 
-            ('Heavy Duty Excavator', 'EQ-EX-001', 'High-performance hydraulic excavator for major earthmoving and trenching operations.', 'Available', 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800'),
-            ('Tower Crane - 50M', 'EQ-CR-042', 'Reliable vertical transport for high-rise construction projects with precision control systems.', 'In Use', 'https://images.unsplash.com/photo-1541888946425-d81bb19480c5?q=80&w=800'),
-            ('Industrial Cement Mixer', 'EQ-MX-099', 'Efficient concrete mixing and delivery for structural foundations and large-scale flooring.', 'Available', 'https://images.unsplash.com/photo-1533160600052-a5676735237c?q=80&w=800')");
-    }
+    // Seed construction_equipment and force update images
+    $pdo->exec("INSERT IGNORE INTO construction_equipment (name, serial_number, description, status, image_url) VALUES 
+        ('Heavy Duty Excavator', 'EQ-EX-001', 'High-performance hydraulic excavator for major earthmoving and trenching operations.', 'Available', 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800'),
+        ('Tower Crane - 50M', 'EQ-CR-042', 'Reliable vertical transport for high-rise construction projects with precision control systems.', 'In Use', 'https://images.unsplash.com/photo-1541888946425-d81bb19480c5?q=80&w=800'),
+        ('Industrial Cement Mixer', 'EQ-MX-099', 'Efficient concrete mixing and delivery for structural foundations and large-scale flooring.', 'Available', 'https://images.unsplash.com/photo-1533160600052-a5676735237c?q=80&w=800')");
+
+    $pdo->exec("UPDATE construction_equipment SET image_url = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800' WHERE serial_number='EQ-EX-001'");
+    $pdo->exec("UPDATE construction_equipment SET image_url = 'https://images.unsplash.com/photo-1541888946425-d81bb19480c5?q=80&w=800' WHERE serial_number='EQ-CR-042'");
+    $pdo->exec("UPDATE construction_equipment SET image_url = 'https://images.unsplash.com/photo-1533160600052-a5676735237c?q=80&w=800' WHERE serial_number='EQ-MX-099'");
 
     // Seed construction_testimonials if empty
     $check_testim = $pdo->query("SELECT COUNT(*) FROM construction_testimonials")->fetchColumn();

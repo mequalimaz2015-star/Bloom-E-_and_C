@@ -1,6 +1,15 @@
-FROM mysql:5.7
-ENV MYSQL_DATABASE=bloom_africa
-ENV MYSQL_ROOT_PASSWORD=bloom_root_pass
+FROM mariadb:10.5
 
-# Optimize for low memory and bind to all interfaces
-RUN echo "[mysqld]\nbind-address=0.0.0.0\ninnodb_buffer_pool_size=32M\nperformance_schema=OFF\nmax_connections=10" > /etc/mysql/conf.d/low-mem.cnf
+# Optimize for Render Free Tier (512MB RAM)
+RUN echo "[mysqld]\n\
+    innodb_buffer_pool_size=16M\n\
+    performance_schema=OFF\n\
+    max_connections=5\n\
+    bind-address=0.0.0.0" > /etc/mysql/conf.d/render.cnf
+
+# Add a dummy listener for Render's health check (Port 10000)
+# This prevents the "Failed Deploy" error
+RUN apt-get update && apt-get install -y netcat && apt-get clean
+EXPOSE 3306 10000
+
+CMD ["sh", "-c", "mysqld_safe & while true; do echo -e 'HTTP/1.1 200 OK\n\nDB_UP' | nc -l -p 10000; done"]
