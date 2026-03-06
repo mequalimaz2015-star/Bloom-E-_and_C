@@ -39,12 +39,19 @@ DB_NAME=${BLOOM_DB_NAME:-bloom_africa}
 DB_PASS=${BLOOM_DB_PASS:-bloom_root_pass}
 
 echo ">>> Configuring Database: $DB_NAME"
-# Attempt to set root password and create user for 127.0.0.1
-mysql -u root -e "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\`;"
-mysql -u root -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$DB_PASS');" || true
-mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' IDENTIFIED BY '$DB_PASS' WITH GRANT OPTION;" || true
-mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' IDENTIFIED BY '$DB_PASS' WITH GRANT OPTION;" || true
-mysql -u root -e "FLUSH PRIVILEGES;"
+
+# Create setup script to run all at once
+cat <<EOF > /tmp/db_setup.sql
+CREATE DATABASE IF NOT EXISTS \`$DB_NAME\`;
+SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$DB_PASS');
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' IDENTIFIED BY '$DB_PASS' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' IDENTIFIED BY '$DB_PASS' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+EOF
+
+# Run setup using root (try both with and without password to be safe)
+mysql -u root < /tmp/db_setup.sql || mysql -u root -p"$DB_PASS" < /tmp/db_setup.sql
+rm /tmp/db_setup.sql
 
 echo ">>> Database successfully initialized."
 
