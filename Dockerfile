@@ -1,15 +1,27 @@
 FROM php:7.4-apache
 
-# Install PDO and MySQLi extensions
-RUN docker-php-ext-install pdo pdo_mysql mysqli
+# Install MariaDB Server and PHP extensions
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y mariadb-server && \
+    docker-php-ext-install pdo pdo_mysql mysqli && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Enable Apache mod_rewrite (if needed for pretty URLs)
+# Config MySQL for low memory (Super Important for Render Free Tier)
+RUN echo "[mysqld]\n\
+    skip-name-resolve\n\
+    innodb_buffer_pool_size = 32M\n\
+    max_connections = 10\n\
+    performance_schema = OFF\n" > /etc/mysql/mariadb.conf.d/low-memory.cnf
+
+# Enable Apache mod_rewrite
 RUN a2enmod rewrite
+
+# Setup Startup Script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # Set the working directory
 WORKDIR /var/www/html
-
-# Copy project files to the container
 COPY . /var/www/html/
 
 # Ensure proper permissions
@@ -17,3 +29,6 @@ RUN chown -R www-data:www-data /var/www/html/
 
 # Expose port 80
 EXPOSE 80
+
+# Start everything
+CMD ["/entrypoint.sh"]
