@@ -1,14 +1,5 @@
 <?php
-// Set session cookie parameters before starting session
-if (session_status() === PHP_SESSION_NONE) {
-    session_set_cookie_params([
-        'path' => '/',
-        'secure' => true,
-        'httponly' => true,
-        'samesite' => 'Lax'
-    ]);
-    session_start();
-}
+require_once 'session_init.php';
 require_once 'db.php';
 
 if (!isset($_SESSION['chat_session'])) {
@@ -239,7 +230,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt->execute([$session_id]);
     $session = $stmt->fetch();
 
-    $stmt = $pdo->prepare("SELECT sender, message, image_path, location_lat, location_lng, created_at FROM chat_messages
+    $stmt = $pdo->prepare("SELECT id, sender, message, image_path, location_lat, location_lng, created_at FROM chat_messages
 WHERE session_id = ? ORDER BY created_at ASC");
     $stmt->execute([$session_id]);
     $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -1,4 +1,5 @@
 <?php
+require_once '../session_init.php';
 require_once '../db.php';
 
 // Fetch Construction Info
@@ -1195,13 +1196,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
                 });
         }
 
-        function appendMessage(sender, text, buttons = []) {
+        function appendMessage(sender, text, buttons = [], id = null) {
             const container = document.getElementById('chatMessages');
-            const exists = Array.from(container.children).some(c => c.dataset.text === text && c.dataset.sender === sender && !buttons.length);
-            if (exists) return;
+
+            if (id) {
+                if (container.querySelector(`[data-msgid="${id}"]`)) return;
+            } else {
+                const exists = Array.from(container.children).some(c => c.dataset.text === text && c.dataset.sender === sender && !buttons.length);
+                if (exists) return;
+            }
 
             const div = document.createElement('div');
             div.className = `chat-bubble ${sender.toLowerCase()}`;
+            if (id) div.dataset.msgid = id;
             div.innerHTML = `<strong>${sender}:</strong> <br> ${text.replace(/\n/g, '<br>')}`;
 
             if (buttons && buttons.length > 0) {
@@ -1230,7 +1237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
                 .then(res => res.json())
                 .then(data => {
                     if (data.messages && data.registered) {
-                        data.messages.forEach(m => appendMessage(m.sender, m.message));
+                        data.messages.forEach(m => appendMessage(m.sender, m.message, [], m.id));
                     }
                 });
         }

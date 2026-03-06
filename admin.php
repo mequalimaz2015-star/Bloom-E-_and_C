@@ -1,4 +1,4 @@
-<?php session_start();
+<?php require_once 'session_init.php';
 require_once 'db.php';
 
 // Auth logic

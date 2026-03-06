@@ -1,4 +1,5 @@
 <?php
+require_once 'session_init.php';
 require_once 'db.php';
 // Fetch menu items
 $stmt = $pdo->query("SELECT * FROM menu_items WHERE available = 1");
@@ -2981,14 +2982,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
                     if (data.reply) appendMessage('Bot', data.reply, data.buttons);
                 });
         }
-        function appendMessage(sender, text, buttons = []) {
+        function appendMessage(sender, text, buttons = [], id = null) {
             const container = document.getElementById('chatMessages');
 
-            // For User messages, we skip duplicates. For bot with buttons, we allow showing buttons on last msg.
-            const exists = Array.from(container.children).some(c => c.dataset.text === text && c.dataset.sender === sender && !buttons.length);
-            if (exists) return;
+            // Robust duplicate check using ID or text/sender combo
+            if (id) {
+                if (container.querySelector(`[data-msgid="${id}"]`)) return;
+            } else {
+                const exists = Array.from(container.children).some(c => c.dataset.text === text && c.dataset.sender === sender && !buttons.length);
+                if (exists) return;
+            }
+
             const div = document.createElement('div');
             div.className = `chat-bubble ${sender.toLowerCase()}`;
+            if (id) div.dataset.msgid = id;
             div.innerHTML = `<strong>${sender}:</strong> <br> ${text.replace(/\n/g, '<br>')}`;
 
             if (buttons && buttons.length > 0) {
@@ -3016,7 +3023,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
                 .then(res => res.json())
                 .then(data => {
                     if (data.messages && data.registered) {
-                        data.messages.forEach(m => appendMessage(m.sender, m.message));
+                        data.messages.forEach(m => appendMessage(m.sender, m.message, [], m.id));
                     }
                 });
         }
@@ -3026,16 +3033,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['apply_job'])) {
             <i class="fa-solid fa-robot"></i>
         </div>
         <?php if (!empty($company['telegram'])): ?>
-            <a href="<?= htmlspecialchars($company['telegram']) ?>" class="telegram-float" target="_blank"
-                rel="noopener noreferrer" data-tooltip="Chat on Telegram">
-                <i class="fa-brands fa-telegram"></i>
-            </a>
+                    <a href="<?= htmlspecialchars($company['telegram']) ?>" class="telegram-float" target="_blank"
+                        rel="noopener noreferrer" data-tooltip="Chat on Telegram">
+                        <i class="fa-brands fa-telegram"></i>
+                    </a>
         <?php endif; ?>
         <?php if (!empty($company['whatsapp'])): ?>
-            <a href="<?= htmlspecialchars($company['whatsapp']) ?>" class="whatsapp-float" target="_blank"
-                rel="noopener noreferrer" data-tooltip="Order on WhatsApp">
-                <i class="fa-brands fa-whatsapp"></i>
-            </a>
+                    <a href="<?= htmlspecialchars($company['whatsapp']) ?>" class="whatsapp-float" target="_blank"
+                        rel="noopener noreferrer" data-tooltip="Order on WhatsApp">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </a>
         <?php endif; ?>
     </div>
 
