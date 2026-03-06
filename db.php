@@ -539,24 +539,7 @@ try {
     }
 
     // Seed construction_info if it's empty
-    $check_const = $pdo->query("SELECT COUNT(*) FROM construction_info")->fetchColumn();
-    if ($check_const == 0) {
-        $pdo->exec("INSERT INTO construction_info (company_name, hero_title, hero_image, email, phone, address, why_choose_us_msg, services_desc, review_text, review_image) VALUES 
-            ('Bloom Construction', 'WELCOME TO OUR COMPANY', 'uploads/const/hero_1772692960.jpg', 'info@bloomconstruction.et', '+251 911 222 333', 'Addis Ababa, Ethiopia', 'Quality and Excellence in every build.', 'Leading construction services in Ethiopia.', 'The team delivered our project ahead of schedule with exceptional attention to detail. Highly recommend for any major construction work in Addis.', 'uploads/const/review_1772692350.png')");
-    } else {
-        // Force update user's specific image and messages back to local defaults for a perfect sync
-        $pdo->exec("UPDATE construction_info SET 
-            hero_image = 'uploads/const/hero_1772692960.jpg', 
-            hero_title = 'WELCOME TO OUR COMPANY',
-            company_name = 'Bloom Construction',
-            why_choose_us_msg = 'Quality and Excellence in every build.',
-            services_desc = 'Leading construction services in Ethiopia.',
-            review_text = 'The team delivered our project ahead of schedule with exceptional attention to detail. Highly recommend for any major construction work in Addis.',
-            review_image = 'uploads/const/review_1772692350.png'
-            WHERE id = 1");
-    }
 
-    // Ensure uploads directory exists for chatbot images
     if (!file_exists('uploads/chat')) {
         @mkdir('uploads/chat', 0777, true);
     }
