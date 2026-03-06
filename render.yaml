@@ -1,8 +1,7 @@
-name: bloom-africa-deployment
+name: bloom-africa
 services:
-  # MySQL Private Service - Define first so Web can reference it
   - type: pserv
-    name: bloom-mysql
+    name: bloom-db
     env: image
     image: mysql:5.7
     plan: free
@@ -13,9 +12,8 @@ services:
       - key: MYSQL_DATABASE
         value: bloom_africa
 
-  # PHP Web Service
   - type: web
-    name: bloom-app
+    name: bloom-web
     env: docker
     plan: free
     region: oregon
@@ -24,7 +22,7 @@ services:
       - key: BLOOM_DB_HOST
         fromService:
           type: pserv
-          name: bloom-mysql
+          name: bloom-db
           property: host
       - key: BLOOM_DB_NAME
         value: bloom_africa
