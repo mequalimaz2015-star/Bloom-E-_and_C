@@ -2,16 +2,16 @@
 require_once 'session_init.php';
 require_once 'db.php';
 // Fetch menu items
-$stmt = $pdo->query("SELECT * FROM menu_items WHERE available = 1");
+$stmt = $pdo->query("SELECT * FROM menu_items WHERE available = 1 LIMIT 3");
 $menu_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Fetch Gallery items
-$stmt = $pdo->query("SELECT * FROM gallery ORDER BY id DESC");
+$stmt = $pdo->query("SELECT * FROM gallery ORDER BY id DESC LIMIT 3");
 $gallery_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Get unique gallery categories for filters
 $gallery_categories = $pdo->query("SELECT DISTINCT category FROM gallery")->fetchAll(PDO::FETCH_COLUMN);
 
 // Fetch Services
-$services_list = $pdo->query("SELECT * FROM services WHERE status='Active' ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
+$services_list = $pdo->query("SELECT * FROM services WHERE status='Active' ORDER BY id DESC LIMIT 3")->fetchAll(PDO::FETCH_ASSOC);
 // Get unique service categories for navigation and filters
 $service_categories = $pdo->query("SELECT DISTINCT category FROM services WHERE status='Active' AND category IS NOT NULL")->fetchAll(PDO::FETCH_COLUMN);
 // Handle Reservation Submission
@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['reserve_action'])) {
     }
 }
 // Fetch Team Members
-$team_members = $pdo->query("SELECT * FROM team_members ORDER BY order_index ASC, id ASC")->fetchAll(PDO::FETCH_ASSOC);
+$team_members = $pdo->query("SELECT * FROM team_members ORDER BY order_index ASC, id ASC LIMIT 3")->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch Company Info
 $company = $pdo->query("SELECT * FROM company_info WHERE id = 1")->fetch(PDO::FETCH_ASSOC);

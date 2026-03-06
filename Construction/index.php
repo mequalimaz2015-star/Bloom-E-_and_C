@@ -6,19 +6,19 @@ require_once '../db.php';
 $c = $pdo->query("SELECT * FROM construction_info WHERE id=1")->fetch();
 
 // Fetch Projects
-$projects = $pdo->query("SELECT * FROM construction_projects ORDER BY created_at DESC LIMIT 6")->fetchAll();
+$projects = $pdo->query("SELECT * FROM construction_projects ORDER BY created_at DESC LIMIT 3")->fetchAll();
 
 // Fetch Features (Highlights)
-$features = $pdo->query("SELECT * FROM construction_features ORDER BY id ASC LIMIT 4")->fetchAll();
+$features = $pdo->query("SELECT * FROM construction_features ORDER BY id ASC LIMIT 3")->fetchAll();
 
 // Fetch Services
 $services = $pdo->query("SELECT * FROM construction_services ORDER BY id ASC LIMIT 3")->fetchAll();
 
 // Fetch Testimonials
-$testimonials = $pdo->query("SELECT * FROM construction_testimonials WHERE status='Active' ORDER BY id DESC LIMIT 6")->fetchAll();
+$testimonials = $pdo->query("SELECT * FROM construction_testimonials WHERE status='Active' ORDER BY id DESC LIMIT 3")->fetchAll();
 
 // Fetch Equipment
-$equipment = $pdo->query("SELECT * FROM construction_equipment ORDER BY id DESC")->fetchAll();
+$equipment = $pdo->query("SELECT * FROM construction_equipment ORDER BY id ASC LIMIT 3")->fetchAll();
 
 // Handle Quote Submission
 $form_msg = "";
@@ -1259,7 +1259,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
                         });
                     }
                 })
-                .catch(() => { });
+                .catch(() => {  });
         }
     </script>
     <div class="float-btn-group" id="socialFloatGroup">
