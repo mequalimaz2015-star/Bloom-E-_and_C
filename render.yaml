@@ -31,8 +31,8 @@ services:
     #   mountPath: /var/www/html/uploads
     #   sizeGB: 1
 
-  # Private MySQL Service
-  - type: web
+  # Private MySQL Service (Background only)
+  - type: pvt
     name: bloom-mysql
     env: docker
     plan: free
