@@ -1297,8 +1297,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->prepare("DELETE FROM team_members WHERE id IN ($placeholders)")->execute($ids);
             logActivity($pdo, "Bulk deleted " . count($ids) . " team members");
             $msg = count($ids) . " team members deleted!";
-        } else {
-            $msg = "No team members selected.";
+        }
     } elseif (isset($_POST['bulk_delete_const_equipment'])) {
         $ids = array_filter(explode(',', $_POST['equip_bulk_ids']), 'is_numeric');
         if (count($ids) > 0) {
@@ -1306,7 +1305,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->prepare("DELETE FROM construction_equipment WHERE id IN ($placeholders)")->execute($ids);
             logActivity($pdo, "Bulk deleted " . count($ids) . " construction equipment");
             $msg = count($ids) . " equipment items deleted!";
-        } else { $msg = "No equipment selected."; }
+        } else {
+            $msg = "No equipment selected.";
+        }
     } elseif (isset($_POST['bulk_delete_const_features'])) {
         $ids = array_filter(explode(',', $_POST['cfeatures_bulk_ids']), 'is_numeric');
         if (count($ids) > 0) {
@@ -1314,7 +1315,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->prepare("DELETE FROM construction_features WHERE id IN ($placeholders)")->execute($ids);
             logActivity($pdo, "Bulk deleted " . count($ids) . " construction highlights");
             $msg = count($ids) . " highlights deleted!";
-        } else { $msg = "No highlights selected."; }
+        } else {
+            $msg = "No highlights selected.";
+        }
     } elseif (isset($_POST['bulk_delete_const_projects'])) {
         $ids = array_filter(explode(',', $_POST['cproj_bulk_ids']), 'is_numeric');
         if (count($ids) > 0) {
@@ -1322,7 +1325,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->prepare("DELETE FROM construction_projects WHERE id IN ($placeholders)")->execute($ids);
             logActivity($pdo, "Bulk deleted " . count($ids) . " construction projects");
             $msg = count($ids) . " projects deleted!";
-        } else { $msg = "No projects selected."; }
+        } else {
+            $msg = "No projects selected.";
+        }
     } elseif (isset($_POST['bulk_delete_const_services'])) {
         $ids = array_filter(explode(',', $_POST['csvc_bulk_ids']), 'is_numeric');
         if (count($ids) > 0) {
@@ -1330,7 +1335,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->prepare("DELETE FROM construction_services WHERE id IN ($placeholders)")->execute($ids);
             logActivity($pdo, "Bulk deleted " . count($ids) . " construction services");
             $msg = count($ids) . " construction services deleted!";
-        } else { $msg = "No services selected."; }
+        } else {
+            $msg = "No services selected.";
+        }
     } elseif (isset($_POST['bulk_delete_const_quotes'])) {
         $ids = array_filter(explode(',', $_POST['cquotes_bulk_ids']), 'is_numeric');
         if (count($ids) > 0) {
@@ -1338,7 +1345,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->prepare("DELETE FROM construction_quotes WHERE id IN ($placeholders)")->execute($ids);
             logActivity($pdo, "Bulk deleted " . count($ids) . " construction quotes");
             $msg = count($ids) . " quote requests deleted!";
-        } else { $msg = "No quotes selected."; }
+        } else {
+            $msg = "No quotes selected.";
+        }
+    } elseif (isset($_POST['bulk_delete_admin_users'])) {
+        $ids = array_filter(explode(',', $_POST['users_bulk_ids']), 'is_numeric');
+        $current_admin_id = $_SESSION['admin_id'] ?? 0;
+        // Filter out root (1) and self to be double safe
+        $ids = array_filter($ids, function ($id) use ($current_admin_id) {
+            return $id != 1 && $id != $current_admin_id;
+        });
+        if (count($ids) > 0) {
+            $placeholders = str_repeat('?,', count($ids) - 1) . '?';
+            $pdo->prepare("DELETE FROM users WHERE id IN ($placeholders)")->execute($ids);
+            logActivity($pdo, "Bulk deleted " . count($ids) . " admin users");
+            $msg = count($ids) . " admin users removed!";
+        } else {
+            $msg = "No eligible users selected.";
+        }
     }
 
     header("Location: admin.php?tab=" . ($_GET['tab'] ?? 'dashboard') . "&msg=" . urlencode($msg));

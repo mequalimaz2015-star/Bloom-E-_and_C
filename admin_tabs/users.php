@@ -28,7 +28,8 @@ $permission_groups = [
         'const_info' => ['label' => 'Company Info', 'icon' => 'fa-building'],
         'const_projects' => ['label' => 'Projects', 'icon' => 'fa-building'],
         'const_equipment' => ['label' => 'Equipment', 'icon' => 'fa-truck-pickup'],
-        'const_info' => ['label' => 'Construction Info', 'icon' => 'fa-info-circle'],
+        'const_gallery' => ['label' => 'Construction Gallery', 'icon' => 'fa-images'],
+        'const_services_c' => ['label' => 'Construction Services', 'icon' => 'fa-tools'],
     ],
     'Access & Comms' => [
         'services' => ['label' => 'Our Services', 'icon' => 'fa-concierge-bell'],
@@ -41,14 +42,22 @@ $permission_groups = [
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
     <h2 style="font-size: 28px; font-weight: 800; color: #1e293b;">User & Access Control</h2>
-    <div style="display: flex; gap: 10px;">
-        <button onclick="toggleModal('addUserModal')" class="btn" style="background: #10b981; color: white;">
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <!-- Bulk Actions -->
+        <div id="users_bulk_actions" style="display: none; align-items: center; gap: 10px;">
+            <span id="users_selected_count" style="font-size: 13px; font-weight: 700; color: #2563eb;">0 selected</span>
+            <form method="POST" id="users_bulk_form" style="display: flex; gap: 5px;">
+                <input type="hidden" name="users_bulk_ids" id="users_bulk_ids_input">
+                <button type="submit" name="bulk_delete_admin_users" class="btn"
+                    onclick="return confirm('🚨 WARN: This will wipe all selected admin accounts. Proceed?')"
+                    style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 7px 16px; font-size: 12px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(239,68,68,0.3);">
+                    <i class="fa-solid fa-trash-can"></i> Delete Selected
+                </button>
+            </form>
+        </div>
+        <button onclick="toggleModal('addUserModal')" class="btn" style="background: #10b981; color: white; padding: 10px 18px; border-radius: 10px; font-weight: 600; display: flex; align-items: center; gap: 8px; border: none; cursor: pointer;">
             <i class="fa-solid fa-user-plus"></i> Add New Admin
         </button>
-        <div style="background: #f1f5f9; padding: 10px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; color: #64748b;">
-            <i class="fa-solid fa-user-shield" style="margin-right: 8px; color: var(--blue);"></i>
-            Security Protocol Active
-        </div>
     </div>
 </div>
 
@@ -57,7 +66,9 @@ $permission_groups = [
         <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
             <thead style="background: #f8fafc;">
                 <tr>
-                    <th style="padding: 20px; text-align: left; width: 40px;"><input type="checkbox" onclick="toggleAllUsers(this)" style="cursor:pointer;"></th>
+                    <th style="padding: 20px; text-align: left; width: 40px;">
+                        <input type="checkbox" id="select_all_users" onchange="toggleSelectAllUsers(this)" style="cursor:pointer; width: 16px; height: 16px; accent-color: #2563eb;">
+                    </th>
                     <th style="padding: 20px; text-align: left;">Personnel Details</th>
                     <th style="padding: 20px; text-align: left; width: 180px;">Designated Role</th>
                     <th style="padding: 20px; text-align: left;">Tab-Level Access Permissions</th>
@@ -71,7 +82,13 @@ $permission_groups = [
                     $is_root = $user['id'] == 1;
                     ?>
                         <tr style="border-bottom: 1px solid #f1f5f9;" class="user-row" id="row_<?= $user['id'] ?>">
-                            <td style="padding: 20px;"><input type="checkbox" class="user-select" style="cursor:pointer;"></td>
+                            <td style="padding: 20px;">
+                                <?php if (!$is_root && !$is_self): ?>
+                                    <input type="checkbox" class="user-checkbox" value="<?= $user['id'] ?>" onchange="updateUsersBulkUI()" style="cursor:pointer; width: 16px; height: 16px; accent-color: #2563eb;">
+                                <?php else: ?>
+                                    <i class="fa-solid fa-lock" style="color: #cbd5e1; font-size: 14px;" title="System Account Protected"></i>
+                                <?php endif; ?>
+                            </td>
                             <td style="padding: 20px;">
                                 <div style="display:flex; align-items:center; gap:15px;">
                                     <div style="width:50px; height:50px; border-radius:12px; background:#e2e8f0; display:flex; align-items:center; justify-content:center; overflow:hidden; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
@@ -190,8 +207,7 @@ function toggleGroup(master, groupClass) {
     checks.forEach(c => c.checked = master.checked);
 }
 
-function toggleAllUsers(master) {
-    document.querySelectorAll('.user-select').forEach(c => c.checked = master.checked);
+    } else if (newPass) alert("Error: Use at least 6 characters.");
 }
 
 function toggleModal(id) {
@@ -208,6 +224,39 @@ function promptPassword(uid) {
         document.body.appendChild(f);
         f.submit();
     } else if (newPass) alert("Error: Use at least 6 characters.");
+}
+
+function toggleSelectAllUsers(source) {
+    document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = source.checked);
+    updateUsersBulkUI();
+}
+
+function updateUsersBulkUI() {
+    const checked = document.querySelectorAll('.user-checkbox:checked');
+    const all = document.querySelectorAll('.user-checkbox');
+    const bulk = document.getElementById('users_bulk_actions');
+    const count = document.getElementById('users_selected_count');
+    const ids = document.getElementById('users_bulk_ids_input');
+    const selAll = document.getElementById('select_all_users');
+    
+    if (checked.length > 0) {
+        bulk.style.display = 'flex';
+        count.innerText = checked.length + ' selected';
+        ids.value = Array.from(checked).map(cb => cb.value).join(',');
+    } else {
+        bulk.style.display = 'none';
+    }
+    
+    if (all.length > 0 && checked.length === all.length) {
+        selAll.checked = true;
+        selAll.indeterminate = false;
+    } else if (checked.length > 0) {
+        selAll.checked = false;
+        selAll.indeterminate = true;
+    } else {
+        selAll.checked = false;
+        selAll.indeterminate = false;
+    }
 }
 </script>
 
