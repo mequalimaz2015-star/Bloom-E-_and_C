@@ -1,11 +1,11 @@
-# 100% FREE TIER ONLY - NO CARD REQUIRED
+version: 1
+name: Bloom E and C
 services:
-  # One Service, Infinite Power (PHP + MariaDB combined)
   - type: web
     name: bloom-africa-app
-    env: docker
+    runtime: docker
     plan: free
-    region: oregon
+    region: oregon # or your preferred region
     healthCheckPath: /
     envVars:
       - key: BLOOM_DB_HOST
