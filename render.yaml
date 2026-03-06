@@ -1,4 +1,5 @@
 version: 1
+name: Bloom E and C
 services:
   - type: web
     name: bloom-africa-app
@@ -8,7 +9,7 @@ services:
     healthCheckPath: /
     envVars:
       - key: BLOOM_DB_HOST
-        value: "127.0.0.1"
+        value: "bloom-db"
       - key: BLOOM_DB_NAME
         value: "bloom_africa"
       - key: BLOOM_DB_USER
@@ -17,3 +18,15 @@ services:
         value: "bloom_root_pass"
       - key: BLOOM_DB_PORT
         value: "3306"
+
+  - type: web
+    name: bloom-db
+    env: docker
+    plan: free
+    region: oregon
+    dockerfilePath: Dockerfile.mysql
+    envVars:
+      - key: MYSQL_DATABASE
+        value: "bloom_africa"
+      - key: MYSQL_ROOT_PASSWORD
+        value: "bloom_root_pass"

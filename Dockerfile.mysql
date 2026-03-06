@@ -1,3 +1,6 @@
 FROM mysql:5.7
 ENV MYSQL_DATABASE=bloom_africa
 ENV MYSQL_ROOT_PASSWORD=bloom_root_pass
+
+# Optimize for low memory and bind to all interfaces
+RUN echo "[mysqld]\nbind-address=0.0.0.0\ninnodb_buffer_pool_size=32M\nperformance_schema=OFF\nmax_connections=10" > /etc/mysql/conf.d/low-mem.cnf
