@@ -1,61 +1,53 @@
 #!/bin/bash
-set -e
+# Entrypoint for Render All-in-One Container
 
-echo "Starting deployment script..."
+echo ">>> Starting Bloom Africa Deployment Script..."
 
-# Support MariaDB startup in Docker
+# Set up MariaDB directories
 mkdir -p /var/run/mysqld /var/lib/mysql
 chown -R mysql:mysql /var/run/mysqld /var/lib/mysql
 chmod 777 /var/run/mysqld
 
 # Initialize MariaDB data directory if empty
 if [ ! -d "/var/lib/mysql/mysql" ]; then
-    echo "Initializing MariaDB data directory..."
+    echo ">>> Initializing MariaDB data directory (First run)..."
     mysql_install_db --user=mysql --datadir=/var/lib/mysql > /dev/null
     chown -R mysql:mysql /var/lib/mysql
 fi
 
-# Start MariaDB
-echo "Starting MariaDB..."
-service mysql start
+# Start MariaDB in background using mysqld_safe (More reliable for Docker)
+echo ">>> Starting MariaDB Server..."
+/usr/bin/mysqld_safe --datadir='/var/lib/mysql' --nowatch &
 
 # Wait for MariaDB to be ready
-echo "Waiting for MariaDB to be ready..."
-for i in {30..0}; do
-    if mysqladmin ping >/dev/null 2>&1; then
-        break
+echo ">>> Waiting for MariaDB to become healthy..."
+RETRIES=30
+while ! mysqladmin ping >/dev/null 2>&1; do
+    RETRIES=$((RETRIES - 1))
+    if [ $RETRIES -le 0 ]; then
+        echo ">>> ERROR: MariaDB failed to start within 30 seconds."
+        exit 1
     fi
-    echo "MariaDB is starting... ($i)"
+    echo ">>> MariaDB starting... ($RETRIES attempts remaining)"
     sleep 1
 done
 
-if ! mysqladmin ping >/dev/null 2>&1; then
-    echo "MariaDB failed to start. Logs:"
-    cat /var/log/mysql/error.log
-    exit 1
-fi
+echo ">>> MariaDB is UP and running!"
 
-echo "MariaDB is UP!"
-
-# DB Setup from environment variables
+# Setup user and database
 DB_NAME=${BLOOM_DB_NAME:-bloom_africa}
-DB_USER=${BLOOM_DB_USER:-root}
 DB_PASS=${BLOOM_DB_PASS:-bloom_root_pass}
 
-echo "Setting up database: $DB_NAME"
-# Use -u root without password for initial setup (typical for fresh Debian/Ubuntu installs)
+echo ">>> Configuring Database: $DB_NAME"
+# Attempt to set root password and create user for 127.0.0.1
 mysql -u root -e "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\`;"
-
-# Configure root user and external user
-# Note: In some MariaDB versions on Debian, root uses unix_socket by default.
 mysql -u root -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$DB_PASS');" || true
 mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' IDENTIFIED BY '$DB_PASS' WITH GRANT OPTION;" || true
-mysql -u root -e "CREATE USER IF NOT EXISTS '$DB_USER'@'127.0.0.1' IDENTIFIED BY '$DB_PASS';" || true
-mysql -u root -e "GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USER'@'127.0.0.1';" || true
+mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' IDENTIFIED BY '$DB_PASS' WITH GRANT OPTION;" || true
 mysql -u root -e "FLUSH PRIVILEGES;"
 
-echo "Database successfully initialized."
+echo ">>> Database successfully initialized."
 
-# Start Apache
-echo "Starting Apache..."
+# Start Apache in foreground
+echo ">>> Starting Apache Web Server..."
 exec apache2-foreground
