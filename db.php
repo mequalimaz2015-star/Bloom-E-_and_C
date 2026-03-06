@@ -469,7 +469,8 @@ try {
             'hero3_button_text' => "VARCHAR(100)",
             'hero3_image' => "VARCHAR(255)"
         ],
-        'chat_sessions' => ['department' => "VARCHAR(50) DEFAULT 'Restaurant' AFTER customer_phone"]
+        'chat_sessions' => ['department' => "VARCHAR(50) DEFAULT 'Restaurant' AFTER customer_phone"],
+        'chat_messages' => ['is_read' => "BOOLEAN DEFAULT 0 AFTER location_lng"]
     ];
 
     foreach ($sync_tasks as $table => $columns) {
@@ -526,23 +527,25 @@ try {
     }
 
 
-    // Seed construction_services if empty (Using user's local images)
-    $check_const_services = $pdo->query("SELECT COUNT(*) FROM construction_services")->fetchColumn();
-    if ($check_const_services == 0) {
-        $pdo->exec("INSERT INTO construction_services (title, description, image_url, button_text, button_url) VALUES 
-            ('Construction Management', 'Full lifecycle management of your construction project, ensuring site safety, resource efficiency, and regulatory compliance from start to finish.', 'Construction/Images/card1.jpg', 'Learn More', '#'), 
-            ('Renovation', 'Modernizing existing structures with the latest materials and designs, breathing new life into your residential or commercial space.', 'Construction/Images/card2.jpg', 'Learn More', '#'), 
-            ('Interior Design', 'Creating functional and aesthetically pleasing interior spaces tailored to your personal style and operational needs.', 'Construction/Images/card3.jpg', 'Learn More', '#')");
-    }
+    // Seed construction_services (Using user's local images)
+    $pdo->exec("INSERT IGNORE INTO construction_services (title, description, image_url, button_text, button_url) VALUES 
+        ('Construction Management', 'Full lifecycle management of your construction project, ensuring site safety, resource efficiency, and regulatory compliance from start to finish.', 'Construction/Images/card1.jpg', 'Learn More', '#'), 
+        ('Renovation', 'Modernizing existing structures with the latest materials and designs, breathing new life into your residential or commercial space.', 'Construction/Images/card2.jpg', 'Learn More', '#'), 
+        ('Interior Design', 'Creating functional and aesthetically pleasing interior spaces tailored to your personal style and operational needs.', 'Construction/Images/card3.jpg', 'Learn More', '#')");
 
-    // Seed construction_projects if empty
-    $check_const_projects = $pdo->query("SELECT COUNT(*) FROM construction_projects")->fetchColumn();
-    if ($check_const_projects == 0) {
-        $pdo->exec("INSERT INTO construction_projects (title, description, status, image_url) VALUES 
-            ('Skyline Tower', 'A modern 40-story commercial skyscraper featuring sustainable materials and state-of-the-art energy systems.', 'Ongoing', 'Construction/Images/gallery1.jpg'),
-            ('Oceanview Residences', 'Luxury residential complex with panoramic ocean views, infinity pools, and high-end finishes throughout.', 'Ongoing', 'Construction/Images/gallery2.jpg'),
-            ('City Center Mall', 'Massive retail and entertainment complex in the heart of the city, bringing over 200 premium brands together.', 'Completed', 'Construction/Images/gallery3.jpg')");
-    }
+    $pdo->exec("UPDATE construction_services SET image_url = 'Construction/Images/card1.jpg' WHERE title='Construction Management'");
+    $pdo->exec("UPDATE construction_services SET image_url = 'Construction/Images/card2.jpg' WHERE title='Renovation'");
+    $pdo->exec("UPDATE construction_services SET image_url = 'Construction/Images/card3.jpg' WHERE title='Interior Design'");
+
+    // Seed construction_projects
+    $pdo->exec("INSERT IGNORE INTO construction_projects (title, description, status, image_url) VALUES 
+        ('Skyline Tower', 'A modern 40-story commercial skyscraper featuring sustainable materials and state-of-the-art energy systems.', 'Ongoing', 'Construction/Images/gallery1.jpg'),
+        ('Oceanview Residences', 'Luxury residential complex with panoramic ocean views, infinity pools, and high-end finishes throughout.', 'Ongoing', 'Construction/Images/gallery2.jpg'),
+        ('City Center Mall', 'Massive retail and entertainment complex in the heart of the city, bringing over 200 premium brands together.', 'Completed', 'Construction/Images/gallery3.jpg')");
+
+    $pdo->exec("UPDATE construction_projects SET image_url = 'Construction/Images/gallery1.jpg' WHERE title='Skyline Tower'");
+    $pdo->exec("UPDATE construction_projects SET image_url = 'Construction/Images/gallery2.jpg' WHERE title='Oceanview Residences'");
+    $pdo->exec("UPDATE construction_projects SET image_url = 'Construction/Images/gallery3.jpg' WHERE title='City Center Mall'");
 
     // Seed default admin if empty
     $check_users = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();

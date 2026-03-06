@@ -403,7 +403,6 @@
             </div>
         </div>
     </div>
-
     <!-- Admin Link -->
     <a href="admin.php"
         style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 100; color: rgba(255,255,255,0.3); text-decoration: none; font-size: 11px; letter-spacing: 2px; font-weight: 700; transition: color 0.3s; text-transform: uppercase; padding: 5px 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); pointer-events: auto;"
@@ -411,7 +410,6 @@
         onmouseout="this.style.color='rgba(255,255,255,0.3)'; this.style.borderColor='rgba(255,255,255,0.1)';">
         <i class="fa-solid fa-gauge-high" style="margin-right: 5px;"></i> Admin Portal
     </a>
-
 </body>
 
 </html>

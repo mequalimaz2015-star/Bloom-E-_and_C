@@ -1,5 +1,14 @@
 <?php
-session_start();
+// Set session cookie parameters before starting session
+if (session_status() === PHP_SESSION_NONE) {
+    session_set_cookie_params([
+        'path' => '/',
+        'secure' => true,
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
+    session_start();
+}
 require_once 'db.php';
 
 if (!isset($_SESSION['chat_session'])) {
@@ -21,7 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $department = trim($data['department'] ?? 'Restaurant');
 
         if ($name && $email && $phone) {
-            $stmt = $pdo->prepare("INSERT INTO chat_sessions (session_id, customer_name, customer_email, customer_phone, department) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE customer_name=VALUES(customer_name), customer_email=VALUES(customer_email), customer_phone=VALUES(customer_phone), department=VALUES(department)");
+            $stmt = $pdo->prepare("INSERT INTO chat_sessions (session_id, customer_name, customer_email, customer_phone, department)
+VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE customer_name=VALUES(customer_name),
+customer_email=VALUES(customer_email), customer_phone=VALUES(customer_phone), department=VALUES(department)");
             $stmt->execute([$session_id, $name, $email, $phone, $department]);
 
             // Welcome message
@@ -65,7 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
 
     // Save user message
-    $stmt = $pdo->prepare("INSERT INTO chat_messages (session_id, sender, message, image_path, location_lat, location_lng) VALUES (?, 'User', ?, ?, ?, ?)");
+    $stmt = $pdo->prepare("INSERT INTO chat_messages (session_id, sender, message, image_path, location_lat, location_lng)
+VALUES (?, 'User', ?, ?, ?, ?)");
     $stmt->execute([$session_id, $user_msg, $image_path, $lat, $lng]);
 
     $department = 'Restaurant';
@@ -110,7 +122,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (strpos($msg_lower, 'location') !== false || strpos($msg_lower, 'where') !== false) {
             $bot_reply = "We are located centrally in Addis Ababa, Ethiopia! 🇪🇹 Drop by for a site consultation.";
             $buttons = ['◀️ Main Menu', '👤 Talk to Human'];
-        } elseif (strpos($msg_lower, 'wait') !== false || strpos($msg_lower, 'staff') !== false || strpos($msg_lower, 'human') !== false) {
+        } elseif (
+            strpos($msg_lower, 'wait') !== false || strpos($msg_lower, 'staff') !== false || strpos($msg_lower, 'human')
+            !== false
+        ) {
             $bot_reply = "I've sent an alert to our site managers! 🔔 Someone will join this chat soon.";
             $buttons = ['◀️ Main Menu'];
             $log = $pdo->prepare("INSERT INTO activity_logs (action) VALUES (?)");
@@ -161,7 +176,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Match Service Category (e.g., Wedding Events)
             if (!$is_cat) {
                 foreach ($service_cats as $cat) {
-                    if (strpos($msg_lower, strtolower($cat)) !== false || ($cat == "Wedding Events" && strpos($msg_lower, "wedding") !== false)) {
+                    if (
+                        strpos($msg_lower, strtolower($cat)) !== false || ($cat == "Wedding Events" && strpos($msg_lower, "wedding") !==
+                            false)
+                    ) {
                         $is_cat = true;
                         $stmt = $pdo->prepare("SELECT title, description FROM services WHERE category = ? AND status='Active'");
                         $stmt->execute([$cat]);
@@ -183,13 +201,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (strpos($msg_lower, 'order') !== false || strpos($msg_lower, 'enquire') !== false) {
                     $stmt = $pdo->prepare("INSERT INTO orders (order_details, platform, status) VALUES (?, 'Website', 'Pending')");
                     $stmt->execute(["Chatbot Order: " . $user_msg]);
-                    $bot_reply = "Perfect decision! ✅ I've logged your request: '$user_msg'. Our staff will confirm it with you shortly. Anything else?";
+                    $bot_reply = "Perfect decision! ✅ I've logged your request: '$user_msg'. Our staff will confirm it with you shortly.
+Anything else?";
                     $buttons = ['🍽️ Food Menu', '🎉 Event Services', '👤 Talk to Human'];
                 } elseif (strpos($msg_lower, 'location') !== false || strpos($msg_lower, 'where') !== false) {
-                    $bot_reply = "We are located in Addis Ababa, Ethiopia! 🇪🇹 Visit us for the full experience. Would you like to see our menu?";
+                    $bot_reply = "We are located in Addis Ababa, Ethiopia! 🇪🇹 Visit us for the full experience. Would you like to see our
+menu?";
                     $buttons = ['🍽️ Food Menu', '👤 Talk to Human'];
-                } elseif (strpos($msg_lower, 'wait') !== false || strpos($msg_lower, 'staff') !== false || strpos($msg_lower, 'human') !== false) {
-                    $bot_reply = "I've sent an alert to our team! 🔔 Someone will join this chat soon. While you wait, check out our latest offers:";
+                } elseif (
+                    strpos($msg_lower, 'wait') !== false || strpos($msg_lower, 'staff') !== false || strpos($msg_lower, 'human')
+                    !== false
+                ) {
+                    $bot_reply = "I've sent an alert to our team! 🔔 Someone will join this chat soon. While you wait, check out our latest
+offers:";
                     $buttons = ['🍽️ Food Menu', '🎉 Event Services'];
                     $log = $pdo->prepare("INSERT INTO activity_logs (action) VALUES (?)");
                     $log->execute(["Priority Chat Request from session: $session_id"]);
@@ -215,7 +239,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt->execute([$session_id]);
     $session = $stmt->fetch();
 
-    $stmt = $pdo->prepare("SELECT sender, message, image_path, location_lat, location_lng, created_at FROM chat_messages WHERE session_id = ? ORDER BY created_at ASC");
+    $stmt = $pdo->prepare("SELECT sender, message, image_path, location_lat, location_lng, created_at FROM chat_messages
+WHERE session_id = ? ORDER BY created_at ASC");
     $stmt->execute([$session_id]);
     $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
